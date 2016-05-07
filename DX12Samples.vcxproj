@@ -148,7 +148,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Core\Camera.h" />
     <ClInclude Include="Core\d3dx12.h" />
+    <ClInclude Include="Core\DDSTextureLoader.h" />
+    <ClInclude Include="Core\GameTimer.h" />
+    <ClInclude Include="Core\MathHelper.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Core\Camera.cpp" />
+    <ClCompile Include="Core\DDSTextureLoader.cpp" />
+    <ClCompile Include="Core\GameTimer.cpp" />
+    <ClCompile Include="Core\MathHelper.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
