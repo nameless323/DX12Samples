@@ -148,16 +148,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Core\Application.h" />
     <ClInclude Include="Core\Camera.h" />
+    <ClInclude Include="Core\D3DUtil.h" />
     <ClInclude Include="Core\d3dx12.h" />
     <ClInclude Include="Core\DDSTextureLoader.h" />
     <ClInclude Include="Core\GameTimer.h" />
+    <ClInclude Include="Core\GeometryGenerator.h" />
     <ClInclude Include="Core\MathHelper.h" />
+    <ClInclude Include="Core\UploadBuffer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Core\Application.cpp" />
     <ClCompile Include="Core\Camera.cpp" />
+    <ClCompile Include="Core\D3DUtil.cpp" />
     <ClCompile Include="Core\DDSTextureLoader.cpp" />
     <ClCompile Include="Core\GameTimer.cpp" />
+    <ClCompile Include="Core\GeometryGenerator.cpp" />
     <ClCompile Include="Core\MathHelper.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
