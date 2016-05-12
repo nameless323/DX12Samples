@@ -42,6 +42,9 @@
     <ClInclude Include="Core\Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\InitDX.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Camera.cpp">
@@ -63,6 +66,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Core\Application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\InitDX.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\DX12Samples.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

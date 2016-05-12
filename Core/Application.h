@@ -10,13 +10,11 @@
 
 class Application
 {
-protected:
+public:
     Application(HINSTANCE hInstance);
     Application(const Application& rhs) = delete;
     Application& operator= (const Application& rhs) = delete;
     virtual ~Application();
-
-public:
     static Application* GetApplication();
     HINSTANCE AppInstance() const;
     HWND MainWindow() const;
@@ -25,7 +23,7 @@ public:
     bool Get4xMsaaState() const;
     void Set4xMsaaState(bool value);
 
-    int Run();
+    virtual int Run();
 
     virtual bool Init();
     virtual LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
