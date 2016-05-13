@@ -50,7 +50,7 @@ void InitDX::Draw(const GameTimer& timer)
     _commandList->RSSetViewports(1, &_screenViewport);
     _commandList->RSSetScissorRects(1, &_scissorRect);
 
-    _commandList->ClearRenderTargetView(CurrentBackBufferView(), Colors::LightSteelBlue, 0, nullptr);
+    _commandList->ClearRenderTargetView(CurrentBackBufferView(), Colors::DarkSeaGreen, 0, nullptr);
     _commandList->ClearDepthStencilView(DepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0.0f, 0, nullptr);
 
     _commandList->OMSetRenderTargets(1, &CurrentBackBufferView(), true, &DepthStencilView());

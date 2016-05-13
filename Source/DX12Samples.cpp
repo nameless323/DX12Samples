@@ -10,15 +10,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 #endif
     try
     {
-        InitDX app(hInstance);
-        if (!app.Init())
+        app = new InitDX(hInstance);
+        if (!app->Init())
             return 0;
-        return app.Run();
+        return app->Run();
     }
     catch(DxException& e)
     {
         MessageBox(nullptr, e.ToString().c_str(), L"HR Failed", MB_OK);
+        delete app;
+        app = nullptr;
         return 0;
     }
-
+    delete app;
+    app = nullptr;
 }

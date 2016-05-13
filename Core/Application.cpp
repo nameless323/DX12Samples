@@ -154,7 +154,7 @@ void Application::OnResize()
 
     D3D12_CLEAR_VALUE optClear;
     optClear.Format = _dsvFormat;
-    optClear.DepthStencil.Depth = 0.0f;
+    optClear.DepthStencil.Depth = 1.0f;
     optClear.DepthStencil.Stencil = 0;
 
     ThrowIfFailed(_device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, &depthStencilDesc, D3D12_RESOURCE_STATE_COMMON, &optClear, IID_PPV_ARGS(_depthStencilBuffer.GetAddressOf())));
