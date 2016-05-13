@@ -65,7 +65,7 @@ protected:
     bool _isInFullscreen = false;
 
     bool _4xMsaa = false;
-    bool _4xMsaaQuality = 0;
+    UINT _4xMsaaQuality = 0;
 
     GameTimer _timer;
 
