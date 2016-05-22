@@ -76,7 +76,7 @@ int Application::Run()
             _timer.Tick();
             if (!_isPaused)
             {
-                CalbulateFrameStats();
+                CalculateFrameStats();
                 Update(_timer);
                 Draw(_timer);
             }
@@ -457,7 +457,7 @@ D3D12_CPU_DESCRIPTOR_HANDLE Application::DepthStencilView() const
     return _dsvHeap->GetCPUDescriptorHandleForHeapStart();
 }
 
-void Application::CalbulateFrameStats() const
+void Application::CalculateFrameStats() const
 {
     static int frameCnt = 0;
     static float timeElapsed = 0.0f;

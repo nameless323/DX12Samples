@@ -45,6 +45,9 @@
     <ClInclude Include="Source\InitDX.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Box.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Camera.cpp">
@@ -74,5 +77,15 @@
     <ClCompile Include="Source\DX12Samples.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Box.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\color_ps.cso" />
+    <None Include="Shaders\color_vs.cso" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\Color.hlsl" />
   </ItemGroup>
 </Project>

@@ -111,6 +111,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d3dcompiler.lib;D3D12.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <FxCompile>
+      <EntryPointName>main</EntryPointName>
+    </FxCompile>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -158,6 +164,7 @@
     <ClInclude Include="Core\GeometryGenerator.h" />
     <ClInclude Include="Core\MathHelper.h" />
     <ClInclude Include="Core\UploadBuffer.h" />
+    <ClInclude Include="Source\Box.h" />
     <ClInclude Include="Source\InitDX.h" />
   </ItemGroup>
   <ItemGroup>
@@ -168,8 +175,23 @@
     <ClCompile Include="Core\GameTimer.cpp" />
     <ClCompile Include="Core\GeometryGenerator.cpp" />
     <ClCompile Include="Core\MathHelper.cpp" />
+    <ClCompile Include="Source\Box.cpp" />
     <ClCompile Include="Source\DX12Samples.cpp" />
     <ClCompile Include="Source\InitDX.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\Color.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <FileType>Document</FileType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS</EntryPointName>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\color_ps.cso" />
+    <None Include="Shaders\color_vs.cso" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
