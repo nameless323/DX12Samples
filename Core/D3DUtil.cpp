@@ -28,7 +28,7 @@ ComPtr<ID3DBlob> D3DUtil::LoadBinary(const std::wstring& filename)
     return blob;
 }
 
-ComPtr<ID3D12Resource> D3DUtil::CreateDefaultBuffer(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, const void* initData, UINT64 byteSize, Microsoft::WRL::ComPtr<ID3D12Resource>& uploadBuffer)
+ComPtr<ID3D12Resource> D3DUtil::CreateDefaultBuffer(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, const void* initData, UINT64 byteSize, ComPtr<ID3D12Resource>& uploadBuffer)
 {
     ComPtr<ID3D12Resource> defaultBuffer;
     ThrowIfFailed(device->CreateCommittedResource
@@ -39,6 +39,15 @@ ComPtr<ID3D12Resource> D3DUtil::CreateDefaultBuffer(ID3D12Device* device, ID3D12
             D3D12_RESOURCE_STATE_COMMON,
             nullptr,
             IID_PPV_ARGS(defaultBuffer.GetAddressOf())
+        ));
+    ThrowIfFailed(device->CreateCommittedResource
+        (
+            &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+            D3D12_HEAP_FLAG_NONE,
+            &CD3DX12_RESOURCE_DESC::Buffer(byteSize),
+            D3D12_RESOURCE_STATE_GENERIC_READ,
+            nullptr,
+            IID_PPV_ARGS(uploadBuffer.GetAddressOf())
         ));
 
     D3D12_SUBRESOURCE_DATA subResourceData = {};

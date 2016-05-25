@@ -1,5 +1,6 @@
 #include "../Core/Application.h"
 #include "InitDX.h"
+#include "Box.h"
 
 Application* app;
 
@@ -10,7 +11,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 #endif
     try
     {
-        app = new InitDX(hInstance);
+        app = new Box(hInstance);
         if (!app->Init())
             return 0;
         return app->Run();

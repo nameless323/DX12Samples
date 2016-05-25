@@ -283,11 +283,11 @@ void Box::BuildPSO()
 
     psoDesc.VS =
         {
-            reinterpret_cast<BYTE*>(_vsByteCode->GetBufferPointer() , _vsByteCode->GetBufferSize())
+            reinterpret_cast<BYTE*>(_vsByteCode->GetBufferPointer()), _vsByteCode->GetBufferSize()
         };
     psoDesc.PS =
         {
-            reinterpret_cast<BYTE*>(_psByteCode->GetBufferPointer() , _psByteCode->GetBufferSize())
+            reinterpret_cast<BYTE*>(_psByteCode->GetBufferPointer()), _psByteCode->GetBufferSize()
         };
     psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
     psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);

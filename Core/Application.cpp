@@ -375,7 +375,7 @@ bool Application::InitDirectX()
     D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS msQualityLevels;
     msQualityLevels.Format = _backBufferFormat;
     msQualityLevels.SampleCount = 4;
-    msQualityLevels.Flags = D3D12_MULTISAMPLE_QUALITY_LEVELS_FLAG_NONE;;
+    msQualityLevels.Flags = D3D12_MULTISAMPLE_QUALITY_LEVELS_FLAG_NONE;
     msQualityLevels.NumQualityLevels = 0;
     ThrowIfFailed(_device->CheckFeatureSupport(D3D12_FEATURE_MULTISAMPLE_QUALITY_LEVELS, &msQualityLevels, sizeof(msQualityLevels)));
     _4xMsaaQuality = msQualityLevels.NumQualityLevels;
@@ -461,6 +461,7 @@ void Application::CalculateFrameStats() const
 {
     static int frameCnt = 0;
     static float timeElapsed = 0.0f;
+    frameCnt++;
 
     if (_timer.TotalTime() - timeElapsed >= 1.0f)
     {
