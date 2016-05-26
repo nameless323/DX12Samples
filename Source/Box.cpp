@@ -252,7 +252,6 @@ void Box::BuildBoxGeometry()
 
     _boxGeo = std::make_unique<MeshGeometry>();
     _boxGeo->Name = "boxGeo";
-
     ThrowIfFailed(D3DCreateBlob(vbByteSize, &_boxGeo->VertexBufferCPU));
     CopyMemory(_boxGeo->VertexBufferCPU->GetBufferPointer(), vertices.data(), vbByteSize);
 
@@ -260,7 +259,7 @@ void Box::BuildBoxGeometry()
     CopyMemory(_boxGeo->IndexBufferCPU->GetBufferPointer(), indices.data(), ibByteSize);
 
     _boxGeo->VertexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), vertices.data(), vbByteSize, _boxGeo->VertexBufferUploader);
-    _boxGeo->VertexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), indices.data(), ibByteSize, _boxGeo->IndexBufferUploader);
+    _boxGeo->IndexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), indices.data(), ibByteSize, _boxGeo->IndexBufferUploader);
 
     _boxGeo->VertexByteStride = sizeof(Vertex);
     _boxGeo->VertexBufferByteSize = vbByteSize;

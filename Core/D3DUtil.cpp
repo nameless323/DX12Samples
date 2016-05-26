@@ -40,7 +40,7 @@ ComPtr<ID3D12Resource> D3DUtil::CreateDefaultBuffer(ID3D12Device* device, ID3D12
             nullptr,
             IID_PPV_ARGS(defaultBuffer.GetAddressOf())
         ));
-    ThrowIfFailed(device->CreateCommittedResource
+   ThrowIfFailed(device->CreateCommittedResource
         (
             &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
             D3D12_HEAP_FLAG_NONE,
@@ -49,6 +49,7 @@ ComPtr<ID3D12Resource> D3DUtil::CreateDefaultBuffer(ID3D12Device* device, ID3D12
             nullptr,
             IID_PPV_ARGS(uploadBuffer.GetAddressOf())
         ));
+    uploadBuffer->SetPrivateData(WKPDID_D3DDebugObjectName, lstrlenA("upl buf"), "upl buf");
 
     D3D12_SUBRESOURCE_DATA subResourceData = {};
     subResourceData.pData = initData;
