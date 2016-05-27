@@ -59,7 +59,7 @@ void GameTimer::Stop()
 
 void GameTimer::Tick()
 {
-    if (!_stopped)
+    if (_stopped)
     {
         _dt = 0.0;
         return;
@@ -69,7 +69,7 @@ void GameTimer::Tick()
     _currTime = currTime;
     _dt = (currTime - _prevTime) * _secondsPerCount;
 
-    _prevTime = currTime;
+    _prevTime = _currTime;
 
     if (_dt < 0.0)
         _dt = 0.0;
