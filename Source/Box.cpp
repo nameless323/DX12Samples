@@ -196,8 +196,8 @@ void Box::BuildShadersAndInputLayout()
 {
     HRESULT hr = S_OK;
 
-    _vsByteCode = D3DUtil::CompileShader(L"Shaders\\Color.hlsl", nullptr, "VS", "vs_5_0");
-    _psByteCode = D3DUtil::CompileShader(L"Shaders\\Color.hlsl", nullptr, "PS", "ps_5_0");
+    _vsByteCode = D3DUtil::CompileShader(L"Shaders\\Color.hlsl", nullptr, "vert", "vs_5_0");
+    _psByteCode = D3DUtil::CompileShader(L"Shaders\\Color.hlsl", nullptr, "frag", "ps_5_0");
 
     _inputLayout =
         {

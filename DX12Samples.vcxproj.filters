@@ -82,10 +82,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\color_ps.cso" />
-    <None Include="Shaders\color_vs.cso" />
-  </ItemGroup>
-  <ItemGroup>
     <FxCompile Include="Shaders\Color.hlsl" />
   </ItemGroup>
 </Project>

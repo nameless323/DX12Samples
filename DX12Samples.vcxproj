@@ -112,7 +112,7 @@
       <AdditionalDependencies>d3dcompiler.lib;D3D12.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
-      <EntryPointName>main</EntryPointName>
+      <EntryPointName>vert</EntryPointName>
     </FxCompile>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
@@ -186,12 +186,7 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <FileType>Document</FileType>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS</EntryPointName>
     </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Shaders\color_ps.cso" />
-    <None Include="Shaders\color_vs.cso" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
