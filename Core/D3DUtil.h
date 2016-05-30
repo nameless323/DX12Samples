@@ -105,22 +105,22 @@ struct MeshGeometry
     std::string Name;
 
     Microsoft::WRL::ComPtr<ID3DBlob> VertexBufferCPU = nullptr;
-    Microsoft::WRL::ComPtr<ID3DBlob> VertexBufferCPU2 = nullptr;
+    Microsoft::WRL::ComPtr<ID3DBlob> VertexBufferCPUSlot2 = nullptr;
     Microsoft::WRL::ComPtr<ID3DBlob> IndexBufferCPU = nullptr;
 
     Microsoft::WRL::ComPtr<ID3D12Resource> VertexBufferGPU = nullptr;
-    Microsoft::WRL::ComPtr<ID3D12Resource> VertexBufferGPU2 = nullptr;
+    Microsoft::WRL::ComPtr<ID3D12Resource> VertexBufferGPUSlot2 = nullptr;
     Microsoft::WRL::ComPtr<ID3D12Resource> IndexBufferGPU = nullptr;
 
     Microsoft::WRL::ComPtr<ID3D12Resource> VertexBufferUploader = nullptr;
-    Microsoft::WRL::ComPtr<ID3D12Resource> VertexBufferUploader2 = nullptr;
+    Microsoft::WRL::ComPtr<ID3D12Resource> VertexBufferUploaderSlot2 = nullptr;
     Microsoft::WRL::ComPtr<ID3D12Resource> IndexBufferUploader = nullptr;
 
     UINT VertexByteStride = 0;
     UINT VertexBufferByteSize = 0;
 
-    UINT VertexByteStride2 = 0;
-    UINT VertexBufferByteSize2 = 0;
+    UINT VertexByteStrideSlot2 = 0;
+    UINT VertexBufferByteSizeSlot2 = 0;
 
 
     DXGI_FORMAT IndexFormat = DXGI_FORMAT_R16_UINT;
@@ -137,12 +137,12 @@ struct MeshGeometry
         return vbv;
     }
 
-    D3D12_VERTEX_BUFFER_VIEW VertexBufferView2() const
+    D3D12_VERTEX_BUFFER_VIEW VertexBufferViewSlot2() const
     {
         D3D12_VERTEX_BUFFER_VIEW vbv;
-        vbv.BufferLocation = VertexBufferGPU2->GetGPUVirtualAddress();
-        vbv.StrideInBytes = VertexByteStride2;
-        vbv.SizeInBytes = VertexBufferByteSize2;
+        vbv.BufferLocation = VertexBufferGPUSlot2->GetGPUVirtualAddress();
+        vbv.StrideInBytes = VertexByteStrideSlot2;
+        vbv.SizeInBytes = VertexBufferByteSizeSlot2;
         return vbv;
     }
 
@@ -158,7 +158,7 @@ struct MeshGeometry
     void DisposeUploaders()
     {
         VertexBufferUploader = nullptr;
-        VertexBufferUploader2 = nullptr;
+        VertexBufferUploaderSlot2 = nullptr;
         IndexBufferUploader = nullptr;
     }
 };

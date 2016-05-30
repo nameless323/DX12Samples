@@ -94,7 +94,7 @@ void Ch6Ex::Draw(const GameTimer& timer)
 
     _commandList->SetGraphicsRootSignature(_rootSignature.Get());
     _commandList->IASetVertexBuffers(0, 1, &_boxGeo->VertexBufferView());
-    _commandList->IASetVertexBuffers(1, 1, &_boxGeo->VertexBufferView2());
+    _commandList->IASetVertexBuffers(1, 1, &_boxGeo->VertexBufferViewSlot2());
     _commandList->IASetIndexBuffer(&_boxGeo->IndexBufferView());
     _commandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     _commandList->SetGraphicsRootDescriptorTable(0, _cbvHeap->GetGPUDescriptorHandleForHeapStart());
@@ -263,23 +263,15 @@ void Ch6Ex::BuildBoxGeometry()
 
     _boxGeo = std::make_unique<MeshGeometry>();
     _boxGeo->Name = "boxGeo";
-    ThrowIfFailed(D3DCreateBlob(vbPosByteSize, &_boxGeo->VertexBufferCPU));
-    CopyMemory(_boxGeo->VertexBufferCPU->GetBufferPointer(), positions.data(), vbPosByteSize);
-
-    ThrowIfFailed(D3DCreateBlob(vbColByteSize, &_boxGeo->VertexBufferCPU2));
-    CopyMemory(_boxGeo->VertexBufferCPU2->GetBufferPointer(), colors.data(), vbColByteSize);
-
-    ThrowIfFailed(D3DCreateBlob(ibByteSize, &_boxGeo->IndexBufferCPU));
-    CopyMemory(_boxGeo->IndexBufferCPU->GetBufferPointer(), indices.data(), ibByteSize);
 
     _boxGeo->VertexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), positions.data(), vbPosByteSize, _boxGeo->VertexBufferUploader);
-    _boxGeo->VertexBufferGPU2 = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), colors.data(), vbColByteSize, _boxGeo->VertexBufferUploader2);
+    _boxGeo->VertexBufferGPUSlot2 = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), colors.data(), vbColByteSize, _boxGeo->VertexBufferUploaderSlot2);
     _boxGeo->IndexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), indices.data(), ibByteSize, _boxGeo->IndexBufferUploader);
 
     _boxGeo->VertexByteStride = sizeof(VertexPosData);
     _boxGeo->VertexBufferByteSize = vbPosByteSize;
-    _boxGeo->VertexByteStride2 = sizeof(VertexColorData);
-    _boxGeo->VertexBufferByteSize2 = vbColByteSize;
+    _boxGeo->VertexByteStrideSlot2 = sizeof(VertexColorData);
+    _boxGeo->VertexBufferByteSizeSlot2 = vbColByteSize;
 
     _boxGeo->IndexFormat = DXGI_FORMAT_R16_UINT;
     _boxGeo->IndexBufferByteSize = ibByteSize;
