@@ -1,8 +1,14 @@
 #include "../Core/Application.h"
 #include "InitDX.h"
 #include "Box.h"
+#include "Exercises/Ch6Ex.h"
 
 Application* app;
+
+void CreateScene(HINSTANCE hInstance)
+{
+    app = new Ch6Ex(hInstance);
+}
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
 {
@@ -11,7 +17,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 #endif
     try
     {
-        app = new Box(hInstance);
+        CreateScene(hInstance);
         if (!app->Init())
             return 0;
         return app->Run();

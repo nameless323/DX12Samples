@@ -1,19 +1,19 @@
-#include "Box.h"
+#include "Ch6Ex.h"
 
 using namespace DirectX;
 using namespace PackedVector;
 using Microsoft::WRL::ComPtr;
 
-Box::Box(HINSTANCE hInstance) : Application(hInstance)
+Ch6Ex::Ch6Ex(HINSTANCE hInstance) : Application(hInstance)
 {
 }
 
-Box::~Box()
+Ch6Ex::~Ch6Ex()
 {
 }
 
 
-bool Box::Init()
+bool Ch6Ex::Init()
 {
     if (!Application::Init())
         return false;
@@ -35,24 +35,24 @@ bool Box::Init()
 }
 
 
-LRESULT Box::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT Ch6Ex::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     return Application::MsgProc(hwnd, msg, wParam, lParam);
 }
 
-int Box::Run()
+int Ch6Ex::Run()
 {
     return Application::Run();
 }
 
-void Box::OnResize()
+void Ch6Ex::OnResize()
 {
     Application::OnResize();
     XMMATRIX P = XMMatrixPerspectiveFovLH(0.25f * MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
     XMStoreFloat4x4(&_proj, P);
 }
 
-void Box::Update(const GameTimer& timer)
+void Ch6Ex::Update(const GameTimer& timer)
 {
     float x = _radius * sinf(_phi) * cosf(_theta);
     float z = _radius * sinf(_phi) * sinf(_theta);
@@ -74,7 +74,7 @@ void Box::Update(const GameTimer& timer)
     _objectCB->CopyData(0, objConstants);
 }
 
-void Box::Draw(const GameTimer& timer)
+void Ch6Ex::Draw(const GameTimer& timer)
 {
     ThrowIfFailed(_commandAllocator->Reset());
     ThrowIfFailed(_commandList->Reset(_commandAllocator.Get(), _PSO.Get()));
@@ -94,6 +94,7 @@ void Box::Draw(const GameTimer& timer)
 
     _commandList->SetGraphicsRootSignature(_rootSignature.Get());
     _commandList->IASetVertexBuffers(0, 1, &_boxGeo->VertexBufferView());
+    _commandList->IASetVertexBuffers(1, 1, &_boxGeo->VertexBufferView2());
     _commandList->IASetIndexBuffer(&_boxGeo->IndexBufferView());
     _commandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     _commandList->SetGraphicsRootDescriptorTable(0, _cbvHeap->GetGPUDescriptorHandleForHeapStart());
@@ -112,19 +113,19 @@ void Box::Draw(const GameTimer& timer)
     FlushCommandQueue();
 }
 
-void Box::OnMouseDown(WPARAM btnState, int x, int y)
+void Ch6Ex::OnMouseDown(WPARAM btnState, int x, int y)
 {
     _lastMousePos.x = x;
     _lastMousePos.y = y;
     SetCapture(_hMainWindow);
 }
 
-void Box::OnMouseUp(WPARAM btnState, int x, int y)
+void Ch6Ex::OnMouseUp(WPARAM btnState, int x, int y)
 {
     ReleaseCapture();
 }
 
-void Box::OnMouseMove(WPARAM btnState, int x, int y)
+void Ch6Ex::OnMouseMove(WPARAM btnState, int x, int y)
 {
     if ((btnState & MK_LBUTTON) != 0)
     {
@@ -148,7 +149,7 @@ void Box::OnMouseMove(WPARAM btnState, int x, int y)
     _lastMousePos.y = y;
 }
 
-void Box::BuildDescriptorHeaps()
+void Ch6Ex::BuildDescriptorHeaps()
 {
     D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
     cbvHeapDesc.NumDescriptors = 1;
@@ -158,7 +159,7 @@ void Box::BuildDescriptorHeaps()
     ThrowIfFailed(_device->CreateDescriptorHeap(&cbvHeapDesc, IID_PPV_ARGS(&_cbvHeap)));
 }
 
-void Box::BuildConstantBuffers()
+void Ch6Ex::BuildConstantBuffers()
 {
     _objectCB = std::make_unique<UploadBuffer<ObjectConstants>>(_device.Get(), 1, true);
     UINT objCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
@@ -173,7 +174,7 @@ void Box::BuildConstantBuffers()
     _device->CreateConstantBufferView(&cbvDesc, _cbvHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
-void Box::BuildRootSignature()
+void Ch6Ex::BuildRootSignature()
 {
     CD3DX12_ROOT_PARAMETER slotRootParameter[1];
     CD3DX12_DESCRIPTOR_RANGE cbvTable;
@@ -191,30 +192,43 @@ void Box::BuildRootSignature()
     ThrowIfFailed(_device->CreateRootSignature(0, serializedRootSig->GetBufferPointer(), serializedRootSig->GetBufferSize(), IID_PPV_ARGS(&_rootSignature)));
 }
 
-void Box::BuildShadersAndInputLayout()
+void Ch6Ex::BuildShadersAndInputLayout()
 {
-    _vsByteCode = D3DUtil::CompileShader(L"Shaders\\Color.hlsl", nullptr, "vert", "vs_5_0");
-    _psByteCode = D3DUtil::CompileShader(L"Shaders\\Color.hlsl", nullptr, "frag", "ps_5_0");
+    _vsByteCode = D3DUtil::CompileShader(L"Shaders\\Ch6Ex.hlsl", nullptr, "vert", "vs_5_0");
+    _psByteCode = D3DUtil::CompileShader(L"Shaders\\Ch6Ex.hlsl", nullptr, "frag", "ps_5_0");
     _inputLayout =
         {
             {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-            {"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
+            {"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
         };
 }
 
-void Box::BuildBoxGeometry()
+void Ch6Ex::BuildBoxGeometry()
 {
-    std::array<Vertex, 8> vertices =
+    std::array<VertexPosData, 8> positions =
         {
-            Vertex({XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::White)}),
-            Vertex({XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Black)}),
-            Vertex({XMFLOAT3(+1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Red)}),
-            Vertex({XMFLOAT3(+1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::Green)}),
-            Vertex({XMFLOAT3(-1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Blue)}),
-            Vertex({XMFLOAT3(-1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Yellow)}),
-            Vertex({XMFLOAT3(+1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Cyan)}),
-            Vertex({XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Magenta)})
+            VertexPosData({XMFLOAT3(-1.0f, -1.0f, -1.0f)}),
+            VertexPosData({XMFLOAT3(-1.0f, +1.0f, -1.0f)}),
+            VertexPosData({XMFLOAT3(+1.0f, +1.0f, -1.0f)}),
+            VertexPosData({XMFLOAT3(+1.0f, -1.0f, -1.0f)}),
+            VertexPosData({XMFLOAT3(-1.0f, -1.0f, +1.0f)}),
+            VertexPosData({XMFLOAT3(-1.0f, +1.0f, +1.0f)}),
+            VertexPosData({XMFLOAT3(+1.0f, +1.0f, +1.0f)}),
+            VertexPosData({XMFLOAT3(+1.0f, -1.0f, +1.0f)})
         };
+
+    std::array<VertexColorData, 8> colors =
+        {
+            VertexColorData({XMFLOAT4(Colors::White)}),
+            VertexColorData({XMFLOAT4(Colors::Black)}),
+            VertexColorData({XMFLOAT4(Colors::Red)}),
+            VertexColorData({XMFLOAT4(Colors::Green)}),
+            VertexColorData({XMFLOAT4(Colors::Blue)}),
+            VertexColorData({XMFLOAT4(Colors::Yellow)}),
+            VertexColorData({XMFLOAT4(Colors::Cyan)}),
+            VertexColorData({XMFLOAT4(Colors::Magenta)})
+        };
+
 
     std::array<std::uint16_t, 36> indices =
         {
@@ -243,22 +257,30 @@ void Box::BuildBoxGeometry()
             4, 3, 7
         };
 
-    const UINT vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
+    const UINT vbPosByteSize = (UINT)positions.size() * sizeof(VertexPosData);
+    const UINT vbColByteSize = (UINT)colors.size() * sizeof(VertexColorData);
     const UINT ibByteSize = (UINT)indices.size() * sizeof(std::uint16_t);
 
     _boxGeo = std::make_unique<MeshGeometry>();
     _boxGeo->Name = "boxGeo";
-    ThrowIfFailed(D3DCreateBlob(vbByteSize, &_boxGeo->VertexBufferCPU));
-    CopyMemory(_boxGeo->VertexBufferCPU->GetBufferPointer(), vertices.data(), vbByteSize);
+    ThrowIfFailed(D3DCreateBlob(vbPosByteSize, &_boxGeo->VertexBufferCPU));
+    CopyMemory(_boxGeo->VertexBufferCPU->GetBufferPointer(), positions.data(), vbPosByteSize);
+
+    ThrowIfFailed(D3DCreateBlob(vbColByteSize, &_boxGeo->VertexBufferCPU2));
+    CopyMemory(_boxGeo->VertexBufferCPU2->GetBufferPointer(), colors.data(), vbColByteSize);
 
     ThrowIfFailed(D3DCreateBlob(ibByteSize, &_boxGeo->IndexBufferCPU));
     CopyMemory(_boxGeo->IndexBufferCPU->GetBufferPointer(), indices.data(), ibByteSize);
 
-    _boxGeo->VertexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), vertices.data(), vbByteSize, _boxGeo->VertexBufferUploader);
+    _boxGeo->VertexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), positions.data(), vbPosByteSize, _boxGeo->VertexBufferUploader);
+    _boxGeo->VertexBufferGPU2 = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), colors.data(), vbColByteSize, _boxGeo->VertexBufferUploader2);
     _boxGeo->IndexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), indices.data(), ibByteSize, _boxGeo->IndexBufferUploader);
 
-    _boxGeo->VertexByteStride = sizeof(Vertex);
-    _boxGeo->VertexBufferByteSize = vbByteSize;
+    _boxGeo->VertexByteStride = sizeof(VertexPosData);
+    _boxGeo->VertexBufferByteSize = vbPosByteSize;
+    _boxGeo->VertexByteStride2 = sizeof(VertexColorData);
+    _boxGeo->VertexBufferByteSize2 = vbColByteSize;
+
     _boxGeo->IndexFormat = DXGI_FORMAT_R16_UINT;
     _boxGeo->IndexBufferByteSize = ibByteSize;
 
@@ -269,7 +291,7 @@ void Box::BuildBoxGeometry()
     _boxGeo->DrawArgs["box"] = submesh;
 }
 
-void Box::BuildPSO()
+void Ch6Ex::BuildPSO()
 {
     D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
     ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));

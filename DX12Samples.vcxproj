@@ -165,6 +165,7 @@
     <ClInclude Include="Core\MathHelper.h" />
     <ClInclude Include="Core\UploadBuffer.h" />
     <ClInclude Include="Source\Box.h" />
+    <ClInclude Include="Source\Exercises\Ch6Ex.h" />
     <ClInclude Include="Source\InitDX.h" />
   </ItemGroup>
   <ItemGroup>
@@ -177,9 +178,16 @@
     <ClCompile Include="Core\MathHelper.cpp" />
     <ClCompile Include="Source\Box.cpp" />
     <ClCompile Include="Source\DX12Samples.cpp" />
+    <ClCompile Include="Source\Exercises\Ch6Ex.cpp" />
     <ClCompile Include="Source\InitDX.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="Shaders\Ch6Ex.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
     <FxCompile Include="Shaders\Color.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>

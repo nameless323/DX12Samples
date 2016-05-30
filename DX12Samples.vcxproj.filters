@@ -48,6 +48,9 @@
     <ClInclude Include="Source\Box.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Exercises\Ch6Ex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Camera.cpp">
@@ -80,8 +83,12 @@
     <ClCompile Include="Source\Box.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Exercises\Ch6Ex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\Color.hlsl" />
+    <FxCompile Include="Shaders\Ch6Ex.hlsl" />
   </ItemGroup>
 </Project>
