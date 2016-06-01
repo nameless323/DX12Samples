@@ -71,8 +71,10 @@ void Ch6Ex::Update(const GameTimer& timer)
 
     ObjectConstants objConstants;
     XMStoreFloat4x4(&objConstants.MVP, XMMatrixTranspose(mvp));
-    objConstants.Time = timer.TotalTime();
     _objectCB->CopyData(0, objConstants);
+
+    //_timeCB->CopyData(0, timer.TotalTime());
+    _timeCB->CopyData(0, timer.TotalTime());
 }
 
 void Ch6Ex::Draw(const GameTimer& timer)
@@ -153,7 +155,7 @@ void Ch6Ex::OnMouseMove(WPARAM btnState, int x, int y)
 void Ch6Ex::BuildDescriptorHeaps()
 {
     D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
-    cbvHeapDesc.NumDescriptors = 1;
+    cbvHeapDesc.NumDescriptors = 2;
     cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
     cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
     cbvHeapDesc.NodeMask = 0;
@@ -173,13 +175,25 @@ void Ch6Ex::BuildConstantBuffers()
     cbvDesc.SizeInBytes = D3DUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
 
     _device->CreateConstantBufferView(&cbvDesc, _cbvHeap->GetCPUDescriptorHandleForHeapStart());
+
+    _timeCB = std::make_unique<UploadBuffer<float>>(_device.Get(), 1, true);
+    objCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(float));
+    cbAdderss = _timeCB->Resource()->GetGPUVirtualAddress();
+    D3D12_CONSTANT_BUFFER_VIEW_DESC timeDesc;
+    timeDesc.BufferLocation = cbAdderss;
+    timeDesc.SizeInBytes = objCBByteSize;
+
+    //offset of cbv handle ??
+    CD3DX12_CPU_DESCRIPTOR_HANDLE cbvHeapHandle(_cbvHeap->GetCPUDescriptorHandleForHeapStart());
+    cbvHeapHandle.Offset(1, _cbvSrvUavDescriptorSize); 
+    _device->CreateConstantBufferView(&timeDesc, cbvHeapHandle);
 }
 
 void Ch6Ex::BuildRootSignature()
 {
     CD3DX12_ROOT_PARAMETER slotRootParameter[1];
     CD3DX12_DESCRIPTOR_RANGE cbvTable;
-    cbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
+    cbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 2, 0);
     slotRootParameter[0].InitAsDescriptorTable(1, &cbvTable);
     CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(1, slotRootParameter, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
     ComPtr<ID3DBlob> serializedRootSig = nullptr;
@@ -299,6 +313,7 @@ void Ch6Ex::BuildPSO()
         {
             reinterpret_cast<BYTE*>(_psByteCode->GetBufferPointer()), _psByteCode->GetBufferSize()
         };
+    //CD3D11_RASTERIZER_DESC
     psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
     psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
     psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);

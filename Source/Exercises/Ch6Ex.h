@@ -22,7 +22,6 @@ public:
     struct ObjectConstants
     {
         DirectX::XMFLOAT4X4 MVP = MathHelper::Identity4x4();
-        float Time;
     };
 
 
@@ -51,6 +50,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> _cbvHeap = nullptr;
 
     std::unique_ptr<UploadBuffer<ObjectConstants>> _objectCB = nullptr;
+    std::unique_ptr<UploadBuffer<float>> _timeCB = nullptr;
     std::unique_ptr<MeshGeometry> _boxGeo = nullptr;
 
     Microsoft::WRL::ComPtr<ID3DBlob> _vsByteCode = nullptr;
