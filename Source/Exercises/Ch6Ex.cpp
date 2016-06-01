@@ -71,6 +71,7 @@ void Ch6Ex::Update(const GameTimer& timer)
 
     ObjectConstants objConstants;
     XMStoreFloat4x4(&objConstants.MVP, XMMatrixTranspose(mvp));
+    objConstants.Time = timer.TotalTime();
     _objectCB->CopyData(0, objConstants);
 }
 
