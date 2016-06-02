@@ -18,6 +18,12 @@ public:
     {        
         DirectX::XMFLOAT4 Color;
     };
+    
+    struct VertDataFull
+    {
+        DirectX::XMFLOAT3 Pos;
+        DirectX::XMFLOAT4 Color;
+    };
 
     struct ObjectConstants
     {
@@ -44,6 +50,7 @@ private:
     void BuildRootSignature();
     void BuildShadersAndInputLayout();
     void BuildBoxGeometry();
+    void BuildPyramidGeometry();
     void BuildPSO();
 
     Microsoft::WRL::ComPtr<ID3D12RootSignature> _rootSignature = nullptr;
@@ -52,6 +59,7 @@ private:
     std::unique_ptr<UploadBuffer<ObjectConstants>> _objectCB = nullptr;
     std::unique_ptr<UploadBuffer<float>> _timeCB = nullptr;
     std::unique_ptr<MeshGeometry> _boxGeo = nullptr;
+    std::unique_ptr<MeshGeometry> _pyramidGeo = nullptr;
 
     Microsoft::WRL::ComPtr<ID3DBlob> _vsByteCode = nullptr;
     Microsoft::WRL::ComPtr<ID3DBlob> _psByteCode = nullptr;

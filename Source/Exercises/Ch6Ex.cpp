@@ -24,6 +24,7 @@ bool Ch6Ex::Init()
     BuildRootSignature();
     BuildShadersAndInputLayout();
     BuildBoxGeometry();
+    BuildPyramidGeometry();
     BuildPSO();
 
     ThrowIfFailed(_commandList->Close());
@@ -96,13 +97,13 @@ void Ch6Ex::Draw(const GameTimer& timer)
     _commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
     _commandList->SetGraphicsRootSignature(_rootSignature.Get());
-    _commandList->IASetVertexBuffers(0, 1, &_boxGeo->VertexBufferView());
-    _commandList->IASetVertexBuffers(1, 1, &_boxGeo->VertexBufferViewSlot2());
-    _commandList->IASetIndexBuffer(&_boxGeo->IndexBufferView());
+    _commandList->IASetVertexBuffers(0, 1, &_pyramidGeo->VertexBufferView());
+    _commandList->IASetVertexBuffers(1, 1, &_pyramidGeo->VertexBufferViewSlot2());
+    _commandList->IASetIndexBuffer(&_pyramidGeo->IndexBufferView());
     _commandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     _commandList->SetGraphicsRootDescriptorTable(0, _cbvHeap->GetGPUDescriptorHandleForHeapStart());
 
-    _commandList->DrawIndexedInstanced(_boxGeo->DrawArgs["box"].IndexCount, 1, 0, 0, 0);
+    _commandList->DrawIndexedInstanced(_pyramidGeo->DrawArgs["pyro"].IndexCount, 1, 0, 0, 0);
 
     _commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
     ThrowIfFailed(_commandList->Close());
@@ -183,7 +184,6 @@ void Ch6Ex::BuildConstantBuffers()
     timeDesc.BufferLocation = cbAdderss;
     timeDesc.SizeInBytes = objCBByteSize;
 
-    //offset of cbv handle ??
     CD3DX12_CPU_DESCRIPTOR_HANDLE cbvHeapHandle(_cbvHeap->GetCPUDescriptorHandleForHeapStart());
     cbvHeapHandle.Offset(1, _cbvSrvUavDescriptorSize); 
     _device->CreateConstantBufferView(&timeDesc, cbvHeapHandle);
@@ -209,8 +209,8 @@ void Ch6Ex::BuildRootSignature()
 
 void Ch6Ex::BuildShadersAndInputLayout()
 {
-    _vsByteCode = D3DUtil::CompileShader(L"Shaders\\Ch6Ex.hlsl", nullptr, "vert", "vs_5_0");
-    _psByteCode = D3DUtil::CompileShader(L"Shaders\\Ch6Ex.hlsl", nullptr, "frag", "ps_5_0");
+    _vsByteCode = D3DUtil::CompileShader(L"Shaders\\Ch6Ex.hlsl", nullptr, "vert", "vs_5_1");
+    _psByteCode = D3DUtil::CompileShader(L"Shaders\\Ch6Ex.hlsl", nullptr, "frag", "ps_5_1");
     _inputLayout =
         {
             {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
@@ -298,6 +298,63 @@ void Ch6Ex::BuildBoxGeometry()
     _boxGeo->DrawArgs["box"] = submesh;
 }
 
+void Ch6Ex::BuildPyramidGeometry()
+{
+    std::array<VertexPosData, 5> vertPos =
+    {
+        VertexPosData({XMFLOAT3(0.0f, 0.7f, 0.0f)}),
+        VertexPosData({XMFLOAT3(-1.0f, -0.7f, -1.0f)}),
+        VertexPosData({XMFLOAT3(-1.0f, -0.7f, 1.0f)}),
+        VertexPosData({XMFLOAT3(1.0f, -0.7f, 1.0f)}),
+        VertexPosData({XMFLOAT3(1.0f, -0.7f, -1.0f)})
+    };
+    std::array<VertexColorData, 5> vertColor =
+    {
+        VertexColorData({XMFLOAT4(Colors::AliceBlue)}),
+        VertexColorData({XMFLOAT4(Colors::LightSeaGreen)}),
+        VertexColorData({XMFLOAT4(Colors::LightSeaGreen)}),
+        VertexColorData({XMFLOAT4(Colors::LightSeaGreen)}),
+        VertexColorData({XMFLOAT4(Colors::LightSeaGreen)}),
+    };
+    std::array<uint16_t, 18> indices =
+    {
+        //sides
+        0, 1, 2,
+        0, 2, 3,
+        0, 3, 4,
+        0, 4, 1,
+        
+        //bottom
+        1, 3, 2,
+        3, 1, 4
+    };
+
+    _pyramidGeo = std::make_unique<MeshGeometry>();
+    _pyramidGeo->Name = "pyroGeo";
+
+    size_t vertPosSize = sizeof(VertexPosData) * vertPos.size();
+    size_t vertColSize = sizeof(VertexColorData) * vertColor.size();
+    size_t indicesSize = sizeof(uint16_t) * indices.size();
+
+    _pyramidGeo->VertexBufferByteSize = vertPosSize;
+    _pyramidGeo->VertexByteStride = sizeof(VertexPosData);
+    _pyramidGeo->VertexBufferByteSizeSlot2 = vertColSize;
+    _pyramidGeo->VertexByteStrideSlot2 = sizeof(VertexColorData);
+
+    _pyramidGeo->IndexBufferByteSize = indicesSize;
+    _pyramidGeo->IndexFormat = DXGI_FORMAT_R16_UINT;
+
+    _pyramidGeo->VertexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), vertPos.data(), vertPosSize, _pyramidGeo->VertexBufferUploader);
+    _pyramidGeo->VertexBufferGPUSlot2 = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), vertColor.data(), vertColSize, _pyramidGeo->VertexBufferUploaderSlot2);
+    _pyramidGeo->IndexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), indices.data(), indicesSize, _pyramidGeo->IndexBufferUploader);
+
+    SubmeshGeometry submesh;
+    submesh.IndexCount = indices.size();
+    submesh.BaseVertexLocation = 0;
+    submesh.StartIndexLocation = 0;
+    _pyramidGeo->DrawArgs["pyro"] = submesh;
+}
+
 void Ch6Ex::BuildPSO()
 {
     D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
@@ -313,8 +370,9 @@ void Ch6Ex::BuildPSO()
         {
             reinterpret_cast<BYTE*>(_psByteCode->GetBufferPointer()), _psByteCode->GetBufferSize()
         };
-    //CD3D11_RASTERIZER_DESC
+
     psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+    //psoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
     psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
     psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
     psoDesc.SampleMask = UINT_MAX;
