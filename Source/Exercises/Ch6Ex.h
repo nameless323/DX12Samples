@@ -49,8 +49,7 @@ private:
     void BuildConstantBuffers();
     void BuildRootSignature();
     void BuildShadersAndInputLayout();
-    void BuildBoxGeometry();
-    void BuildPyramidGeometry();
+    void BuildGeometry();
     void BuildPSO();
 
     Microsoft::WRL::ComPtr<ID3D12RootSignature> _rootSignature = nullptr;

@@ -23,8 +23,7 @@ bool Ch6Ex::Init()
     BuildConstantBuffers();
     BuildRootSignature();
     BuildShadersAndInputLayout();
-    BuildBoxGeometry();
-    BuildPyramidGeometry();
+    BuildGeometry();
     BuildPSO();
 
     ThrowIfFailed(_commandList->Close());
@@ -260,7 +259,7 @@ void Ch6Ex::BuildShadersAndInputLayout()
         };
 }
 
-void Ch6Ex::BuildBoxGeometry()
+void Ch6Ex::BuildGeometry()
 {
     std::array<VertexPosData, 13> positions =
         {
@@ -370,62 +369,6 @@ void Ch6Ex::BuildBoxGeometry()
     _geometry->DrawArgs["pyramide"] = pyramideGeometry;
 }
 
-void Ch6Ex::BuildPyramidGeometry()
-{
-    std::array<VertexPosData, 5> vertPos =
-    {
-        VertexPosData({XMFLOAT3(0.0f, 0.7f, 0.0f)}),
-        VertexPosData({XMFLOAT3(-1.0f, -0.7f, -1.0f)}),
-        VertexPosData({XMFLOAT3(-1.0f, -0.7f, 1.0f)}),
-        VertexPosData({XMFLOAT3(1.0f, -0.7f, 1.0f)}),
-        VertexPosData({XMFLOAT3(1.0f, -0.7f, -1.0f)})
-    };
-    std::array<VertexColorData, 5> vertColor =
-    {
-        VertexColorData({XMFLOAT4(Colors::AliceBlue)}),
-        VertexColorData({XMFLOAT4(Colors::LightSeaGreen)}),
-        VertexColorData({XMFLOAT4(Colors::LightSeaGreen)}),
-        VertexColorData({XMFLOAT4(Colors::LightSeaGreen)}),
-        VertexColorData({XMFLOAT4(Colors::LightSeaGreen)}),
-    };
-    std::array<uint16_t, 18> indices =
-    {
-        //sides
-        0, 1, 2,
-        0, 2, 3,
-        0, 3, 4,
-        0, 4, 1,
-        
-        //bottom
-        1, 3, 2,
-        3, 1, 4
-    };
-
-    _pyramidGeo = std::make_unique<MeshGeometry>();
-    _pyramidGeo->Name = "pyraGeo";
-
-    size_t vertPosSize = sizeof(VertexPosData) * vertPos.size();
-    size_t vertColSize = sizeof(VertexColorData) * vertColor.size();
-    size_t indicesSize = sizeof(uint16_t) * indices.size();
-
-    _pyramidGeo->VertexBufferByteSize = vertPosSize;
-    _pyramidGeo->VertexByteStride = sizeof(VertexPosData);
-    _pyramidGeo->VertexBufferByteSizeSlot2 = vertColSize;
-    _pyramidGeo->VertexByteStrideSlot2 = sizeof(VertexColorData);
-
-    _pyramidGeo->IndexBufferByteSize = indicesSize;
-    _pyramidGeo->IndexFormat = DXGI_FORMAT_R16_UINT;
-
-    _pyramidGeo->VertexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), vertPos.data(), vertPosSize, _pyramidGeo->VertexBufferUploader);
-    _pyramidGeo->VertexBufferGPUSlot2 = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), vertColor.data(), vertColSize, _pyramidGeo->VertexBufferUploaderSlot2);
-    _pyramidGeo->IndexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), indices.data(), indicesSize, _pyramidGeo->IndexBufferUploader);
-
-    SubmeshGeometry submesh;
-    submesh.IndexCount = indices.size();
-    submesh.BaseVertexLocation = 0;
-    submesh.StartIndexLocation = 0;
-    _pyramidGeo->DrawArgs["pyra"] = submesh;
-}
 
 void Ch6Ex::BuildPSO()
 {
