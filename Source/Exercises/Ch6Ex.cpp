@@ -55,6 +55,7 @@ void Ch6Ex::OnResize()
 
 void Ch6Ex::Update(const GameTimer& timer)
 {
+    //box
     float x = _radius * sinf(_phi) * cosf(_theta);
     float z = _radius * sinf(_phi) * sinf(_theta);
     float y = _radius * cosf(_phi);
@@ -66,7 +67,7 @@ void Ch6Ex::Update(const GameTimer& timer)
     XMMATRIX view = XMMatrixLookAtLH(pos, target, up);
     XMStoreFloat4x4(&_view, view);
 
-    XMMATRIX model = XMLoadFloat4x4(&_model);
+    XMMATRIX model = XMLoadFloat4x4(&_model)  * XMMatrixTranslation(-2, 0, 0) * XMMatrixScaling(0.5f, 0.5f, 0.5f);
     XMMATRIX proj = XMLoadFloat4x4(&_proj);
     XMMATRIX mvp = model * view * proj;
 
@@ -74,8 +75,30 @@ void Ch6Ex::Update(const GameTimer& timer)
     XMStoreFloat4x4(&objConstants.MVP, XMMatrixTranspose(mvp));
     _objectCB->CopyData(0, objConstants);
 
+    //pyramide
+    x = _radius * sinf(_phi) * cosf(_theta);
+    z = _radius * sinf(_phi) * sinf(_theta);
+    y = _radius * cosf(_phi);
+
+    pos = XMVectorSet(x, y, z, 1.0f);
+    target = XMVectorZero();
+    up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+    view = XMMatrixLookAtLH(pos, target, up);
+    XMStoreFloat4x4(&_view, view);
+
+    model = XMLoadFloat4x4(&_model) * XMMatrixTranslation(2, 0, 0) * XMMatrixScaling(0.5f, 0.5f, 0.5f);
+    proj = XMLoadFloat4x4(&_proj);
+    mvp = model * view * proj;
+
+    ObjectConstants objConstantsPira;
+    XMStoreFloat4x4(&objConstantsPira.MVP, XMMatrixTranspose(mvp));
+
+    _objectCB->CopyData(1, objConstantsPira);
+
     //_timeCB->CopyData(0, timer.TotalTime());
     _timeCB->CopyData(0, timer.TotalTime());
+    _timeCB->CopyData(1, timer.TotalTime());
 }
 
 void Ch6Ex::Draw(const GameTimer& timer)
@@ -97,14 +120,19 @@ void Ch6Ex::Draw(const GameTimer& timer)
     _commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
     _commandList->SetGraphicsRootSignature(_rootSignature.Get());
-    _commandList->IASetVertexBuffers(0, 1, &_pyramidGeo->VertexBufferView());
-    _commandList->IASetVertexBuffers(1, 1, &_pyramidGeo->VertexBufferViewSlot2());
-    _commandList->IASetIndexBuffer(&_pyramidGeo->IndexBufferView());
+    _commandList->IASetVertexBuffers(0, 1, &_geometry->VertexBufferView());
+    _commandList->IASetVertexBuffers(1, 1, &_geometry->VertexBufferViewSlot2());
+    _commandList->IASetIndexBuffer(&_geometry->IndexBufferView());
     _commandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     _commandList->SetGraphicsRootDescriptorTable(0, _cbvHeap->GetGPUDescriptorHandleForHeapStart());
 
-    _commandList->DrawIndexedInstanced(_pyramidGeo->DrawArgs["pyro"].IndexCount, 1, 0, 0, 0);
+    _commandList->DrawIndexedInstanced(_geometry->DrawArgs["box"].IndexCount, 1, _geometry->DrawArgs["box"].StartIndexLocation, _geometry->DrawArgs["box"].BaseVertexLocation, 0);
 
+    CD3DX12_GPU_DESCRIPTOR_HANDLE heapHandle(_cbvHeap->GetGPUDescriptorHandleForHeapStart());
+    heapHandle.Offset(2, _cbvSrvUavDescriptorSize);
+    _commandList->SetGraphicsRootDescriptorTable(0, heapHandle);
+    _commandList->DrawIndexedInstanced(_geometry->DrawArgs["pyramide"].IndexCount, 1, _geometry->DrawArgs["pyramide"].StartIndexLocation, _geometry->DrawArgs["pyramide"].BaseVertexLocation, 0);
+    
     _commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
     ThrowIfFailed(_commandList->Close());
 
@@ -156,7 +184,7 @@ void Ch6Ex::OnMouseMove(WPARAM btnState, int x, int y)
 void Ch6Ex::BuildDescriptorHeaps()
 {
     D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
-    cbvHeapDesc.NumDescriptors = 2;
+    cbvHeapDesc.NumDescriptors = 4;
     cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
     cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
     cbvHeapDesc.NodeMask = 0;
@@ -165,7 +193,7 @@ void Ch6Ex::BuildDescriptorHeaps()
 
 void Ch6Ex::BuildConstantBuffers()
 {
-    _objectCB = std::make_unique<UploadBuffer<ObjectConstants>>(_device.Get(), 1, true);
+    _objectCB = std::make_unique<UploadBuffer<ObjectConstants>>(_device.Get(), 2, true);
     UINT objCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
     D3D12_GPU_VIRTUAL_ADDRESS cbAdderss = _objectCB->Resource()->GetGPUVirtualAddress();
     int boxCBufIndex = 0;
@@ -177,7 +205,7 @@ void Ch6Ex::BuildConstantBuffers()
 
     _device->CreateConstantBufferView(&cbvDesc, _cbvHeap->GetCPUDescriptorHandleForHeapStart());
 
-    _timeCB = std::make_unique<UploadBuffer<float>>(_device.Get(), 1, true);
+    _timeCB = std::make_unique<UploadBuffer<float>>(_device.Get(), 2, true);
     objCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(float));
     cbAdderss = _timeCB->Resource()->GetGPUVirtualAddress();
     D3D12_CONSTANT_BUFFER_VIEW_DESC timeDesc;
@@ -186,6 +214,20 @@ void Ch6Ex::BuildConstantBuffers()
 
     CD3DX12_CPU_DESCRIPTOR_HANDLE cbvHeapHandle(_cbvHeap->GetCPUDescriptorHandleForHeapStart());
     cbvHeapHandle.Offset(1, _cbvSrvUavDescriptorSize); 
+    _device->CreateConstantBufferView(&timeDesc, cbvHeapHandle);
+
+    int pyroCBufIndex = 1;
+    objCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
+    cbAdderss = _objectCB->Resource()->GetGPUVirtualAddress();
+    cbAdderss += pyroCBufIndex * objCBByteSize;
+    D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDescPyro;
+    cbvDescPyro.BufferLocation = cbAdderss;
+    cbvDescPyro.SizeInBytes = D3DUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
+
+    cbvHeapHandle.Offset(1, _cbvSrvUavDescriptorSize);
+    _device->CreateConstantBufferView(&cbvDescPyro, cbvHeapHandle);
+
+    cbvHeapHandle.Offset(1, _cbvSrvUavDescriptorSize);
     _device->CreateConstantBufferView(&timeDesc, cbvHeapHandle);
 }
 
@@ -220,7 +262,7 @@ void Ch6Ex::BuildShadersAndInputLayout()
 
 void Ch6Ex::BuildBoxGeometry()
 {
-    std::array<VertexPosData, 8> positions =
+    std::array<VertexPosData, 13> positions =
         {
             VertexPosData({XMFLOAT3(-1.0f, -1.0f, -1.0f)}),
             VertexPosData({XMFLOAT3(-1.0f, +1.0f, -1.0f)}),
@@ -229,10 +271,17 @@ void Ch6Ex::BuildBoxGeometry()
             VertexPosData({XMFLOAT3(-1.0f, -1.0f, +1.0f)}),
             VertexPosData({XMFLOAT3(-1.0f, +1.0f, +1.0f)}),
             VertexPosData({XMFLOAT3(+1.0f, +1.0f, +1.0f)}),
-            VertexPosData({XMFLOAT3(+1.0f, -1.0f, +1.0f)})
+            VertexPosData({XMFLOAT3(+1.0f, -1.0f, +1.0f)}),
+
+            //pyramide
+            VertexPosData({ XMFLOAT3(0.0f, 0.7f, 0.0f) }),
+            VertexPosData({ XMFLOAT3(-1.0f, -0.7f, -1.0f) }),
+            VertexPosData({ XMFLOAT3(-1.0f, -0.7f, 1.0f) }),
+            VertexPosData({ XMFLOAT3(1.0f, -0.7f, 1.0f) }),
+            VertexPosData({ XMFLOAT3(1.0f, -0.7f, -1.0f) })
         };
 
-    std::array<VertexColorData, 8> colors =
+    std::array<VertexColorData, 13> colors =
         {
             VertexColorData({XMFLOAT4(Colors::White)}),
             VertexColorData({XMFLOAT4(Colors::Black)}),
@@ -241,11 +290,18 @@ void Ch6Ex::BuildBoxGeometry()
             VertexColorData({XMFLOAT4(Colors::Blue)}),
             VertexColorData({XMFLOAT4(Colors::Yellow)}),
             VertexColorData({XMFLOAT4(Colors::Cyan)}),
-            VertexColorData({XMFLOAT4(Colors::Magenta)})
+            VertexColorData({XMFLOAT4(Colors::Magenta)}),
+
+            //pyramide
+            VertexColorData({ XMFLOAT4(Colors::AliceBlue) }),
+            VertexColorData({ XMFLOAT4(Colors::Gainsboro) }),
+            VertexColorData({ XMFLOAT4(Colors::SteelBlue) }),
+            VertexColorData({ XMFLOAT4(Colors::DarkOrange) }),
+            VertexColorData({ XMFLOAT4(Colors::DarkGoldenrod) })
         };
 
 
-    std::array<std::uint16_t, 36> indices =
+    std::array<std::uint16_t, 54> indices =
         {
             // front face
             0, 1, 2,
@@ -269,33 +325,49 @@ void Ch6Ex::BuildBoxGeometry()
 
             // bottom face
             4, 0, 3,
-            4, 3, 7
+            4, 3, 7,
+
+            //sides
+            0, 1, 2,
+            0, 2, 3,
+            0, 3, 4,
+            0, 4, 1,
+
+            //bottom
+            1, 3, 2,
+            3, 1, 4
         };
 
     const UINT vbPosByteSize = (UINT)positions.size() * sizeof(VertexPosData);
     const UINT vbColByteSize = (UINT)colors.size() * sizeof(VertexColorData);
     const UINT ibByteSize = (UINT)indices.size() * sizeof(std::uint16_t);
 
-    _boxGeo = std::make_unique<MeshGeometry>();
-    _boxGeo->Name = "boxGeo";
+    _geometry = std::make_unique<MeshGeometry>();
+    _geometry->Name = "boxGeo";
 
-    _boxGeo->VertexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), positions.data(), vbPosByteSize, _boxGeo->VertexBufferUploader);
-    _boxGeo->VertexBufferGPUSlot2 = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), colors.data(), vbColByteSize, _boxGeo->VertexBufferUploaderSlot2);
-    _boxGeo->IndexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), indices.data(), ibByteSize, _boxGeo->IndexBufferUploader);
+    _geometry->VertexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), positions.data(), vbPosByteSize, _geometry->VertexBufferUploader);
+    _geometry->VertexBufferGPUSlot2 = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), colors.data(), vbColByteSize, _geometry->VertexBufferUploaderSlot2);
+    _geometry->IndexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), indices.data(), ibByteSize, _geometry->IndexBufferUploader);
 
-    _boxGeo->VertexByteStride = sizeof(VertexPosData);
-    _boxGeo->VertexBufferByteSize = vbPosByteSize;
-    _boxGeo->VertexByteStrideSlot2 = sizeof(VertexColorData);
-    _boxGeo->VertexBufferByteSizeSlot2 = vbColByteSize;
+    _geometry->VertexByteStride = sizeof(VertexPosData);
+    _geometry->VertexBufferByteSize = vbPosByteSize;
+    _geometry->VertexByteStrideSlot2 = sizeof(VertexColorData);
+    _geometry->VertexBufferByteSizeSlot2 = vbColByteSize;
 
-    _boxGeo->IndexFormat = DXGI_FORMAT_R16_UINT;
-    _boxGeo->IndexBufferByteSize = ibByteSize;
+    _geometry->IndexFormat = DXGI_FORMAT_R16_UINT;
+    _geometry->IndexBufferByteSize = ibByteSize;
 
-    SubmeshGeometry submesh;
-    submesh.IndexCount = (UINT)indices.size();
-    submesh.StartIndexLocation = 0;
-    submesh.BaseVertexLocation = 0;
-    _boxGeo->DrawArgs["box"] = submesh;
+    SubmeshGeometry boxGeometry;
+    boxGeometry.IndexCount = 36;
+    boxGeometry.StartIndexLocation = 0;
+    boxGeometry.BaseVertexLocation = 0;
+    _geometry->DrawArgs["box"] = boxGeometry;
+
+    SubmeshGeometry pyramideGeometry;
+    pyramideGeometry.IndexCount = 18;
+    pyramideGeometry.StartIndexLocation = 36;
+    pyramideGeometry.BaseVertexLocation = 8;
+    _geometry->DrawArgs["pyramide"] = pyramideGeometry;
 }
 
 void Ch6Ex::BuildPyramidGeometry()
@@ -330,7 +402,7 @@ void Ch6Ex::BuildPyramidGeometry()
     };
 
     _pyramidGeo = std::make_unique<MeshGeometry>();
-    _pyramidGeo->Name = "pyroGeo";
+    _pyramidGeo->Name = "pyraGeo";
 
     size_t vertPosSize = sizeof(VertexPosData) * vertPos.size();
     size_t vertColSize = sizeof(VertexColorData) * vertColor.size();
@@ -352,7 +424,7 @@ void Ch6Ex::BuildPyramidGeometry()
     submesh.IndexCount = indices.size();
     submesh.BaseVertexLocation = 0;
     submesh.StartIndexLocation = 0;
-    _pyramidGeo->DrawArgs["pyro"] = submesh;
+    _pyramidGeo->DrawArgs["pyra"] = submesh;
 }
 
 void Ch6Ex::BuildPSO()

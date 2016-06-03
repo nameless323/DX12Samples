@@ -58,7 +58,7 @@ private:
 
     std::unique_ptr<UploadBuffer<ObjectConstants>> _objectCB = nullptr;
     std::unique_ptr<UploadBuffer<float>> _timeCB = nullptr;
-    std::unique_ptr<MeshGeometry> _boxGeo = nullptr;
+    std::unique_ptr<MeshGeometry> _geometry = nullptr;
     std::unique_ptr<MeshGeometry> _pyramidGeo = nullptr;
 
     Microsoft::WRL::ComPtr<ID3DBlob> _vsByteCode = nullptr;
