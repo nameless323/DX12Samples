@@ -408,4 +408,5 @@ void Ch6Ex::BuildPSO()
     psoDesc.SampleDesc.Quality = _4xMsaa ? (_4xMsaaQuality - 1) : 0;
     psoDesc.DSVFormat = _dsvFormat;
     ThrowIfFailed(_device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&_PSO)));
+
 }
