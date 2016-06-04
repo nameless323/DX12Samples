@@ -1,4 +1,4 @@
-#include "../Core/Application.h"
+#include "../../Core/Application.h"
 #include "InitDX.h"
 #include <DirectXColors.h>
 

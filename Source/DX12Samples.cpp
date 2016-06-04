@@ -1,6 +1,6 @@
 #include "../Core/Application.h"
-#include "InitDX.h"
-#include "Box.h"
+#include "Scenes/InitDX/InitDX.h"
+#include "Scenes/Box/Box.h"
 #include "Exercises/Ch6Ex.h"
 
 Application* app;

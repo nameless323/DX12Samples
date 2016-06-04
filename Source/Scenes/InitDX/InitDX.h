@@ -1,5 +1,6 @@
 #pragma once
 #include <windows.h>
+#include "../../../Core/Application.h"
 
 class InitDX : public Application
 {

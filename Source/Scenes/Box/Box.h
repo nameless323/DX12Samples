@@ -1,7 +1,7 @@
 #pragma once
 #include <windows.h>
-#include "../Core/Application.h"
-#include "../Core/UploadBuffer.h"
+#include "../../../Core/UploadBuffer.h"
+#include "../../../Core/Application.h"
 
 struct Vertex
 {

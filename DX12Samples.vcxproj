@@ -75,6 +75,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir)DX12Samples\Core;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -105,6 +106,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -164,9 +166,9 @@
     <ClInclude Include="Core\GeometryGenerator.h" />
     <ClInclude Include="Core\MathHelper.h" />
     <ClInclude Include="Core\UploadBuffer.h" />
-    <ClInclude Include="Source\Box.h" />
+    <ClInclude Include="Source\Scenes\Box\Box.h" />
     <ClInclude Include="Source\Exercises\Ch6Ex.h" />
-    <ClInclude Include="Source\InitDX.h" />
+    <ClInclude Include="Source\Scenes\InitDX\InitDX.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Application.cpp" />
@@ -176,10 +178,10 @@
     <ClCompile Include="Core\GameTimer.cpp" />
     <ClCompile Include="Core\GeometryGenerator.cpp" />
     <ClCompile Include="Core\MathHelper.cpp" />
-    <ClCompile Include="Source\Box.cpp" />
+    <ClCompile Include="Source\Scenes\Box\Box.cpp" />
     <ClCompile Include="Source\DX12Samples.cpp" />
     <ClCompile Include="Source\Exercises\Ch6Ex.cpp" />
-    <ClCompile Include="Source\InitDX.cpp" />
+    <ClCompile Include="Source\Scenes\InitDX\InitDX.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\Ch6Ex.hlsl">
