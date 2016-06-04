@@ -123,12 +123,16 @@ void Ch6Ex::Draw(const GameTimer& timer)
     _commandList->IASetVertexBuffers(1, 1, &_geometry->VertexBufferViewSlot2());
     _commandList->IASetIndexBuffer(&_geometry->IndexBufferView());
     _commandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    _commandList->SetGraphicsRootDescriptorTable(0, _cbvHeap->GetGPUDescriptorHandleForHeapStart());
+
+    CD3DX12_GPU_DESCRIPTOR_HANDLE heapHandle(_cbvHeap->GetGPUDescriptorHandleForHeapStart());
+    _commandList->SetGraphicsRootDescriptorTable(0, heapHandle);
+    heapHandle.Offset(2, _cbvSrvUavDescriptorSize);
+    _commandList->SetGraphicsRootDescriptorTable(1, heapHandle);
 
     _commandList->DrawIndexedInstanced(_geometry->DrawArgs["box"].IndexCount, 1, _geometry->DrawArgs["box"].StartIndexLocation, _geometry->DrawArgs["box"].BaseVertexLocation, 0);
 
-    CD3DX12_GPU_DESCRIPTOR_HANDLE heapHandle(_cbvHeap->GetGPUDescriptorHandleForHeapStart());
-    heapHandle.Offset(2, _cbvSrvUavDescriptorSize);
+    heapHandle = _cbvHeap->GetGPUDescriptorHandleForHeapStart();
+    heapHandle.Offset(1, _cbvSrvUavDescriptorSize);
     _commandList->SetGraphicsRootDescriptorTable(0, heapHandle);
     _commandList->DrawIndexedInstanced(_geometry->DrawArgs["pyramide"].IndexCount, 1, _geometry->DrawArgs["pyramide"].StartIndexLocation, _geometry->DrawArgs["pyramide"].BaseVertexLocation, 0);
     
@@ -193,38 +197,38 @@ void Ch6Ex::BuildDescriptorHeaps()
 void Ch6Ex::BuildConstantBuffers()
 {
     _objectCB = std::make_unique<UploadBuffer<ObjectConstants>>(_device.Get(), 2, true);
-    UINT objCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
+    UINT constantsBufferSize = D3DUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
+    UINT objCBByteSize = constantsBufferSize;
     D3D12_GPU_VIRTUAL_ADDRESS cbAdderss = _objectCB->Resource()->GetGPUVirtualAddress();
     int boxCBufIndex = 0;
     cbAdderss += boxCBufIndex * objCBByteSize;
 
     D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
     cbvDesc.BufferLocation = cbAdderss;
-    cbvDesc.SizeInBytes = D3DUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
+    cbvDesc.SizeInBytes = constantsBufferSize;
 
     _device->CreateConstantBufferView(&cbvDesc, _cbvHeap->GetCPUDescriptorHandleForHeapStart());
 
-    _timeCB = std::make_unique<UploadBuffer<float>>(_device.Get(), 2, true);
+    int pyroCBufIndex = 1;
+    objCBByteSize = constantsBufferSize;
+    cbAdderss = _objectCB->Resource()->GetGPUVirtualAddress();
+    cbAdderss += pyroCBufIndex * objCBByteSize;
+    D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDescPyro;
+    cbvDescPyro.BufferLocation = cbAdderss;
+    cbvDescPyro.SizeInBytes = constantsBufferSize;
+
+    CD3DX12_CPU_DESCRIPTOR_HANDLE cbvHeapHandle(_cbvHeap->GetCPUDescriptorHandleForHeapStart());
+    cbvHeapHandle.Offset(1, _cbvSrvUavDescriptorSize); 
+
+    _device->CreateConstantBufferView(&cbvDescPyro, cbvHeapHandle);
+
+
+    _timeCB = std::make_unique<UploadBuffer<float>>(_device.Get(), 1, true);
     objCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(float));
     cbAdderss = _timeCB->Resource()->GetGPUVirtualAddress();
     D3D12_CONSTANT_BUFFER_VIEW_DESC timeDesc;
     timeDesc.BufferLocation = cbAdderss;
     timeDesc.SizeInBytes = objCBByteSize;
-
-    CD3DX12_CPU_DESCRIPTOR_HANDLE cbvHeapHandle(_cbvHeap->GetCPUDescriptorHandleForHeapStart());
-    cbvHeapHandle.Offset(1, _cbvSrvUavDescriptorSize); 
-    _device->CreateConstantBufferView(&timeDesc, cbvHeapHandle);
-
-    int pyroCBufIndex = 1;
-    objCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
-    cbAdderss = _objectCB->Resource()->GetGPUVirtualAddress();
-    cbAdderss += pyroCBufIndex * objCBByteSize;
-    D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDescPyro;
-    cbvDescPyro.BufferLocation = cbAdderss;
-    cbvDescPyro.SizeInBytes = D3DUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
-
-    cbvHeapHandle.Offset(1, _cbvSrvUavDescriptorSize);
-    _device->CreateConstantBufferView(&cbvDescPyro, cbvHeapHandle);
 
     cbvHeapHandle.Offset(1, _cbvSrvUavDescriptorSize);
     _device->CreateConstantBufferView(&timeDesc, cbvHeapHandle);
@@ -232,11 +236,17 @@ void Ch6Ex::BuildConstantBuffers()
 
 void Ch6Ex::BuildRootSignature()
 {
-    CD3DX12_ROOT_PARAMETER slotRootParameter[1];
+    CD3DX12_ROOT_PARAMETER slotRootParameter[2];
+
     CD3DX12_DESCRIPTOR_RANGE cbvTable;
-    cbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 2, 0);
+    cbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
+    CD3DX12_DESCRIPTOR_RANGE cbvTableTime;
+    cbvTableTime.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
     slotRootParameter[0].InitAsDescriptorTable(1, &cbvTable);
-    CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(1, slotRootParameter, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+    slotRootParameter[1].InitAsDescriptorTable(1, &cbvTableTime);
+
+
+    CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(2, slotRootParameter, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
     ComPtr<ID3DBlob> serializedRootSig = nullptr;
     ComPtr<ID3DBlob> errorBlob = nullptr;
     HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1, serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
