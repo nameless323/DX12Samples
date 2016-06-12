@@ -4,6 +4,8 @@
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace DirectX::PackedVector;
+using ObjectConstants = ShapesFrameResource::ObjectConstants;
+using Vertex = ShapesFrameResource::Vertex;
 
 Shapes::Shapes(HINSTANCE hInstance) : Application(hInstance)
 {
@@ -22,6 +24,11 @@ bool Shapes::Init()
     BuildDescriptorHeaps();
     BuildConstantBufferViews();
     BuildPSOs();
+
+    ThrowIfFailed(_commandList->Close());
+    ID3D12CommandList* cmdsLists[] = { _commandList.Get() };
+    _commandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
+    FlushCommandQueue();
 
     return true;
 }
@@ -384,24 +391,22 @@ void Shapes::BuildShapeGeometry()
     }
 
     std::vector<uint16_t> indices;
-    indices.insert(indices.end(), begin(box.GetIndices16()), end(box.GetIndices16()));
-    indices.insert(indices.end(), begin(grid.GetIndices16()), end(grid.GetIndices16()));
-    indices.insert(indices.end(), begin(sphere.GetIndices16()), end(sphere.GetIndices16()));
-    indices.insert(indices.end(), begin(cylinder.GetIndices16()), end(cylinder.GetIndices16()));
+    auto a = indices.end();
+    auto b = begin(box.GetIndices16());
+    auto c = end(box.GetIndices16());
+    indices.insert(
+        indices.end(), 
+        std::begin(box.GetIndices16()), 
+        std::end(box.GetIndices16()));
+    indices.insert(indices.end(), std::begin(grid.GetIndices16()), std::end(grid.GetIndices16()));
+    indices.insert(indices.end(), std::begin(sphere.GetIndices16()), std::end(sphere.GetIndices16()));
+    indices.insert(indices.end(), std::begin(cylinder.GetIndices16()), std::end(cylinder.GetIndices16()));
 
     const UINT vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
     const UINT ibByteSize = (UINT)indices.size() * sizeof(uint16_t);
 
     auto geo = std::make_unique<MeshGeometry>();
     geo->Name = "shapeGeo";
-
-
-    //todo ?????
-    ThrowIfFailed(D3DCreateBlob(vbByteSize, &geo->VertexBufferCPU));
-    CopyMemory(geo->VertexBufferCPU->GetBufferPointer(), vertices.data(), vbByteSize);
-
-    ThrowIfFailed(D3DCreateBlob(ibByteSize, &geo->IndexBufferCPU));
-    CopyMemory(geo->IndexBufferCPU->GetBufferPointer(), indices.data(), ibByteSize);
 
     geo->VertexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), vertices.data(), vbByteSize, geo->VertexBufferUploader);
     geo->IndexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), indices.data(), ibByteSize, geo->IndexBufferUploader);
@@ -437,7 +442,7 @@ void Shapes::BuildPSOs()
         _shaders["opaquePS"]->GetBufferSize()
     };
     opaquePsoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-    opaquePsoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME; //? D3D12_FILL_MODE_SOLID
+    opaquePsoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
     opaquePsoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
     opaquePsoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
     opaquePsoDesc.SampleMask = UINT_MAX;
@@ -447,11 +452,11 @@ void Shapes::BuildPSOs()
     opaquePsoDesc.SampleDesc.Count = _4xMsaa ? 4 : 1;
     opaquePsoDesc.SampleDesc.Quality = _4xMsaa ? (_4xMsaaQuality - 1) : 0;
     opaquePsoDesc.DSVFormat = _dsvFormat;
-    _device->CreateGraphicsPipelineState(&opaquePsoDesc, IID_PPV_ARGS(&_PSOs["opaque"]));
+    ThrowIfFailed(_device->CreateGraphicsPipelineState(&opaquePsoDesc, IID_PPV_ARGS(&_PSOs["opaque"])));
 
     D3D12_GRAPHICS_PIPELINE_STATE_DESC opaqueWireframePsoDesc = opaquePsoDesc;
     opaqueWireframePsoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
-    _device->CreateGraphicsPipelineState(&opaqueWireframePsoDesc, IID_PPV_ARGS(&_PSOs["opaque_wireframe"]));
+    ThrowIfFailed(_device->CreateGraphicsPipelineState(&opaqueWireframePsoDesc, IID_PPV_ARGS(&_PSOs["opaque_wireframe"])));
 }
 
 void Shapes::BuildFrameResources()
@@ -541,21 +546,18 @@ void Shapes::BuildRenderItems()
 
 void Shapes::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<ShapesRenderItem*>& renderItems)
 {
-    UINT objCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
-    auto objectCB = _currFrameResource->ObjectCB->Resource();
-
     for (size_t i = 0; i < renderItems.size(); i++)
     {
         auto ri = renderItems[i];
-        _commandList->IASetVertexBuffers(0, 1, &ri->Geo->VertexBufferView());
-        _commandList->IASetIndexBuffer(&ri->Geo->IndexBufferView());
-        _commandList->IASetPrimitiveTopology(ri->PrimitiveType);
+        cmdList->IASetVertexBuffers(0, 1, &ri->Geo->VertexBufferView());
+        cmdList->IASetIndexBuffer(&ri->Geo->IndexBufferView());
+        cmdList->IASetPrimitiveTopology(ri->PrimitiveType);
 
         UINT cbvIndex = _currentFrameResourceIndex*(UINT)_opaqueRenderItems.size() + ri->ObjCBIndex;
         auto cbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(_cbvHeap->GetGPUDescriptorHandleForHeapStart());
         cbvHandle.Offset(cbvIndex, _cbvSrvUavDescriptorSize);
-        _commandList->SetGraphicsRootDescriptorTable(0, cbvHandle);
+        cmdList->SetGraphicsRootDescriptorTable(0, cbvHandle);
 
-        _commandList->DrawIndexedInstanced(ri->IndexCount, 1, ri->StartIndexLocation, ri->BaseVertexLocation, 0);
+        cmdList->DrawIndexedInstanced(ri->IndexCount, 1, ri->StartIndexLocation, ri->BaseVertexLocation, 0);
     }
 }

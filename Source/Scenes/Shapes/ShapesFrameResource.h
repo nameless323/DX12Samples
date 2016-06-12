@@ -4,10 +4,7 @@
 #include "../../Core/MathHelper.h"
 #include "../../Core/UploadBuffer.h"
 
-struct ObjectConstants
-{
-    DirectX::XMFLOAT4X4 Model = MathHelper::Identity4x4();
-};
+
 
 struct PassConstants
 {
@@ -27,15 +24,21 @@ struct PassConstants
     float DeltaTime = 0.0f;
 };
 
-struct Vertex
-{
-    DirectX::XMFLOAT3 Pos;
-    DirectX::XMFLOAT4 Color;
-};
+
 
 struct ShapesFrameResource
 {
 public:
+    struct Vertex
+    {
+        DirectX::XMFLOAT3 Pos;
+        DirectX::XMFLOAT4 Color;
+    };
+    struct ObjectConstants
+    {
+        DirectX::XMFLOAT4X4 Model = MathHelper::Identity4x4();
+    };
+
     ShapesFrameResource(ID3D12Device* device, UINT passCount, UINT objectCount);
     ShapesFrameResource(const ShapesFrameResource& rhs) = delete;
     ShapesFrameResource& operator= (const ShapesFrameResource& rhs) = delete;
@@ -46,4 +49,5 @@ public:
     std::unique_ptr<UploadBuffer<ObjectConstants>> ObjectCB = nullptr;
 
     UINT64 Fence = 0;
+   
 };

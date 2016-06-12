@@ -42,7 +42,7 @@ VOut vert(VIn i)
     return o;
 }
 
-float4 main(VOut i) : SV_Target
+float4 frag(VOut i) : SV_Target
 {
 	return i.color;
 }

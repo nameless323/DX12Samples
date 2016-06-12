@@ -2,12 +2,13 @@
 #include "Scenes/InitDX/InitDX.h"
 #include "Scenes/Box/Box.h"
 #include "Exercises/Ch6Ex.h"
+#include "Scenes/Shapes/Shapes.h"
 
 Application* app;
 
 void CreateScene(HINSTANCE hInstance)
 {
-    app = new Ch6Ex(hInstance);
+    app = new Shapes(hInstance);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)

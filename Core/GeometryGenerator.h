@@ -43,8 +43,8 @@ public:
                 {
                     _indices16[i] = static_cast<uint16>(Indices32[i]);
                 }
-                return _indices16;
             }
+            return _indices16;
         }
     private:
         std::vector<uint16> _indices16;
