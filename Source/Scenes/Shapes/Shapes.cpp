@@ -137,7 +137,7 @@ void Shapes::OnMouseMove(WPARAM btnState, int x, int y)
     if ((btnState & MK_LBUTTON) != 0)
     {
         float dx = XMConvertToRadians(0.25f * static_cast<float>(x - _lastMousePos.x));
-        float dy = XMConvertToRadians(0.25f * static_cast<float>(x - _lastMousePos.y));
+        float dy = XMConvertToRadians(0.25f * static_cast<float>(y - _lastMousePos.y));
 
         _theta += dx;
         _phi += dy;
@@ -168,7 +168,7 @@ void Shapes::OnKeyboardInput(const GameTimer& timer)
 void Shapes::UpdateCamera(const GameTimer& timer)
 {
     _eyePos.x = _radius*sinf(_phi)*cosf(_theta);
-    _eyePos.z = _radius*sinf(_phi)*cosf(_theta);
+    _eyePos.z = _radius*sinf(_phi)*sinf(_theta);
     _eyePos.y = _radius*cosf(_phi);
 
     XMVECTOR pos = XMVectorSet(_eyePos.x, _eyePos.y, _eyePos.z, 1.0f);
