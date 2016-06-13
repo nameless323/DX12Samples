@@ -60,6 +60,12 @@
     <ClInclude Include="Source\Scenes\Shapes\ShapesRenderItem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Scenes\Waves\WavesFrameResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scenes\Waves\Waves.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Camera.cpp">
@@ -101,10 +107,17 @@
     <ClCompile Include="Source\Scenes\Shapes\Shapes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Scenes\Waves\WavesFrameResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scenes\Waves\Waves.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\Color.hlsl" />
     <FxCompile Include="Shaders\Ch6Ex.hlsl" />
     <FxCompile Include="Shaders\Shapes.hlsl" />
+    <FxCompile Include="Shaders\Waves.hlsl" />
   </ItemGroup>
 </Project>
