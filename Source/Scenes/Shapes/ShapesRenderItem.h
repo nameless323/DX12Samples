@@ -3,10 +3,10 @@
 #include "../../Core/D3DUtil.h"
 #include "../../Core/MathHelper.h"
 
-const int NumFrameResources = 3;
 
 struct ShapesRenderItem
 {
+    static const int NumFrameResources = 3;
     ShapesRenderItem() = default;
 
     DirectX::XMFLOAT4X4 Model = MathHelper::Identity4x4();

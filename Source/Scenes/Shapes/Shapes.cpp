@@ -60,7 +60,7 @@ void Shapes::Update(const GameTimer& timer)
     OnKeyboardInput(timer);
     UpdateCamera(timer);
 
-    _currentFrameResourceIndex = (_currentFrameResourceIndex + 1) % NumFrameResources;
+    _currentFrameResourceIndex = (_currentFrameResourceIndex + 1) % ShapesRenderItem::NumFrameResources;
     _currFrameResource = _frameResources[_currentFrameResourceIndex].get();
 
     if (_currFrameResource->Fence != 0 && _fence->GetCompletedValue() < _currFrameResource->Fence)
@@ -226,8 +226,8 @@ void Shapes::UpdateMainPassCB(const GameTimer& timer)
 void Shapes::BuildDescriptorHeaps()
 {
     UINT objCount = (UINT)_opaqueRenderItems.size();
-    UINT numDescriptors = (objCount + 1) * NumFrameResources;
-    _passCbvOffset = objCount*NumFrameResources;
+    UINT numDescriptors = (objCount + 1) * ShapesRenderItem::NumFrameResources;
+    _passCbvOffset = objCount* ShapesRenderItem::NumFrameResources;
 
     D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
     cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
@@ -242,7 +242,7 @@ void Shapes::BuildConstantBufferViews()
     UINT objCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
     UINT objCount = (UINT)_opaqueRenderItems.size();
 
-    for (int frameIndex = 0; frameIndex < NumFrameResources; frameIndex++)
+    for (int frameIndex = 0; frameIndex < ShapesRenderItem::NumFrameResources; frameIndex++)
     {
         auto objectCB = _frameResources[frameIndex]->ObjectCB->Resource();
         for (UINT i = 0; i < objCount; i++)
@@ -264,7 +264,7 @@ void Shapes::BuildConstantBufferViews()
     }
 
     UINT passCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(PassConstants));
-    for (int frameIndex = 0; frameIndex < NumFrameResources; frameIndex++)
+    for (int frameIndex = 0; frameIndex < ShapesRenderItem::NumFrameResources; frameIndex++)
     {
         auto passCB = _frameResources[frameIndex]->PassCB->Resource();
         D3D12_GPU_VIRTUAL_ADDRESS cbAddress = passCB->GetGPUVirtualAddress();
@@ -461,7 +461,7 @@ void Shapes::BuildPSOs()
 
 void Shapes::BuildFrameResources()
 {
-    for (int i = 0; i < NumFrameResources; i++)
+    for (int i = 0; i < ShapesRenderItem::NumFrameResources; i++)
         _frameResources.push_back(std::make_unique<ShapesFrameResource>(_device.Get(), 1, (UINT)_allRenderItems.size()));
 }
 
