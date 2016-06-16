@@ -54,7 +54,7 @@ private:
     std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3DBlob>> _shaders;
     std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> _PSOs;
 
-    std::vector<D3D12_INPUT_LAYOUT_DESC> _inputLayout;
+    std::vector<D3D12_INPUT_ELEMENT_DESC> _inputLayout;
     WavesRenderItem* _wavesRenderItem = nullptr;
 
     std::vector<std::unique_ptr<WavesRenderItem>> _allRenderItems;
