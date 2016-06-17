@@ -21,6 +21,8 @@ bool WavesScene::Init()
         return false;
     ThrowIfFailed(_commandList->Reset(_commandAllocator.Get(), nullptr));
 
+    _waves = std::make_unique<Waves>(128, 128, 1.0f, 0.03f, 4.0f, 0.2f);
+
     BuildRootSignature();
     BuildShaderAndInputLayout();
     BuildLangGeometry();
@@ -368,7 +370,6 @@ void WavesScene::BuildWavesGeometryBuffers()
     auto geo = std::make_unique<MeshGeometry>();
     geo->Name = "waterGeo";
 
-    geo->VertexBufferCPU = nullptr;
     geo->VertexBufferGPU = nullptr;
 
     geo->IndexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), indices.data(), ibByteSize, geo->IndexBufferUploader);
@@ -431,10 +432,53 @@ void WavesScene::BuildFrameResources()
 
 void WavesScene::BuildRenderItems()
 {
+    auto wavesRenderItem = std::make_unique<WavesRenderItem>();
+    wavesRenderItem->Model = MathHelper::Identity4x4();
+    wavesRenderItem->ObjCBIndex = 0;
+    wavesRenderItem->Geo = _geometries["waterGeo"].get();
+    wavesRenderItem->PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+    wavesRenderItem->IndexCount = wavesRenderItem->Geo->DrawArgs["grid"].IndexCount;
+    wavesRenderItem->StartIndexLocation = wavesRenderItem->Geo->DrawArgs["grid"].StartIndexLocation;
+    wavesRenderItem->BaseVertexLocation = wavesRenderItem->Geo->DrawArgs["grid"].BaseVertexLocation;
+
+    _wavesRenderItem = wavesRenderItem.get();
+
+    _renderItemLayer[(int)RenderLayer::Opaque].push_back(wavesRenderItem.get());
+
+    auto gridRenderItem = std::make_unique<WavesRenderItem>();
+    gridRenderItem->Model = MathHelper::Identity4x4();
+    gridRenderItem->ObjCBIndex = 1;
+    gridRenderItem->Geo = _geometries["landGeo"].get();
+    gridRenderItem->PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+    gridRenderItem->IndexCount = gridRenderItem->Geo->DrawArgs["grid"].IndexCount;
+    gridRenderItem->StartIndexLocation = gridRenderItem->Geo->DrawArgs["grid"].StartIndexLocation;
+    gridRenderItem->BaseVertexLocation = gridRenderItem->Geo->DrawArgs["grid"].BaseVertexLocation;
+
+    _renderItemLayer[(int)RenderLayer::Opaque].push_back(gridRenderItem.get());
+
+    _allRenderItems.push_back(std::move(wavesRenderItem));
+    _allRenderItems.push_back(std::move(gridRenderItem));
 }
 
 void WavesScene::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<WavesRenderItem*>& renderItems)
 {
+    UINT objCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(WavesFrameResource::ObjectConstants));
+    auto objectCB = _currFrameResource->ObjectCB->Resource();
+
+    for (size_t i = 0; i < renderItems.size(); i++)
+    {
+        auto ri = renderItems[i];
+
+        cmdList->IASetVertexBuffers(0, 1, &ri->Geo->VertexBufferView());
+        cmdList->IASetIndexBuffer(&ri->Geo->IndexBufferView());
+        cmdList->IASetPrimitiveTopology(ri->PrimitiveType);
+
+        D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = objectCB->GetGPUVirtualAddress();
+        objCBAddress += ri->ObjCBIndex*objCBByteSize;
+
+        cmdList->SetGraphicsRootConstantBufferView(0, objCBAddress);
+        cmdList->DrawIndexedInstanced(ri->IndexCount, 1, ri->StartIndexLocation, ri->BaseVertexLocation, 0);
+    }
 }
 
 float WavesScene::GetHillsHeight(float x, float z) const

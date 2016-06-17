@@ -3,13 +3,16 @@
 #include "Scenes/Box/Box.h"
 #include "Exercises/Ch6Ex.h"
 #include "Scenes/Shapes/Shapes.h"
+#include <strstream>
+#include "Scenes/Waves/WavesScene.h"
 
 Application* app;
 
 void CreateScene(HINSTANCE hInstance)
 {
-    app = new Shapes(hInstance);
+    app = new WavesScene(hInstance);
 }
+
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
 {
