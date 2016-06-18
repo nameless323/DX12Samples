@@ -2,6 +2,7 @@
 #include "../../../Core/Application.h"
 #include "ShapesRenderItem.h"
 #include "ShapesFrameResource.h"
+#include "../../../Core/GeometryGenerator.h"
 
 class Shapes : public Application
 {
@@ -34,6 +35,7 @@ protected:
     void BuildFrameResources();
     void BuildRenderItems();
     void DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<ShapesRenderItem*>& renderItems);
+    GeometryGenerator::MeshData ParseFile(std::string filename) const;
 private:
     std::vector<std::unique_ptr<ShapesFrameResource>> _frameResources;
     ShapesFrameResource* _currFrameResource = nullptr;

@@ -26,7 +26,7 @@ bool Shapes::Init()
     BuildPSOs();
 
     ThrowIfFailed(_commandList->Close());
-    ID3D12CommandList* cmdsLists[] = { _commandList.Get() };
+    ID3D12CommandList* cmdsLists[] = {_commandList.Get()};
     _commandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
     FlushCommandQueue();
 
@@ -97,7 +97,7 @@ void Shapes::Draw(const GameTimer& timer)
 
     _commandList->OMSetRenderTargets(1, &CurrentBackBufferView(), true, &DepthStencilView());
 
-    ID3D12DescriptorHeap* descriptorHeaps[] = { _cbvHeap.Get() };
+    ID3D12DescriptorHeap* descriptorHeaps[] = {_cbvHeap.Get()};
     _commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
     _commandList->SetGraphicsRootSignature(_rootSignature.Get());
@@ -111,7 +111,7 @@ void Shapes::Draw(const GameTimer& timer)
 
     _commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
     ThrowIfFailed(_commandList->Close());
-    ID3D12CommandList* cmdLists[] = { _commandList.Get() };
+    ID3D12CommandList* cmdLists[] = {_commandList.Get()};
     _commandQueue->ExecuteCommandLists(1, cmdLists);
 
     ThrowIfFailed(_swapChain->Present(0, 0));
@@ -167,9 +167,9 @@ void Shapes::OnKeyboardInput(const GameTimer& timer)
 
 void Shapes::UpdateCamera(const GameTimer& timer)
 {
-    _eyePos.x = _radius*sinf(_phi)*cosf(_theta);
-    _eyePos.z = _radius*sinf(_phi)*sinf(_theta);
-    _eyePos.y = _radius*cosf(_phi);
+    _eyePos.x = _radius * sinf(_phi) * cosf(_theta);
+    _eyePos.z = _radius * sinf(_phi) * sinf(_theta);
+    _eyePos.y = _radius * cosf(_phi);
 
     XMVECTOR pos = XMVectorSet(_eyePos.x, _eyePos.y, _eyePos.z, 1.0f);
     XMVECTOR target = XMVectorZero();
@@ -227,7 +227,7 @@ void Shapes::BuildDescriptorHeaps()
 {
     UINT objCount = (UINT)_opaqueRenderItems.size();
     UINT numDescriptors = (objCount + 1) * ShapesRenderItem::NumFrameResources;
-    _passCbvOffset = objCount* ShapesRenderItem::NumFrameResources;
+    _passCbvOffset = objCount * ShapesRenderItem::NumFrameResources;
 
     D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
     cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
@@ -249,9 +249,9 @@ void Shapes::BuildConstantBufferViews()
         {
             D3D12_GPU_VIRTUAL_ADDRESS cbAddress = objectCB->GetGPUVirtualAddress();
 
-            cbAddress += i*objCBByteSize;
+            cbAddress += i * objCBByteSize;
 
-            int heapIndex = frameIndex*objCount + i;
+            int heapIndex = frameIndex * objCount + i;
             auto handle = CD3DX12_CPU_DESCRIPTOR_HANDLE(_cbvHeap->GetCPUDescriptorHandleForHeapStart());
             handle.Offset(heapIndex, _cbvSrvUavDescriptorSize);
 
@@ -305,7 +305,6 @@ void Shapes::BuildRootSignature()
     ThrowIfFailed(hr);
 
     ThrowIfFailed(_device->CreateRootSignature(0, serializedRootSig->GetBufferPointer(), serializedRootSig->GetBufferSize(), IID_PPV_ARGS(_rootSignature.GetAddressOf())));
-    
 }
 
 void Shapes::BuildShaderAndInputLayout()
@@ -314,10 +313,10 @@ void Shapes::BuildShaderAndInputLayout()
     _shaders["opaquePS"] = D3DUtil::CompileShader(L"Shaders\\Shapes.hlsl", nullptr, "frag", "ps_5_1");
 
     _inputLayout =
-    {
-        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-        { "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-    };
+        {
+            {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+            {"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+        };
 }
 
 void Shapes::BuildShapeGeometry()
@@ -325,17 +324,20 @@ void Shapes::BuildShapeGeometry()
     GeometryGenerator geoGen;
     GeometryGenerator::MeshData box = geoGen.CreateBox(1.5f, 0.5f, 1.5f, 3);
     GeometryGenerator::MeshData grid = geoGen.CreateGrid(20.0f, 30.0f, 60, 40);
+    GeometryGenerator::MeshData skull = ParseFile("Models\\skull.txt");
     GeometryGenerator::MeshData sphere = geoGen.CreateSphere(0.5f, 20, 20);
     GeometryGenerator::MeshData cylinder = geoGen.CreateCylinder(0.5f, 0.3f, 3.0f, 20, 20);
 
     UINT boxVertexOffset = 0;
     UINT gridVertexOffset = (UINT)box.Vertices.size();
-    UINT sphereVertexOffset = gridVertexOffset + (UINT)grid.Vertices.size();
+    UINT skullVertexOffset = gridVertexOffset + (UINT)grid.Vertices.size();
+    UINT sphereVertexOffset = skullVertexOffset + (UINT)skull.Vertices.size();
     UINT cylinderVertexOffset = sphereVertexOffset + (UINT)sphere.Vertices.size();
 
     UINT boxIndexOffset = 0;
     UINT gridIndexOffset = (UINT)box.Indices32.size();
-    UINT sphereIndexOffset = gridIndexOffset + (UINT)grid.Indices32.size();
+    UINT skullIndexOffset = gridIndexOffset + (UINT)grid.Indices32.size();
+    UINT sphereIndexOffset = skullIndexOffset + (UINT)skull.Indices32.size();
     UINT cylinderIndexOffset = sphereIndexOffset + (UINT)sphere.Indices32.size();
 
     SubmeshGeometry boxSubmesh;
@@ -347,6 +349,11 @@ void Shapes::BuildShapeGeometry()
     gridSubmesh.IndexCount = (UINT)grid.Indices32.size();
     gridSubmesh.StartIndexLocation = gridIndexOffset;
     gridSubmesh.BaseVertexLocation = gridVertexOffset;
+
+    SubmeshGeometry skullSubmesh;
+    skullSubmesh.IndexCount = (UINT)skull.Indices32.size();
+    skullSubmesh.StartIndexLocation = skullIndexOffset;
+    skullSubmesh.BaseVertexLocation = skullVertexOffset;
 
     SubmeshGeometry sphereSubmesh;
     sphereSubmesh.IndexCount = (UINT)sphere.Indices32.size();
@@ -361,44 +368,47 @@ void Shapes::BuildShapeGeometry()
     auto totalVertexCount =
         box.Vertices.size() +
         grid.Vertices.size() +
+        skull.Vertices.size() +
         sphere.Vertices.size() +
         cylinder.Vertices.size();
     std::vector<Vertex> vertices(totalVertexCount);
 
     UINT k = 0;
-    for (size_t i = 0; i < box.Vertices.size(); i++, k++)
+    for (size_t i = 0; i < box.Vertices.size(); i++ , k++)
     {
         vertices[k].Pos = box.Vertices[i].Position;
         vertices[k].Color = XMFLOAT4(Colors::DarkGreen);
     }
 
-    for (size_t i = 0; i < grid.Vertices.size(); i++, k++)
+    for (size_t i = 0; i < grid.Vertices.size(); i++ , k++)
     {
         vertices[k].Pos = grid.Vertices[i].Position;
         vertices[k].Color = XMFLOAT4(Colors::ForestGreen);
     }
 
-    for (size_t i = 0; i < sphere.Vertices.size(); i++, k++)
+    for (size_t i = 0; i < skull.Vertices.size(); i++ , k++)
+    {
+        vertices[k].Pos = skull.Vertices[i].Position;
+        vertices[k].Color = XMFLOAT4(Colors::GhostWhite);
+    }
+
+    for (size_t i = 0; i < sphere.Vertices.size(); i++ , k++)
     {
         vertices[k].Pos = sphere.Vertices[i].Position;
         vertices[k].Color = XMFLOAT4(Colors::Crimson);
     }
 
-    for (size_t i = 0; i < cylinder.Vertices.size(); i++, k++)
+    for (size_t i = 0; i < cylinder.Vertices.size(); i++ , k++)
     {
         vertices[k].Pos = cylinder.Vertices[i].Position;
         vertices[k].Color = XMFLOAT4(Colors::SteelBlue);
     }
 
     std::vector<uint16_t> indices;
-    auto a = indices.end();
-    auto b = begin(box.GetIndices16());
-    auto c = end(box.GetIndices16());
-    indices.insert(
-        indices.end(), 
-        std::begin(box.GetIndices16()), 
-        std::end(box.GetIndices16()));
+    indices.insert(indices.end(), std::begin(box.GetIndices16()), std::end(box.GetIndices16()));
     indices.insert(indices.end(), std::begin(grid.GetIndices16()), std::end(grid.GetIndices16()));
+    indices.insert(indices.end(), std::begin(skull.GetIndices16()), std::end(skull.GetIndices16()));
+
     indices.insert(indices.end(), std::begin(sphere.GetIndices16()), std::end(sphere.GetIndices16()));
     indices.insert(indices.end(), std::begin(cylinder.GetIndices16()), std::end(cylinder.GetIndices16()));
 
@@ -420,6 +430,7 @@ void Shapes::BuildShapeGeometry()
     geo->DrawArgs["grid"] = gridSubmesh;
     geo->DrawArgs["sphere"] = sphereSubmesh;
     geo->DrawArgs["cylinder"] = cylinderSubmesh;
+    geo->DrawArgs["skull"] = skullSubmesh;
 
     _geometries[geo->Name] = move(geo);
 }
@@ -429,18 +440,18 @@ void Shapes::BuildPSOs()
     D3D12_GRAPHICS_PIPELINE_STATE_DESC opaquePsoDesc;
 
     ZeroMemory(&opaquePsoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
-    opaquePsoDesc.InputLayout = { _inputLayout.data(), (UINT)_inputLayout.size() };
+    opaquePsoDesc.InputLayout = {_inputLayout.data(), (UINT)_inputLayout.size()};
     opaquePsoDesc.pRootSignature = _rootSignature.Get();
     opaquePsoDesc.VS =
-    {
-        reinterpret_cast<BYTE*>(_shaders["standardVS"]->GetBufferPointer()),
-        _shaders["standardVS"]->GetBufferSize()
-    };
+        {
+            reinterpret_cast<BYTE*>(_shaders["standardVS"]->GetBufferPointer()),
+            _shaders["standardVS"]->GetBufferSize()
+        };
     opaquePsoDesc.PS =
-    {
-        reinterpret_cast<BYTE*>(_shaders["opaquePS"]->GetBufferPointer()),
-        _shaders["opaquePS"]->GetBufferSize()
-    };
+        {
+            reinterpret_cast<BYTE*>(_shaders["opaquePS"]->GetBufferPointer()),
+            _shaders["opaquePS"]->GetBufferSize()
+        };
     opaquePsoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
     opaquePsoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
     opaquePsoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
@@ -487,7 +498,17 @@ void Shapes::BuildRenderItems()
     gridRitem->BaseVertexLocation = gridRitem->Geo->DrawArgs["grid"].BaseVertexLocation;
     _allRenderItems.push_back(move(gridRitem));
 
-    UINT objectCBIndex = 2;
+    auto skullRitem = std::make_unique<ShapesRenderItem>();
+    XMStoreFloat4x4(&skullRitem->Model, XMMatrixScaling(0.3f, 0.3f, 0.3f) * XMMatrixTranslation(0.0f, 1.0f, 0.0f));
+    skullRitem->ObjCBIndex = 2;
+    skullRitem->Geo = _geometries["shapeGeo"].get();
+    skullRitem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+    skullRitem->IndexCount = skullRitem->Geo->DrawArgs["skull"].IndexCount;
+    skullRitem->StartIndexLocation = skullRitem->Geo->DrawArgs["skull"].StartIndexLocation;
+    skullRitem->BaseVertexLocation = skullRitem->Geo->DrawArgs["skull"].BaseVertexLocation;
+    _allRenderItems.push_back(move(skullRitem));
+
+    UINT objectCBIndex = 3;
     for (int i = 0; i < 5; i++)
     {
         auto leftCylRitem = std::make_unique<ShapesRenderItem>();
@@ -553,11 +574,69 @@ void Shapes::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vect
         cmdList->IASetIndexBuffer(&ri->Geo->IndexBufferView());
         cmdList->IASetPrimitiveTopology(ri->PrimitiveType);
 
-        UINT cbvIndex = _currentFrameResourceIndex*(UINT)_opaqueRenderItems.size() + ri->ObjCBIndex;
+        UINT cbvIndex = _currentFrameResourceIndex * (UINT)_opaqueRenderItems.size() + ri->ObjCBIndex;
         auto cbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(_cbvHeap->GetGPUDescriptorHandleForHeapStart());
         cbvHandle.Offset(cbvIndex, _cbvSrvUavDescriptorSize);
         cmdList->SetGraphicsRootDescriptorTable(0, cbvHandle);
 
         cmdList->DrawIndexedInstanced(ri->IndexCount, 1, ri->StartIndexLocation, ri->BaseVertexLocation, 0);
     }
+}
+
+
+GeometryGenerator::MeshData Shapes::ParseFile(std::string filename) const
+{
+    GeometryGenerator::MeshData data;
+    enum class ReadMode
+        {
+            Skip,
+            Verts,
+            Trigs
+        };
+    std::fstream file;
+    file.open(filename, std::fstream::in);
+
+    std::vector<float> vertData;
+    std::vector<int> trigData;
+
+    ReadMode readMode = ReadMode::Skip;
+    for (std::string line; std::getline(file, line);)
+    {
+        std::istringstream lineStream(line);
+        std::string str = lineStream.str();
+        if (str == "{" || str == "}" || str == "") continue;
+        if (str.find("VertexList") != std::string::npos)
+        {
+            readMode = ReadMode::Verts;
+            continue;
+        }
+        if (str.find("TriangleList") != std::string::npos)
+        {
+            readMode = ReadMode::Trigs;
+            continue;
+        }
+
+        if (readMode == ReadMode::Skip)
+        {
+            continue;
+        }
+        if (readMode == ReadMode::Verts)
+        {
+            float v1, v2, v3, n1, n2, n3;
+            lineStream >> v1 >> v2 >> v3 >> n1 >> n2 >> n3;
+            data.Vertices.push_back(GeometryGenerator::Vertex(v1, v2, v3, n1, n2, n3, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
+            continue;
+        }
+        if (readMode == ReadMode::Trigs)
+        {
+            float t1, t2, t3;
+            lineStream >> t1 >> t2 >> t3;
+            data.Indices32.push_back(t1);
+            data.Indices32.push_back(t2);
+            data.Indices32.push_back(t3);
+            continue;
+        }
+    }
+    file.close();
+    return data;
 }

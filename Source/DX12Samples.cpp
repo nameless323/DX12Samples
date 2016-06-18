@@ -10,9 +10,8 @@ Application* app;
 
 void CreateScene(HINSTANCE hInstance)
 {
-    app = new WavesScene(hInstance);
+    app = new Shapes(hInstance);
 }
-
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
 {
