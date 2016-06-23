@@ -23,7 +23,7 @@
 #include "DDSTextureLoader.h"
 #include "MathHelper.h"
 
-extern const int gNumFrameResources;
+const int gNumFrameResources = 3;
 
 inline void D3DSetDebugName(IDXGIObject* obj, const char* name)
 {

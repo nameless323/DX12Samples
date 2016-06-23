@@ -80,7 +80,7 @@ float4 frag(vOut i) : SV_Target
 
     const float shininess = 1.0f - Roughness;
     Material mat = { DiffuseAlbedo, FresnelR0, shininess };
-    float3 shadowFactor = 1.0f;
+    float3 shadowFactor = 1.0;
     float4 directLight = ComputeLighting(Lights, mat, i.PosW, i.NormalW, toEyeW, shadowFactor);
     float4 litColor = ambient + directLight;
     litColor.a = DiffuseAlbedo.a;

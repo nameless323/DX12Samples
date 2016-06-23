@@ -169,6 +169,9 @@
     <ClInclude Include="Source\Scenes\Box\Box.h" />
     <ClInclude Include="Source\Exercises\Ch6Ex.h" />
     <ClInclude Include="Source\Scenes\InitDX\InitDX.h" />
+    <ClInclude Include="Source\Scenes\LitColumns\LitColumns.h" />
+    <ClInclude Include="Source\Scenes\LitColumns\LitColumnsFrameResource.h" />
+    <ClInclude Include="Source\Scenes\LitColumns\LitColumnsRenderItem.h" />
     <ClInclude Include="Source\Scenes\Shapes\Shapes.h" />
     <ClInclude Include="Source\Scenes\Shapes\ShapesFrameResource.h" />
     <ClInclude Include="Source\Scenes\Shapes\ShapesRenderItem.h" />
@@ -189,6 +192,8 @@
     <ClCompile Include="Source\DX12Samples.cpp" />
     <ClCompile Include="Source\Exercises\Ch6Ex.cpp" />
     <ClCompile Include="Source\Scenes\InitDX\InitDX.cpp" />
+    <ClCompile Include="Source\Scenes\LitColumns\LitColumns.cpp" />
+    <ClCompile Include="Source\Scenes\LitColumns\LitColumnsFrameResource.cpp" />
     <ClCompile Include="Source\Scenes\Shapes\Shapes.cpp" />
     <ClCompile Include="Source\Scenes\Shapes\ShapesFrameResource.cpp" />
     <ClCompile Include="Source\Scenes\Waves\Waves.cpp" />
@@ -209,6 +214,21 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <FileType>Document</FileType>
     </FxCompile>
+    <ClInclude Include="Shaders\LightingUtil.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CalcAttenuation</EntryPointName>
+      <FileType>Document</FileType>
+    </ClInclude>
+    <ClInclude Include="Shaders\LitShader.hlsl">
+      <FileType>Document</FileType>
+    </ClInclude>
     <FxCompile Include="Shaders\Shapes.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>

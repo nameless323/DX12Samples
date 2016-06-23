@@ -72,6 +72,17 @@
     <ClInclude Include="Source\Scenes\Waves\WavesRenderItem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Scenes\LitColumns\LitColumnsFrameResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scenes\LitColumns\LitColumns.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scenes\LitColumns\LitColumnsRenderItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shaders\LightingUtil.hlsl" />
+    <ClInclude Include="Shaders\LitShader.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Camera.cpp">
@@ -120,6 +131,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Scenes\Waves\WavesScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scenes\LitColumns\LitColumnsFrameResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scenes\LitColumns\LitColumns.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -5,12 +5,13 @@
 #include "Scenes/Shapes/Shapes.h"
 #include <strstream>
 #include "Scenes/Waves/WavesScene.h"
+#include "Scenes/LitColumns/LitColumns.h"
 
 Application* app;
 
 void CreateScene(HINSTANCE hInstance)
 {
-    app = new Shapes(hInstance);
+    app = new LitColumns(hInstance);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
