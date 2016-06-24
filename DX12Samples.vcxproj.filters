@@ -83,6 +83,12 @@
     </ClInclude>
     <ClInclude Include="Shaders\LightingUtil.hlsl" />
     <ClInclude Include="Shaders\LitShader.hlsl" />
+    <ClInclude Include="Source\Scenes\LitWaves\LitWavesFrameResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scenes\LitWaves\LitWaves.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Camera.cpp">
@@ -137,6 +143,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Scenes\LitColumns\LitColumns.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scenes\LitWaves\LitWavesFrameResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scenes\LitWaves\LitWaves.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
