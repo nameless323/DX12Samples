@@ -157,5 +157,6 @@
     <FxCompile Include="Shaders\Ch6Ex.hlsl" />
     <FxCompile Include="Shaders\Shapes.hlsl" />
     <FxCompile Include="Shaders\Waves.hlsl" />
+    <FxCompile Include="Shaders\ToonLit.hlsl" />
   </ItemGroup>
 </Project>

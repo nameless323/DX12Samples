@@ -12,7 +12,7 @@ Application* app;
 
 void CreateScene(HINSTANCE hInstance)
 {
-    app = new LitWaves(hInstance);
+    app = new LitColumns(hInstance);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
