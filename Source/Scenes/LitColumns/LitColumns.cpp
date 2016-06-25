@@ -247,7 +247,8 @@ void LitColumns::UpdateMainPassCB(const GameTimer& timer)
     _mainPassCB.DeltaTime = timer.DeltaTime();
     _mainPassCB.AmbientLight = { 0.25f, 0.25f, 0.35f, 1.0f };
     _mainPassCB.Lights[0].Direction = { 0.57735f, -0.57735f, 0.57735f };
-    _mainPassCB.Lights[0].Strength = { 0.6f, 0.6f, 0.6f };
+    float atten = sinf(timer.TotalTime()*4) / 4.0f + 1.5f;
+    _mainPassCB.Lights[0].Strength = { 0.8f * atten, 0.0f, 0.1f };
     _mainPassCB.Lights[1].Direction = { -0.57735f, -0.57735f, 0.57735f };
     _mainPassCB.Lights[1].Strength = { 0.3f, 0.3f, 0.3f };
     _mainPassCB.Lights[2].Direction = { 0.0f, -0.707f, -0.707f };
