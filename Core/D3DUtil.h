@@ -198,6 +198,15 @@ struct Material
     DirectX::XMFLOAT4X4 MatTransform = MathHelper::Identity4x4();
 };
 
+struct Texture
+{
+    std::string Name;
+    std::wstring Filename;
+
+    Microsoft::WRL::ComPtr<ID3D12Resource> Resource = nullptr;
+    Microsoft::WRL::ComPtr<ID3D12Resource> UploadHeap = nullptr;
+};
+
 #ifndef ThrowIfFailed
 #define ThrowIfFailed(x)                                              \
 {                                                                     \
