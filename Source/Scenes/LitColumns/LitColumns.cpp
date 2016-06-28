@@ -248,23 +248,28 @@ void LitColumns::UpdateMainPassCB(const GameTimer& timer)
     _mainPassCB.AmbientLight = { 0.25f, 0.25f, 0.35f, 1.0f };
 
     float atten = sinf(timer.TotalTime() * 4) / 4.0f + 1.5f;
+
+    _mainPassCB.Lights[0].Strength = { 1.0f * atten, 0.0f, 0.0f };
+    _mainPassCB.Lights[0].FalloffStart = 0.5f;
+    _mainPassCB.Lights[0].FalloffEnd = 10.0f;
+    _mainPassCB.Lights[0].Position = { 0.0f, 6.0f,0.0f };
     for (int i = 0; i < 5; i++)
     {
-        _mainPassCB.Lights[i * 2].Strength = { 0.8f, 0.8f, 0.8f };
-        _mainPassCB.Lights[i * 2].FalloffStart = 0.32f;
-        _mainPassCB.Lights[i * 2].FalloffEnd = 5.0f;
-        _mainPassCB.Lights[i * 2].Position = { -5.0f, 6.0f, -10.0f + i * 5.0f };
-
         _mainPassCB.Lights[i * 2 + 1].Strength = { 0.8f, 0.8f, 0.8f };
+        _mainPassCB.Lights[i * 2 + 1].Direction = { 0.0f, -1.0f, 0.0f };
+        _mainPassCB.Lights[i * 2 + 1].SpotPower = 64.0f;
         _mainPassCB.Lights[i * 2 + 1].FalloffStart = 0.32f;
-        _mainPassCB.Lights[i * 2 + 1].FalloffEnd = 5.0f;
-        _mainPassCB.Lights[i * 2 + 1].Position = { +5.0f, 6.0f, -10.0f + i * 5.0f };
+        _mainPassCB.Lights[i * 2 + 1].FalloffEnd = 25.0f;
+        _mainPassCB.Lights[i * 2 + 1].Position = { -5.0f, 8.0f, -10.0f + i * 5.0f };
+
+        _mainPassCB.Lights[i * 2 + 2].Strength = { 0.8f, 0.8f, 0.8f };
+        _mainPassCB.Lights[i * 2 + 2].Direction = { 0.0f, -1.0f, 0.0f };
+        _mainPassCB.Lights[i * 2 + 2].SpotPower = 64.0f;
+        _mainPassCB.Lights[i * 2 + 2].FalloffStart = 0.32f;
+        _mainPassCB.Lights[i * 2 + 2].FalloffEnd = 25.0f;
+        _mainPassCB.Lights[i * 2 + 2].Position = { +5.0f, 8.0f, -10.0f + i * 5.0f };
 
     }
-    _mainPassCB.Lights[10].Strength = { 1.0f * atten, 0.0f, 0.0f };
-    _mainPassCB.Lights[10].FalloffStart = 0.5f;
-    _mainPassCB.Lights[10].FalloffEnd = 10.0f;
-    _mainPassCB.Lights[10].Position = { 0.0f, 6.0f,0.0f };
 //    _mainPassCB.Lights[0].Direction = { 0.57735f, -0.57735f, 0.57735f };
 //    float atten = sinf(timer.TotalTime()*4) / 4.0f + 1.5f;
 //    _mainPassCB.Lights[0].Strength = { 0.8f * atten, 0.8f * atten, 0.8f * atten};
@@ -296,7 +301,7 @@ void LitColumns::BuildRootSignature()
 
 void LitColumns::BuildShaderAndInputLayout()
 {
-    D3D_SHADER_MACRO macro[] = { "NUM_DIR_LIGHTS", "0", "NUM_POINT_LIGHTS", "11", NULL, NULL };
+    D3D_SHADER_MACRO macro[] = { "NUM_DIR_LIGHTS", "0", "NUM_POINT_LIGHTS", "1", "NUM_SPOT_LIGHTS", "10", nullptr };
     _shaders["standardVS"] = D3DUtil::CompileShader(L"Shaders\\LitShader.hlsl", macro, "vert", "vs_5_1");
     _shaders["opaquePS"] = D3DUtil::CompileShader(L"Shaders\\LitShader.hlsl", macro, "frag", "ps_5_1");
 
