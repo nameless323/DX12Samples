@@ -89,6 +89,15 @@
     <ClInclude Include="Source\Scenes\LitWaves\LitWaves.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Scenes\Crate\CrateRenderItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scenes\Crate\CrateFrameResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scenes\Crate\Crate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Camera.cpp">
@@ -151,6 +160,12 @@
     <ClCompile Include="Source\Scenes\LitWaves\LitWaves.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Scenes\Crate\CrateFrameResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scenes\Crate\Crate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\Color.hlsl" />
@@ -158,5 +173,6 @@
     <FxCompile Include="Shaders\Shapes.hlsl" />
     <FxCompile Include="Shaders\Waves.hlsl" />
     <FxCompile Include="Shaders\ToonLit.hlsl" />
+    <FxCompile Include="Shaders\TexCrate.hlsl" />
   </ItemGroup>
 </Project>

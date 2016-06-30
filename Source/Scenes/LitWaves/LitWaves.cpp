@@ -312,8 +312,8 @@ void LitWaves::BuildShaderAndInputLayout()
     // todo try other things
     D3D_SHADER_MACRO macro[] = { "NUM_DIR_LIGHTS", "1", NULL, NULL };
     
-    _shaders["standardVS"] = D3DUtil::CompileShader(L"Shaders\\LitShader.hlsl", macro, "vert", "vs_5_1");
-    _shaders["opaquePS"] = D3DUtil::CompileShader(L"Shaders\\LitShader.hlsl", macro, "frag", "ps_5_1");
+    _shaders["standardVS"] = D3DUtil::CompileShader(L"Shaders\\ToonLit.hlsl", macro, "vert", "vs_5_1");
+    _shaders["opaquePS"] = D3DUtil::CompileShader(L"Shaders\\ToonLit.hlsl", macro, "frag", "ps_5_1");
 
     _inputLayout =
     {
@@ -536,7 +536,10 @@ float LitWaves::GetHillsHeight(float x, float z) const
 
 XMFLOAT3 LitWaves::GetHillsNormal(float x, float z) const
 {
-    XMFLOAT3 n(-0.03f * z * cosf(0.1f * x) - 0.3f * cosf(0.1f * z), 1.0f, -0.3f * sinf(0.1f * x) + 0.03f * x * sinf(0.1f * z));
+    XMFLOAT3 n(
+        -0.03f * z * cosf(0.1f * x) - 0.3f * cosf(0.1f * z), 
+        1.0f, 
+        -0.3f * sinf(0.1f * x) + 0.03f * x * sinf(0.1f * z));
     XMVECTOR unitNormal = XMVector3Normalize(XMLoadFloat3(&n));
     XMStoreFloat3(&n, unitNormal);
     return n;

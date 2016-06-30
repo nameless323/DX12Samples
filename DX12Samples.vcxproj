@@ -168,6 +168,9 @@
     <ClInclude Include="Core\UploadBuffer.h" />
     <ClInclude Include="Source\Scenes\Box\Box.h" />
     <ClInclude Include="Source\Exercises\Ch6Ex.h" />
+    <ClInclude Include="Source\Scenes\Crate\Crate.h" />
+    <ClInclude Include="Source\Scenes\Crate\CrateFrameResource.h" />
+    <ClInclude Include="Source\Scenes\Crate\CrateRenderItem.h" />
     <ClInclude Include="Source\Scenes\InitDX\InitDX.h" />
     <ClInclude Include="Source\Scenes\LitColumns\LitColumns.h" />
     <ClInclude Include="Source\Scenes\LitColumns\LitColumnsFrameResource.h" />
@@ -193,6 +196,8 @@
     <ClCompile Include="Source\Scenes\Box\Box.cpp" />
     <ClCompile Include="Source\DX12Samples.cpp" />
     <ClCompile Include="Source\Exercises\Ch6Ex.cpp" />
+    <ClCompile Include="Source\Scenes\Crate\Crate.cpp" />
+    <ClCompile Include="Source\Scenes\Crate\CrateFrameResource.cpp" />
     <ClCompile Include="Source\Scenes\InitDX\InitDX.cpp" />
     <ClCompile Include="Source\Scenes\LitColumns\LitColumns.cpp" />
     <ClCompile Include="Source\Scenes\LitColumns\LitColumnsFrameResource.cpp" />
@@ -238,6 +243,13 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Shaders\TexCrate.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Shaders\ToonLit.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
