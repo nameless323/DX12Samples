@@ -23,6 +23,7 @@ bool Crate::Init()
     BuildShapeGeometry();
     BuildMaterials();
     BuildRenderItems();
+    BuildFrameResources();
     BuildPSOs();
 
     ThrowIfFailed(_commandList->Close());
@@ -210,6 +211,8 @@ void Crate::UpdateMaterialsCBs(const GameTimer& timer)
             matConstants.Roughness = mat->Roughness;
             XMStoreFloat4x4(&matConstants.MatTransform, XMMatrixTranspose(matTransform));
             currMaterialCB->CopyData(mat->MatCBIndex, matConstants);
+
+            mat->NumFramesDirty--;
         }
     }
 }
@@ -266,8 +269,8 @@ void Crate::BuildRootSignature()
     CD3DX12_ROOT_PARAMETER slotRootParameter[4];
     slotRootParameter[0].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_PIXEL);
     slotRootParameter[1].InitAsConstantBufferView(0);
-    slotRootParameter[1].InitAsConstantBufferView(1);
-    slotRootParameter[2].InitAsConstantBufferView(2);
+    slotRootParameter[2].InitAsConstantBufferView(1);
+    slotRootParameter[3].InitAsConstantBufferView(2);
 
     auto staticSamplers = GetStaticSamplers();
 
@@ -342,6 +345,13 @@ void Crate::BuildShapeGeometry()
 
     auto geo = std::make_unique<MeshGeometry>();
     geo->Name = "boxGeo";
+    /*
+    ThrowIfFailed(D3DCreateBlob(vbByteSize, &geo->VertexBufferCPU));
+    CopyMemory(geo->VertexBufferCPU->GetBufferPointer(), vertices.data(), vbByteSize);
+
+    ThrowIfFailed(D3DCreateBlob(ibByteSize, &geo->IndexBufferCPU));
+    CopyMemory(geo->IndexBufferCPU->GetBufferPointer(), indices.data(), ibByteSize);
+    */
 
     geo->VertexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), vertices.data(), vbByteSize, geo->VertexBufferUploader);
     geo->IndexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), indices.data(), ibByteSize, geo->IndexBufferUploader);
@@ -501,8 +511,10 @@ std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> Crate::GetStaticSamplers()
         0.0f,                              // mipLODBias
         8);                                // maxAnisotropy
 
-    return{
+    return
+    {
         pointWrap, pointClamp,
         linearWrap, linearClamp,
-        anisotropicWrap, anisotropicClamp };
+        anisotropicWrap, anisotropicClamp 
+    };
 }
