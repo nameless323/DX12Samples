@@ -53,7 +53,7 @@ int Crate::Run()
 void Crate::OnResize()
 {
     Application::OnResize();
-    XMMATRIX p = XMMatrixPerspectiveFovRH(0.25f * MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
+    XMMATRIX p = XMMatrixPerspectiveFovLH(0.25f * MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
     XMStoreFloat4x4(&_proj, p);
 }
 

@@ -7,12 +7,13 @@
 #include "Scenes/Waves/WavesScene.h"
 #include "Scenes/LitColumns/LitColumns.h"
 #include "Scenes/LitWaves/LitWaves.h"
+#include "Scenes/Crate/Crate.h"
 
 Application* app;
 
 void CreateScene(HINSTANCE hInstance)
 {
-    app = new LitColumns(hInstance);
+    app = new Crate(hInstance);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)

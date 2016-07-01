@@ -67,7 +67,7 @@ struct vOut
 
 vOut vert(vIn i)
 {
-    vOut o;
+    vOut o = (vOut)0.0;
     float4 posW = mul(float4(i.pos, 1.0f), Model);
     o.posW = posW.xyz;
     o.normalW = mul(i.normal, (float3x3) Model);
@@ -85,14 +85,14 @@ float4 frag(vOut i) : SV_Target
     i.normalW = normalize(i.normalW);
     float3 toEyeW = normalize(EyePosW - i.posW);
 
-    float4 ambient = AmbientLight * DiffuseAlbedo;
+    float4 ambient = AmbientLight * diffuseAlbedo;
 
     const float shininess = 1.0f - Roughness;
-    Material mat = { DiffuseAlbedo, FresnelR0, shininess };
+    Material mat = { diffuseAlbedo, FresnelR0, shininess };
     float3 shadowFactor = 1.0;
     float4 directLight = ComputeLighting(Lights, mat, i.posW, i.normalW, toEyeW, shadowFactor);
     float4 litColor = ambient + directLight;
-    litColor.a = DiffuseAlbedo.a;
+    litColor.a = diffuseAlbedo.a;
 
     return litColor;
 }
