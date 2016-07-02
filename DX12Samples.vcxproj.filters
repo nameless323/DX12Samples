@@ -98,6 +98,15 @@
     <ClInclude Include="Source\Scenes\Crate\Crate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Common\FrameResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Common\RenderItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scenes\TexColumns\TexColumns.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Camera.cpp">
@@ -164,6 +173,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Scenes\Crate\Crate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Common\FrameResource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

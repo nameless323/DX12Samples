@@ -44,7 +44,6 @@ protected:
     void BuildRenderItems();
     void DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<CrateRenderItem*>& renderItems);
 
-    static std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> GetStaticSamplers();
 private:
     std::vector<std::unique_ptr<CrateFrameResource>> _frameResources;
     CrateFrameResource* _currFrameResource = nullptr;
