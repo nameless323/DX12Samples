@@ -178,6 +178,9 @@
     <ClCompile Include="Source\Common\FrameResource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Scenes\TexColumns\TexColumns.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\Color.hlsl" />
@@ -186,5 +189,6 @@
     <FxCompile Include="Shaders\Waves.hlsl" />
     <FxCompile Include="Shaders\ToonLit.hlsl" />
     <FxCompile Include="Shaders\TexCrate.hlsl" />
+    <FxCompile Include="Shaders\TexColumns.hlsl" />
   </ItemGroup>
 </Project>

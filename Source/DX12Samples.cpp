@@ -8,12 +8,13 @@
 #include "Scenes/LitColumns/LitColumns.h"
 #include "Scenes/LitWaves/LitWaves.h"
 #include "Scenes/Crate/Crate.h"
+#include "Scenes/TexColumns/TexColumns.h"
 
 Application* app;
 
 void CreateScene(HINSTANCE hInstance)
 {
-    app = new Crate(hInstance);
+    app = new TexColumns(hInstance);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
