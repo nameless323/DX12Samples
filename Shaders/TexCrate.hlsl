@@ -13,7 +13,15 @@
 #include "LightingUtil.hlsl"
 
 Texture2D _diffuseMap : register(t0);
-SamplerState _samplerLinear : register(s0);
+Texture2D _fence : register(t1);
+
+SamplerState _samPointWrap : register(s0);
+SamplerState _samPointClamp : register(s1);
+SamplerState _samLinearWrap : register(s2);
+SamplerState _samLinearClamp : register(s3);
+SamplerState _samAnisotropicWrap : register(s4);
+SamplerState _samAnisotropicClamp : register(s5);
+
 
 cbuffer cbPerObject : register(b0)
 {
@@ -80,7 +88,9 @@ vOut vert(vIn i)
 
 float4 frag(vOut i) : SV_Target
 {
-    float4 diffuseAlbedo = _diffuseMap.Sample(_samplerLinear, i.uv) * DiffuseAlbedo;
+    float4 diffuseAlbedo = _diffuseMap.Sample(_samLinearWrap, i.uv) * DiffuseAlbedo;
+    float4 fenceColor = _fence.Sample(_samLinearWrap, i.uv) * DiffuseAlbedo;
+    diffuseAlbedo = lerp(diffuseAlbedo, fenceColor, fenceColor.a);
 
     i.normalW = normalize(i.normalW);
     float3 toEyeW = normalize(EyePosW - i.posW);

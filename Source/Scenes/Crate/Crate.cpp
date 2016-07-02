@@ -259,15 +259,22 @@ void Crate::LoadTextures()
 {
     auto woodCrateTex = std::make_unique<Texture>();
     woodCrateTex->Name = "woodCrateTex";    
-    woodCrateTex->Filename = L"Textures/WoodCrate01.dds";
+    woodCrateTex->Filename = L"Textures/WoodCrate01_mod.dds";
     ThrowIfFailed(CreateDDSTextureFromFile12(_device.Get(), _commandList.Get(), woodCrateTex->Filename.c_str(), woodCrateTex->Resource, woodCrateTex->UploadHeap));
+
+    auto wireFenceTex = std::make_unique<Texture>();
+    wireFenceTex->Name = "wireFence";
+    wireFenceTex->Filename = L"Textures/WireFence.dds";
+    ThrowIfFailed(CreateDDSTextureFromFile12(_device.Get(), _commandList.Get(), wireFenceTex->Filename.c_str(), wireFenceTex->Resource, wireFenceTex->UploadHeap));
+
     _textures[woodCrateTex->Name] = move(woodCrateTex);
+    _textures[wireFenceTex->Name] = move(wireFenceTex);
 }
 
 void Crate::BuildRootSignature()
 {
     CD3DX12_DESCRIPTOR_RANGE texTable;
-    texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+    texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0);
     CD3DX12_ROOT_PARAMETER slotRootParameter[4];
     slotRootParameter[0].InitAsDescriptorTable(1, &texTable, D3D12_SHADER_VISIBILITY_PIXEL);
     slotRootParameter[1].InitAsConstantBufferView(0);
@@ -290,7 +297,7 @@ void Crate::BuildRootSignature()
 void Crate::BuildDescriptorHeaps()
 {
     D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-    srvHeapDesc.NumDescriptors = 1;
+    srvHeapDesc.NumDescriptors = 2;
     srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
     srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
     ThrowIfFailed(_device->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&_srvHeap)));
@@ -308,6 +315,13 @@ void Crate::BuildDescriptorHeaps()
     srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 
     _device->CreateShaderResourceView(woodCrateTex.Get(), &srvDesc, hDescriptor);
+
+    hDescriptor.Offset(1, _cbvSrvUavDescriptorSize);
+    auto fenceTex = _textures["wireFence"]->Resource;
+    srvDesc.Format = fenceTex.Get()->GetDesc().Format;
+    srvDesc.Texture2D.MipLevels = fenceTex.Get()->GetDesc().MipLevels;
+
+    _device->CreateShaderResourceView(fenceTex.Get(), &srvDesc, hDescriptor);
 }
 
 void Crate::BuildShaderAndInputLayout()

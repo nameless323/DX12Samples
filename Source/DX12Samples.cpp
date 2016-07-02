@@ -15,7 +15,7 @@ Application* app;
 
 void CreateScene(HINSTANCE hInstance)
 {
-    app = new TexWaves(hInstance);
+    app = new Crate(hInstance);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
