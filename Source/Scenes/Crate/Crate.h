@@ -74,6 +74,8 @@ private:
     float _phi = 0.4f * DirectX::XM_PI;
     float _radius = 2.5f;
 
+    float _rotationAngle = 0.0f;
+
     POINT _lastMousePos;
 };
 

@@ -176,6 +176,16 @@ void Crate::UpdateCamera(const GameTimer& timer)
 
 void Crate::AnimateMaterials(const GameTimer& timer)
 {
+    _rotationAngle += timer.DeltaTime();
+    if (_rotationAngle >= MathHelper::Pi * 2)
+        _rotationAngle -= MathHelper::Pi * 2;
+
+    XMFLOAT4X4 matTransform = _materials["woodCrate"]->MatTransform;
+    XMMATRIX mat = XMLoadFloat4x4(&matTransform);
+    mat = XMMatrixTranslation(-0.5f, -0.5f, 0.0f) * XMMatrixRotationZ(_rotationAngle) * XMMatrixTranslation(0.5f, 0.5f, 0.0f);
+    XMStoreFloat4x4(&_materials["woodCrate"]->MatTransform, mat);
+
+    _materials["woodCrate"]->NumFramesDirty = FrameResource::NumFrameResources;
 }
 
 void Crate::UpdateObjectCBs(const GameTimer& timer)
