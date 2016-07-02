@@ -22,4 +22,10 @@ struct RenderItem
     UINT IndexCount = 0;
     UINT StartIndexLocation = 0;
     int BaseVertexLocation = 0;
+
+    enum class RenderLayer : int
+    {
+        Opaque = 0,
+        Count
+    };
 };

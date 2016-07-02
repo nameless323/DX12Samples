@@ -1,18 +1,21 @@
 #pragma once
+
 #include "../../../Core/Application.h"
 #include "../../../Core/D3DUtil.h"
 
 #include "../../Common/RenderItem.h"
 #include "../../Common/FrameResource.h"
+#include "../Waves/Waves.h"
 
-class TexColumns : public Application
+class TexWaves : public Application
 {
 public:
-    TexColumns(HINSTANCE hInstance);
-    TexColumns(const TexColumns& rhs) = delete;
-    TexColumns& operator=(const TexColumns& rhs) = delete;
+    TexWaves(HINSTANCE hInstance);
+    TexWaves(const TexWaves& rhs) = delete;
+    TexWaves& operator=(const TexWaves& rhs) = delete;
+    ~TexWaves() override;
+
     bool Init() override;
-    ~TexColumns() override;
     LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
     int Run() override;
 protected:
@@ -28,24 +31,31 @@ protected:
     void UpdateCamera(const GameTimer& timer);
     void AnimateMaterials(const GameTimer& timer);
     void UpdateObjectCBs(const GameTimer& timer);
-    void UpdateMaterialsCBs(const GameTimer& timer);
+    void UpdateMaterialCBs(const GameTimer& timer);
     void UpdateMainPassCB(const GameTimer& timer);
+    void UpdateWaves(const GameTimer& timer);
 
     void LoadTextures();
     void BuildRootSignature();
     void BuildDescriptorHeaps();
     void BuildShaderAndInputLayout();
-    void BuildShapeGeometry();
+    void BuildLandGeometry();
+    void BuildWavesGeometryBuffers();
+    void BuildBoxGeometry();
     void BuildPSOs();
     void BuildFrameResources();
     void BuildMaterials();
     void BuildRenderItems();
     void DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& renderItems);
 
+    float GetHillsHeight(float x, float z) const;
+    DirectX::XMFLOAT3 GetHillsNormal(float x, float z) const;
 private:
     std::vector<std::unique_ptr<FrameResource>> _frameResources;
     FrameResource* _currFrameResource = nullptr;
     int _currentFrameResourceIndex = 0;
+
+    UINT _cbvSrvDescriptorSize = 0;
 
     Microsoft::WRL::ComPtr<ID3D12RootSignature> _rootSignature = nullptr;
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> _srvHeap = nullptr;
@@ -57,21 +67,26 @@ private:
     std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> _PSOs;
 
     std::vector<D3D12_INPUT_ELEMENT_DESC> _inputLayout;
-
+    RenderItem* _wavesRenderItem = nullptr;
 
     std::vector<std::unique_ptr<RenderItem>> _allRenderItems;
-    std::vector<RenderItem*> _opaqueRenderItems;
+    std::vector<RenderItem*> _renderItemLayer[(int)RenderItem::RenderLayer::Count];
+    std::unique_ptr<Waves> _waves;
 
     FrameResource::PassConstants _mainPassCB;
+
+    bool _isWireframe = false;
 
     DirectX::XMFLOAT3 _eyePos = { 0.0f, 0.0f, 0.0f };
     DirectX::XMFLOAT4X4 _view = MathHelper::Identity4x4();
     DirectX::XMFLOAT4X4 _proj = MathHelper::Identity4x4();
 
     float _theta = 1.5f * DirectX::XM_PI;
-    float _phi = 0.2f * DirectX::XM_PI;
-    float _radius = 15.0f;
+    float _phi = DirectX::XM_PIDIV2 - 0.1f;
+    float _radius = 50.0f;
+
+    float _sunTheta = 1.25f * DirectX::XM_PI;
+    float _sunPhi = DirectX::XM_PIDIV4;
 
     POINT _lastMousePos;
 };
-

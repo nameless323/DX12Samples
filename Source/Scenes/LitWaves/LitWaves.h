@@ -1,7 +1,6 @@
 #pragma once
 #include "../../../Core/Application.h"
 #include "LitWavesFrameResource.h"
-#include "LitWaves.h"
 #include "../Waves/Waves.h"
 #include "../LitColumns/LitColumnsRenderItem.h"
 
