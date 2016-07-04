@@ -13,15 +13,12 @@
 #include "LightingUtil.hlsl"
 
 Texture2D _diffuseMap : register(t0);
-Texture2D _fence : register(t1);
-
 SamplerState _samPointWrap : register(s0);
 SamplerState _samPointClamp : register(s1);
 SamplerState _samLinearWrap : register(s2);
 SamplerState _samLinearClamp : register(s3);
 SamplerState _samAnisotropicWrap : register(s4);
 SamplerState _samAnisotropicClamp : register(s5);
-
 
 cbuffer cbPerObject : register(b0)
 {
@@ -46,6 +43,11 @@ cbuffer cbPass : register(b1)
     float TotalTime;
     float DeltaTime;
     float4 AmbientLight;
+
+    float4 FogColor;
+    float FogStart;
+    float FogRange;
+    float2 cbPerObjectPad2;
 
     Light Lights[MaxLights];
 };
@@ -75,7 +77,7 @@ struct vOut
 
 vOut vert(vIn i)
 {
-    vOut o = (vOut)0.0;
+    vOut o = (vOut) 0.0;
     float4 posW = mul(float4(i.pos, 1.0f), Model);
     o.posW = posW.xyz;
     o.normalW = mul(i.normal, (float3x3) Model);
@@ -88,13 +90,16 @@ vOut vert(vIn i)
 
 float4 frag(vOut i) : SV_Target
 {
-    SamplerState st[] = { _samLinearClamp, _samPointClamp, _samAnisotropicClamp };
-    float4 diffuseAlbedo = _diffuseMap.Sample(st[0], i.uv) * DiffuseAlbedo;
-    float4 fenceColor = _fence.Sample(_samLinearWrap, i.uv) * DiffuseAlbedo;
-    diffuseAlbedo = lerp(diffuseAlbedo, fenceColor, fenceColor.a);
+    float4 diffuseAlbedo = _diffuseMap.Sample(_samAnisotropicWrap, i.uv) * DiffuseAlbedo;
+
+#ifdef ALPHA_TEST
+    clip(diffuseAlbedo.a - 0.1);
+#endif
 
     i.normalW = normalize(i.normalW);
-    float3 toEyeW = normalize(EyePosW - i.posW);
+    float3 toEyeW = EyePosW - i.posW;
+    float distToEye = length(toEyeW);
+    toEyeW /= distToEye;
 
     float4 ambient = AmbientLight * diffuseAlbedo;
 
@@ -103,6 +108,11 @@ float4 frag(vOut i) : SV_Target
     float3 shadowFactor = 1.0;
     float4 directLight = ComputeLighting(Lights, mat, i.posW, i.normalW, toEyeW, shadowFactor);
     float4 litColor = ambient + directLight;
+    
+#ifdef FOG
+    float fogAmount = saturate((distToEye - FogStart) / FogRange);
+    litColor = lerp(litColor, FogColor, fogAmount);
+#endif
     litColor.a = diffuseAlbedo.a;
 
     return litColor;

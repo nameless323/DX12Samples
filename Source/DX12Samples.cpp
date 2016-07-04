@@ -10,12 +10,13 @@
 #include "Scenes/Crate/Crate.h"
 #include "Scenes/TexColumns/TexColumns.h"
 #include "Scenes/TexWaves/TexWaves.h"
+#include "Scenes/Blending/Blending.h"
 
 Application* app;
 
 void CreateScene(HINSTANCE hInstance)
 {
-    app = new Crate(hInstance);
+    app = new Blending(hInstance);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)

@@ -144,12 +144,12 @@ void Crate::OnMouseMove(WPARAM btnState, int x, int y)
     }
     else if ((btnState & MK_RBUTTON) != 0)
     {
-        float dx = 0.05f * static_cast<float>(x - _lastMousePos.x);
-        float dy = 0.05f * static_cast<float>(y - _lastMousePos.y);
+        float dx = 0.01f * static_cast<float>(x - _lastMousePos.x);
+        float dy = 0.01f * static_cast<float>(y - _lastMousePos.y);
 
         _radius += dx - dy;
 
-        _radius = MathHelper::Clamp(_radius, 5.0f, 150.0f);
+        _radius = MathHelper::Clamp(_radius, 1.0f, 150.0f);
     }
     _lastMousePos.x = x;
     _lastMousePos.y = y;
@@ -179,10 +179,8 @@ void Crate::AnimateMaterials(const GameTimer& timer)
     _rotationAngle += timer.DeltaTime();
     if (_rotationAngle >= MathHelper::Pi * 2)
         _rotationAngle -= MathHelper::Pi * 2;
-
-    XMFLOAT4X4 matTransform = _materials["woodCrate"]->MatTransform;
-    XMMATRIX mat = XMLoadFloat4x4(&matTransform);
-    mat = XMMatrixTranslation(-0.5f, -0.5f, 0.0f) * XMMatrixRotationZ(_rotationAngle) * XMMatrixTranslation(0.5f, 0.5f, 0.0f);
+    
+    XMMATRIX mat = XMMatrixTranslation(-0.5f, -0.5f, 0.0f) * XMMatrixRotationZ(0) * XMMatrixTranslation(0.5f, 0.5f, 0.0f);
     XMStoreFloat4x4(&_materials["woodCrate"]->MatTransform, mat);
 
     _materials["woodCrate"]->NumFramesDirty = FrameResource::NumFrameResources;

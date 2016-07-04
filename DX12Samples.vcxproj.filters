@@ -110,6 +110,12 @@
     <ClInclude Include="Source\Scenes\TexWaves\TexWaves.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Scenes\Blending\Blending.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scenes\Blending\FrameResourceBlending.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Camera.cpp">
@@ -187,6 +193,12 @@
     <ClCompile Include="Source\Scenes\TexWaves\TexWaves.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Scenes\Blending\Blending.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scenes\Blending\FrameResourceBlending.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\Color.hlsl" />
@@ -196,5 +208,6 @@
     <FxCompile Include="Shaders\ToonLit.hlsl" />
     <FxCompile Include="Shaders\TexCrate.hlsl" />
     <FxCompile Include="Shaders\TexColumns.hlsl" />
+    <FxCompile Include="Shaders\Blending.hlsl" />
   </ItemGroup>
 </Project>
