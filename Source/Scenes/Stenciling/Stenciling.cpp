@@ -109,24 +109,24 @@ void Stenciling::Draw(const GameTimer& timer)
     UINT passCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(PassConstants));
     auto passCB = _currFrameResource->PassCB->Resource();
     _commandList->SetGraphicsRootConstantBufferView(2, passCB->GetGPUVirtualAddress());
-    DrawRenderItems(_commandList.Get(), _renderItemLayer[(int)RenderItem::RenderLayer::Opaque]);
+    DrawRenderItems(_commandList.Get(), _renderItemLayer[(int)RenderLayer::Opaque]);
 
     _commandList->OMSetStencilRef(1);
     _commandList->SetPipelineState(_PSOs["markStencilMirrors"].Get());
-    DrawRenderItems(_commandList.Get(), _renderItemLayer[(int)RenderItem::RenderLayer::Mirrors]);
+    DrawRenderItems(_commandList.Get(), _renderItemLayer[(int)RenderLayer::Mirrors]);
 
     _commandList->SetGraphicsRootConstantBufferView(2, passCB->GetGPUVirtualAddress() + passCBByteSize);
     _commandList->SetPipelineState(_PSOs["drawStencilReflections"].Get());
-    DrawRenderItems(_commandList.Get(), _renderItemLayer[(int)RenderItem::RenderLayer::Reflected]);
+    DrawRenderItems(_commandList.Get(), _renderItemLayer[(int)RenderLayer::Reflected]);
 
     _commandList->SetGraphicsRootConstantBufferView(2, passCB->GetGPUVirtualAddress());
     _commandList->OMSetStencilRef(0);
 
     _commandList->SetPipelineState(_PSOs["transparent"].Get());
-    DrawRenderItems(_commandList.Get(), _renderItemLayer[(int)RenderItem::RenderLayer::Transparent]);
+    DrawRenderItems(_commandList.Get(), _renderItemLayer[(int)RenderLayer::Transparent]);
 
     _commandList->SetPipelineState(_PSOs["shadow"].Get());
-    DrawRenderItems(_commandList.Get(), _renderItemLayer[(int)RenderItem::RenderLayer::Shadow]);
+    DrawRenderItems(_commandList.Get(), _renderItemLayer[(int)RenderLayer::Shadow]);
 
     _commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 
@@ -353,10 +353,10 @@ void Stenciling::LoadTextures()
     white1x1Tex->Filename = L"Textures/white1x1.dds";
     ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(_device.Get(), _commandList.Get(), white1x1Tex->Filename.c_str(), white1x1Tex->Resource, white1x1Tex->UploadHeap));
 
-    _textures[bricksTex->Name] = std::move(bricksTex);
-    _textures[checkboardTex->Name] = std::move(checkboardTex);
-    _textures[iceTex->Name] = std::move(iceTex);
-    _textures[white1x1Tex->Name] = std::move(white1x1Tex);
+    _textures[bricksTex->Name] = move(bricksTex);
+    _textures[checkboardTex->Name] = move(checkboardTex);
+    _textures[iceTex->Name] = move(iceTex);
+    _textures[white1x1Tex->Name] = move(white1x1Tex);
 }
 
 void Stenciling::BuildRootSignature()
@@ -483,7 +483,7 @@ void Stenciling::BuildRoomGeometry()
         Vertex(2.5f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f)
     };
 
-    std::array<std::int16_t, 30> indices =
+    std::array<int16_t, 30> indices =
     {
         // Floor
         0, 1, 2,
@@ -520,7 +520,7 @@ void Stenciling::BuildRoomGeometry()
     mirrorSubmesh.BaseVertexLocation = 0;
 
     const UINT vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
-    const UINT ibByteSize = (UINT)indices.size() * sizeof(std::uint16_t);
+    const UINT ibByteSize = (UINT)indices.size() * sizeof(uint16_t);
 
     auto geo = std::make_unique<MeshGeometry>();
     geo->Name = "roomGeo";
@@ -544,7 +544,7 @@ void Stenciling::BuildRoomGeometry()
     geo->DrawArgs["wall"] = wallSubmesh;
     geo->DrawArgs["mirror"] = mirrorSubmesh;
 
-    _geometries[geo->Name] = std::move(geo);
+    _geometries[geo->Name] = move(geo);
 }
 
 void Stenciling::BuildSkullGeometry()
@@ -575,7 +575,7 @@ void Stenciling::BuildSkullGeometry()
     fin >> ignore;
     fin >> ignore;
 
-    std::vector<std::int32_t> indices(3 * tcount);
+    std::vector<int32_t> indices(3 * tcount);
     for (UINT i = 0; i < tcount; i++)
     {
         fin >> indices[i * 3 + 0] >> indices[i * 3 + 1] >> indices[i * 3 + 2];
@@ -774,11 +774,11 @@ void Stenciling::BuildMaterials()
     shadowMat->FresnelR0 = XMFLOAT3(0.001f, 0.001f, 0.001f);
     shadowMat->Roughness = 0.0f;
 
-    _materials["bricks"] = std::move(bricks);
-    _materials["checkertile"] = std::move(checkertile);
-    _materials["icemirror"] = std::move(icemirror);
-    _materials["skullMat"] = std::move(skullMat);
-    _materials["shadowMat"] = std::move(shadowMat);
+    _materials["bricks"] = move(bricks);
+    _materials["checkertile"] = move(checkertile);
+    _materials["icemirror"] = move(icemirror);
+    _materials["skullMat"] = move(skullMat);
+    _materials["shadowMat"] = move(shadowMat);
 }
 
 void Stenciling::BuildRenderItems()
@@ -820,14 +820,12 @@ void Stenciling::BuildRenderItems()
     _skullRenderItem = skullRitem.get();
     _renderItemLayer[(int)RenderLayer::Opaque].push_back(skullRitem.get());
 
-    // Reflected skull will have different world matrix, so it needs to be its own render item.
     auto reflectedSkullRitem = std::make_unique<RenderItem>();
     *reflectedSkullRitem = *skullRitem;
     reflectedSkullRitem->ObjCBIndex = 3;
     _reflectedSkullRenderItem = reflectedSkullRitem.get();
     _renderItemLayer[(int)RenderLayer::Reflected].push_back(reflectedSkullRitem.get());
 
-    // Shadowed skull will have different world matrix, so it needs to be its own render item.
     auto shadowedSkullRitem = std::make_unique<RenderItem>();
     *shadowedSkullRitem = *skullRitem;
     shadowedSkullRitem->ObjCBIndex = 4;
@@ -848,12 +846,21 @@ void Stenciling::BuildRenderItems()
     _renderItemLayer[(int)RenderLayer::Mirrors].push_back(mirrorRitem.get());
     _renderItemLayer[(int)RenderLayer::Transparent].push_back(mirrorRitem.get());
 
-    _allRenderItems.push_back(std::move(floorRitem));
-    _allRenderItems.push_back(std::move(wallsRitem));
-    _allRenderItems.push_back(std::move(skullRitem));
-    _allRenderItems.push_back(std::move(reflectedSkullRitem));
-    _allRenderItems.push_back(std::move(shadowedSkullRitem));
-    _allRenderItems.push_back(std::move(mirrorRitem));
+    auto reflectedFloorRitem = std::make_unique<RenderItem>();
+    *reflectedFloorRitem = *floorRitem;
+    XMVECTOR mirrorPlane = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+    XMMATRIX R = XMMatrixReflect(mirrorPlane);
+    XMStoreFloat4x4(&reflectedFloorRitem->Model, R);
+    reflectedFloorRitem->ObjCBIndex = 6;
+    _renderItemLayer[(int)RenderLayer::Reflected].push_back(reflectedFloorRitem.get());
+
+    _allRenderItems.push_back(move(floorRitem));
+    _allRenderItems.push_back(move(wallsRitem));
+    _allRenderItems.push_back(move(skullRitem));
+    _allRenderItems.push_back(move(reflectedSkullRitem));
+    _allRenderItems.push_back(move(shadowedSkullRitem));
+    _allRenderItems.push_back(move(mirrorRitem));
+    _allRenderItems.push_back(move(reflectedFloorRitem));
 }
 
 void Stenciling::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& renderItems)
