@@ -11,12 +11,13 @@
 #include "Scenes/TexColumns/TexColumns.h"
 #include "Scenes/TexWaves/TexWaves.h"
 #include "Scenes/Blending/Blending.h"
+#include "Scenes/Stenciling/Stenciling.h"
 
 Application* app;
 
 void CreateScene(HINSTANCE hInstance)
 {
-    app = new Blending(hInstance);
+    app = new Stenciling(hInstance);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)

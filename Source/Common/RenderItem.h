@@ -28,6 +28,9 @@ struct RenderItem
         Opaque = 0,
         Transparent,
         AlphaTested,
+        Mirrors,
+        Reflected,
+        Shadow,
         Count
     };
 };
