@@ -122,6 +122,9 @@
     <ClInclude Include="Source\Scenes\Stenciling\Stenciling.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Scenes\Overdraw\OverdrawBlending.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Camera.cpp">
@@ -211,6 +214,9 @@
     <ClCompile Include="Source\Scenes\Stenciling\Stenciling.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Scenes\Overdraw\OverdrawBlending.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\Color.hlsl" />
@@ -221,5 +227,6 @@
     <FxCompile Include="Shaders\TexCrate.hlsl" />
     <FxCompile Include="Shaders\TexColumns.hlsl" />
     <FxCompile Include="Shaders\Blending.hlsl" />
+    <FxCompile Include="Shaders\BlendingOverdraw.hlsl" />
   </ItemGroup>
 </Project>

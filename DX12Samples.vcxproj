@@ -179,6 +179,7 @@
     <ClInclude Include="Source\Scenes\LitColumns\LitColumnsRenderItem.h" />
     <ClInclude Include="Source\Scenes\LitWaves\LitWaves.h" />
     <ClInclude Include="Source\Scenes\LitWaves\LitWavesFrameResource.h" />
+    <ClInclude Include="Source\Scenes\Overdraw\OverdrawBlending.h" />
     <ClInclude Include="Source\Scenes\Shapes\Shapes.h" />
     <ClInclude Include="Source\Scenes\Shapes\ShapesFrameResource.h" />
     <ClInclude Include="Source\Scenes\Shapes\ShapesRenderItem.h" />
@@ -214,6 +215,7 @@
     <ClCompile Include="Source\Scenes\LitColumns\LitColumnsFrameResource.cpp" />
     <ClCompile Include="Source\Scenes\LitWaves\LitWaves.cpp" />
     <ClCompile Include="Source\Scenes\LitWaves\LitWavesFrameResource.cpp" />
+    <ClCompile Include="Source\Scenes\Overdraw\OverdrawBlending.cpp" />
     <ClCompile Include="Source\Scenes\Shapes\Shapes.cpp" />
     <ClCompile Include="Source\Scenes\Shapes\ShapesFrameResource.cpp" />
     <ClCompile Include="Source\Scenes\Stenciling\Stenciling.cpp" />
@@ -226,6 +228,13 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\Blending.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Shaders\BlendingOverdraw.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
