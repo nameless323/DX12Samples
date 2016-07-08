@@ -13,12 +13,13 @@
 #include "Scenes/Blending/Blending.h"
 #include "Scenes/Stenciling/Stenciling.h"
 #include "Scenes/Overdraw/OverdrawBlending.h"
+#include "Scenes/Overdraw/OverdrawStenciling.h"
 
 Application* app;
 
 void CreateScene(HINSTANCE hInstance)
 {
-    app = new OverdrawBlending(hInstance);
+    app = new OverdrawStenciling(hInstance);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
