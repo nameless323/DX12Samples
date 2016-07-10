@@ -92,7 +92,7 @@ vOut vert(vIn i)
 }
 
 [maxvertexcount(4)]
-gOut geom(point vOut i[1], uint primID : SV_PrimitiveID, inout TriangleStream<gOut> triStream)
+void geom(point vOut i[1], uint primID : SV_PrimitiveID, inout TriangleStream<gOut> triStream)
 {
     float3 up = float3(0.0f, 1.0f, 0.0f);
     float3 look = EyePosW - i[0].center;
@@ -126,10 +126,10 @@ gOut geom(point vOut i[1], uint primID : SV_PrimitiveID, inout TriangleStream<gO
         gout.posW = v[i].xyz;
         gout.normalW = look;
         gout.uv = texC[i];
+        gout.PrimID = primID;
 
         triStream.Append(gout);
     }
-
 }
 
 float4 frag(gOut i) : SV_Target

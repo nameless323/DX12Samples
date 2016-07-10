@@ -128,6 +128,9 @@
     <ClInclude Include="Source\Scenes\Overdraw\OverdrawStenciling.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Scenes\BilboardTrees\BilboardTrees.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Camera.cpp">
@@ -223,6 +226,9 @@
     <ClCompile Include="Source\Scenes\Overdraw\OverdrawStenciling.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Scenes\BilboardTrees\BilboardTrees.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\Color.hlsl" />
@@ -235,5 +241,6 @@
     <FxCompile Include="Shaders\Blending.hlsl" />
     <FxCompile Include="Shaders\BlendingOverdraw.hlsl" />
     <FxCompile Include="Shaders\StencilingOverdraw.hlsl" />
+    <FxCompile Include="Shaders\TreeSprite.hlsl" />
   </ItemGroup>
 </Project>

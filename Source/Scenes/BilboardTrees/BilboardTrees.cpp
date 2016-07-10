@@ -718,7 +718,7 @@ void BilboardTrees::BuildPSOs()
     treeSpritePsoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
     treeSpritePsoDesc.InputLayout = { _treeSpriteInputLayout.data(), (UINT)_treeSpriteInputLayout.size() };
     treeSpritePsoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
-    //TODO !!! treeSpritePsoDesc.BlendState.AlphaToCoverageEnable = true;
+    treeSpritePsoDesc.BlendState.AlphaToCoverageEnable = true;
     ThrowIfFailed(_device->CreateGraphicsPipelineState(&treeSpritePsoDesc, IID_PPV_ARGS(&_PSOs["treeSprites"])));
 }
 

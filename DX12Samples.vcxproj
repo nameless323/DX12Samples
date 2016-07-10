@@ -166,6 +166,7 @@
     <ClInclude Include="Core\GeometryGenerator.h" />
     <ClInclude Include="Core\MathHelper.h" />
     <ClInclude Include="Core\UploadBuffer.h" />
+    <ClInclude Include="Source\Scenes\BilboardTrees\BilboardTrees.h" />
     <ClInclude Include="Source\Scenes\Blending\Blending.h" />
     <ClInclude Include="Source\Scenes\Blending\FrameResourceBlending.h" />
     <ClInclude Include="Source\Scenes\Box\Box.h" />
@@ -204,6 +205,7 @@
     <ClCompile Include="Core\GeometryGenerator.cpp" />
     <ClCompile Include="Core\MathHelper.cpp" />
     <ClCompile Include="Source\Common\FrameResource.cpp" />
+    <ClCompile Include="Source\Scenes\BilboardTrees\BilboardTrees.cpp" />
     <ClCompile Include="Source\Scenes\Blending\Blending.cpp" />
     <ClCompile Include="Source\Scenes\Blending\FrameResourceBlending.cpp" />
     <ClCompile Include="Source\Scenes\Box\Box.cpp" />
@@ -307,6 +309,17 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Shaders\TreeSprite.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Shaders\Waves.hlsl">

@@ -14,12 +14,13 @@
 #include "Scenes/Stenciling/Stenciling.h"
 #include "Scenes/Overdraw/OverdrawBlending.h"
 #include "Scenes/Overdraw/OverdrawStenciling.h"
+#include "Scenes/BilboardTrees/BilboardTrees.h"
 
 Application* app;
 
 void CreateScene(HINSTANCE hInstance)
 {
-    app = new Stenciling(hInstance);
+    app = new BilboardTrees(hInstance);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
