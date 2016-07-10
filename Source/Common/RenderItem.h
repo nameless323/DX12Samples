@@ -28,6 +28,7 @@ struct RenderItem
         Opaque = 0,
         Transparent,
         AlphaTested,
+        AlphaTestedTreeSprites,
         Mirrors,
         Reflected,
         Shadow,

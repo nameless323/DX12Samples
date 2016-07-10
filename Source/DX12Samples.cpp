@@ -19,7 +19,7 @@ Application* app;
 
 void CreateScene(HINSTANCE hInstance)
 {
-    app = new OverdrawStenciling(hInstance);
+    app = new Stenciling(hInstance);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
