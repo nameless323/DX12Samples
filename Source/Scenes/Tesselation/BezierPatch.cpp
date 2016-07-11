@@ -374,7 +374,7 @@ void BezierPatch::BuildQuadPatchGeometry()
     geo->IndexBufferByteSize = ibByteSize;
 
     SubmeshGeometry quadSubmesh;
-    quadSubmesh.IndexCount = 4;
+    quadSubmesh.IndexCount = 16;
     quadSubmesh.StartIndexLocation = 0;
     quadSubmesh.BaseVertexLocation = 0;
 
@@ -454,7 +454,7 @@ void BezierPatch::BuildRenderItems()
     quadPatchRitem->ObjCBIndex = 0;
     quadPatchRitem->Mat = _materials["whiteMat"].get();
     quadPatchRitem->Geo = _geometries["quadpatchGeo"].get();
-    quadPatchRitem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_4_CONTROL_POINT_PATCHLIST;
+    quadPatchRitem->PrimitiveType = D3D_PRIMITIVE_TOPOLOGY_16_CONTROL_POINT_PATCHLIST;
     quadPatchRitem->IndexCount = quadPatchRitem->Geo->DrawArgs["quadpatch"].IndexCount;
     quadPatchRitem->StartIndexLocation = quadPatchRitem->Geo->DrawArgs["quadpatch"].StartIndexLocation;
     quadPatchRitem->BaseVertexLocation = quadPatchRitem->Geo->DrawArgs["quadpatch"].BaseVertexLocation;

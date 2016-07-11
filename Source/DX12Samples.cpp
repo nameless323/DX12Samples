@@ -16,12 +16,13 @@
 #include "Scenes/Overdraw/OverdrawStenciling.h"
 #include "Scenes/BilboardTrees/BilboardTrees.h"
 #include "Scenes/Tesselation/BasicTesselation.h"
+#include "Scenes/Tesselation/BezierPatch.h"
 
 Application* app;
 
 void CreateScene(HINSTANCE hInstance)
 {
-    app = new BasicTesselation(hInstance);
+    app = new BezierPatch(hInstance);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)

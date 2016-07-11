@@ -134,6 +134,9 @@
     <ClInclude Include="Source\Scenes\Tesselation\BasicTesselation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Scenes\Tesselation\BezierPatch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Camera.cpp">
@@ -235,6 +238,9 @@
     <ClCompile Include="Source\Scenes\Tesselation\BasicTesselation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Scenes\Tesselation\BezierPatch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\Color.hlsl" />
@@ -249,5 +255,6 @@
     <FxCompile Include="Shaders\StencilingOverdraw.hlsl" />
     <FxCompile Include="Shaders\TreeSprite.hlsl" />
     <FxCompile Include="Shaders\Tessellation.hlsl" />
+    <FxCompile Include="Shaders\BezierTessellation.hlsl" />
   </ItemGroup>
 </Project>

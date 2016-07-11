@@ -189,6 +189,7 @@
     <ClInclude Include="Source\Common\RenderItem.h" />
     <ClInclude Include="Source\Scenes\Stenciling\Stenciling.h" />
     <ClInclude Include="Source\Scenes\Stenciling\StencilingFrameResource.h" />
+    <ClInclude Include="Source\Scenes\Tesselation\BezierPatch.h" />
     <ClInclude Include="Source\Scenes\TexColumns\TexColumns.h" />
     <ClInclude Include="Source\Scenes\TexWaves\TexWaves.h" />
     <ClInclude Include="Source\Scenes\Waves\Waves.h" />
@@ -225,6 +226,7 @@
     <ClCompile Include="Source\Scenes\Shapes\ShapesFrameResource.cpp" />
     <ClCompile Include="Source\Scenes\Stenciling\Stenciling.cpp" />
     <ClCompile Include="Source\Scenes\Stenciling\StencilingFrameResource.cpp" />
+    <ClCompile Include="Source\Scenes\Tesselation\BezierPatch.cpp" />
     <ClCompile Include="Source\Scenes\TexColumns\TexColumns.cpp" />
     <ClCompile Include="Source\Scenes\TexWaves\TexWaves.cpp" />
     <ClCompile Include="Source\Scenes\Waves\Waves.cpp" />
@@ -233,6 +235,13 @@
     <ClCompile Include="Source\Scenes\Tesselation\BasicTesselation.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="Shaders\BezierTessellation.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="Shaders\Tessellation.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
