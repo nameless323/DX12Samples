@@ -1,4 +1,4 @@
-#include "BasicTesselation.h"
+#include "BezierPatch.h"
 #include "../../../Core/GeometryGenerator.h"
 
 using Microsoft::WRL::ComPtr;
@@ -9,17 +9,17 @@ using PassConstants = FrameResourceBlending::PassConstants;
 using ObjectConstants = FrameResourceBlending::ObjectConstants;
 using RenderLayer = RenderItem::RenderLayer;
 
-BasicTesselation::BasicTesselation(HINSTANCE hInstance) : Application(hInstance)
+BezierPatch::BezierPatch(HINSTANCE hInstance) : Application(hInstance)
 {
 }
 
-BasicTesselation::~BasicTesselation()
+BezierPatch::~BezierPatch()
 {
     if (_device != nullptr)
         FlushCommandQueue();
 }
 
-bool BasicTesselation::Init()
+bool BezierPatch::Init()
 {
     if (!Application::Init())
         return false;
@@ -43,24 +43,24 @@ bool BasicTesselation::Init()
     FlushCommandQueue();
 }
 
-LRESULT BasicTesselation::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT BezierPatch::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     return Application::MsgProc(hwnd, msg, wParam, lParam);
 }
 
-int BasicTesselation::Run()
+int BezierPatch::Run()
 {
     return Application::Run();
 }
 
-void BasicTesselation::OnResize()
+void BezierPatch::OnResize()
 {
     Application::OnResize();
     XMMATRIX p = XMMatrixPerspectiveFovLH(0.25f * MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
     XMStoreFloat4x4(&_proj, p);
 }
 
-void BasicTesselation::Update(const GameTimer& timer)
+void BezierPatch::Update(const GameTimer& timer)
 {
     OnKeyboardInput(timer);
     UpdateCamera(timer);
@@ -81,7 +81,7 @@ void BasicTesselation::Update(const GameTimer& timer)
     UpdateMainPassCB(timer);
 }
 
-void BasicTesselation::Draw(const GameTimer& timer)
+void BezierPatch::Draw(const GameTimer& timer)
 {
     auto cmdListAlloc = _currFrameResource->CmdListAlloc;
 
@@ -123,19 +123,19 @@ void BasicTesselation::Draw(const GameTimer& timer)
     _commandQueue->Signal(_fence.Get(), _currentFence);
 }
 
-void BasicTesselation::OnMouseDown(WPARAM btnState, int x, int y)
+void BezierPatch::OnMouseDown(WPARAM btnState, int x, int y)
 {
     _lastMousePos.x = x;
     _lastMousePos.y = y;
     SetCapture(_hMainWindow);
 }
 
-void BasicTesselation::OnMouseUp(WPARAM btnState, int x, int y)
+void BezierPatch::OnMouseUp(WPARAM btnState, int x, int y)
 {
     ReleaseCapture();
 }
 
-void BasicTesselation::OnMouseMove(WPARAM btnState, int x, int y)
+void BezierPatch::OnMouseMove(WPARAM btnState, int x, int y)
 {
     if ((btnState & MK_LBUTTON) != 0)
     {
@@ -160,11 +160,11 @@ void BasicTesselation::OnMouseMove(WPARAM btnState, int x, int y)
     _lastMousePos.y = y;
 }
 
-void BasicTesselation::OnKeyboardInput(const GameTimer& timer)
+void BezierPatch::OnKeyboardInput(const GameTimer& timer)
 {
 }
 
-void BasicTesselation::UpdateCamera(const GameTimer& timer)
+void BezierPatch::UpdateCamera(const GameTimer& timer)
 {
     _eyePos.x = _radius*sinf(_phi)*cosf(_theta);
     _eyePos.z = _radius*sinf(_phi)*sinf(_theta);
@@ -178,7 +178,7 @@ void BasicTesselation::UpdateCamera(const GameTimer& timer)
     XMStoreFloat4x4(&_view, view);
 }
 
-void BasicTesselation::UpdateObjectCBs(const GameTimer& timer)
+void BezierPatch::UpdateObjectCBs(const GameTimer& timer)
 {
     auto currObjectCB = _currFrameResource->ObjectCB.get();
     for (auto& e : _allRenderItems)
@@ -199,7 +199,7 @@ void BasicTesselation::UpdateObjectCBs(const GameTimer& timer)
     }
 }
 
-void BasicTesselation::UpdateMaterialCBs(const GameTimer& timer)
+void BezierPatch::UpdateMaterialCBs(const GameTimer& timer)
 {
     auto currMaterialCB = _currFrameResource->MaterialCB.get();
     for (auto& e : _materials)
@@ -221,7 +221,7 @@ void BasicTesselation::UpdateMaterialCBs(const GameTimer& timer)
     }
 }
 
-void BasicTesselation::UpdateMainPassCB(const GameTimer& timer)
+void BezierPatch::UpdateMainPassCB(const GameTimer& timer)
 {
     XMMATRIX view = XMLoadFloat4x4(&_view);
     XMMATRIX proj = XMLoadFloat4x4(&_proj);
@@ -257,7 +257,7 @@ void BasicTesselation::UpdateMainPassCB(const GameTimer& timer)
     currPassCB->CopyData(0, _mainPassCB);
 }
 
-void BasicTesselation::LoadTextures()
+void BezierPatch::LoadTextures()
 {
     auto white1x1Tex = std::make_unique<Texture>();
     white1x1Tex->Name = "white1x1Tex";
@@ -267,7 +267,7 @@ void BasicTesselation::LoadTextures()
     _textures[white1x1Tex->Name] = move(white1x1Tex);
 }
 
-void BasicTesselation::BuildRootSignature()
+void BezierPatch::BuildRootSignature()
 {
     CD3DX12_DESCRIPTOR_RANGE texTable;
     texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
@@ -294,7 +294,7 @@ void BasicTesselation::BuildRootSignature()
     ThrowIfFailed(_device->CreateRootSignature(0, serializedRootSig->GetBufferPointer(), serializedRootSig->GetBufferSize(), IID_PPV_ARGS(_rootSignature.GetAddressOf())));
 }
 
-void BasicTesselation::BuildDescriptorHeaps()
+void BezierPatch::BuildDescriptorHeaps()
 {
     D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
     srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
@@ -313,30 +313,52 @@ void BasicTesselation::BuildDescriptorHeaps()
     _device->CreateShaderResourceView(tex.Get(), &srvDesc, _srvHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
-void BasicTesselation::BuildShaderAndInputLayout()
+void BezierPatch::BuildShaderAndInputLayout()
 {
-    _shaders["tessVS"] = D3DUtil::CompileShader(L"Shaders\\Tessellation.hlsl", nullptr, "vert", "vs_5_1");
-    _shaders["tessHS"] = D3DUtil::CompileShader(L"Shaders\\Tessellation.hlsl", nullptr, "hull", "hs_5_1");
-    _shaders["tessDS"] = D3DUtil::CompileShader(L"Shaders\\Tessellation.hlsl", nullptr, "domain", "ds_5_1");
-    _shaders["tessPS"] = D3DUtil::CompileShader(L"Shaders\\Tessellation.hlsl", nullptr, "frag", "ps_5_1");
+    _shaders["tessVS"] = D3DUtil::CompileShader(L"Shaders\\BezierTessellation.hlsl", nullptr, "vert", "vs_5_1");
+    _shaders["tessHS"] = D3DUtil::CompileShader(L"Shaders\\BezierTessellation.hlsl", nullptr, "hull", "hs_5_1");
+    _shaders["tessDS"] = D3DUtil::CompileShader(L"Shaders\\BezierTessellation.hlsl", nullptr, "domain", "ds_5_1");
+    _shaders["tessPS"] = D3DUtil::CompileShader(L"Shaders\\BezierTessellation.hlsl", nullptr, "frag", "ps_5_1");
 
-    _inputLayout = 
+    _inputLayout =
     {
-        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA}
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA }
     };
 }
 
-void BasicTesselation::BuildQuadPatchGeometry()
+void BezierPatch::BuildQuadPatchGeometry()
 {
-    std::array<XMFLOAT3, 4> vertices =
+    std::array<XMFLOAT3, 16> vertices =
     {
-        XMFLOAT3(-10.0f, 0.0f, +10.0f),
-        XMFLOAT3(+10.0f, 0.0f, +10.0f),
-        XMFLOAT3(-10.0f, 0.0f, -10.0f),
-        XMFLOAT3(+10.0f, 0.0f, -10.0f)
+        XMFLOAT3(-10.0f, -10.0f, +15.0f),
+        XMFLOAT3(-5.0f,  0.0f, +15.0f),
+        XMFLOAT3(+5.0f,  0.0f, +15.0f),
+        XMFLOAT3(+10.0f, 0.0f, +15.0f),
+
+        XMFLOAT3(-15.0f, 0.0f, +5.0f),
+        XMFLOAT3(-5.0f,  0.0f, +5.0f),
+        XMFLOAT3(+5.0f,  20.0f, +5.0f),
+        XMFLOAT3(+15.0f, 0.0f, +5.0f),
+
+        XMFLOAT3(-15.0f, 0.0f, -5.0f),
+        XMFLOAT3(-5.0f,  0.0f, -5.0f),
+        XMFLOAT3(+5.0f,  0.0f, -5.0f),
+        XMFLOAT3(+15.0f, 0.0f, -5.0f),
+
+        XMFLOAT3(-10.0f, 10.0f, -15.0f),
+        XMFLOAT3(-5.0f,  0.0f, -15.0f),
+        XMFLOAT3(+5.0f,  0.0f, -15.0f),
+        XMFLOAT3(+25.0f, 10.0f, -15.0f)
     };
 
-    std::array<int16_t, 4> indices = { 0, 1, 2, 3 };
+    std::array<std::int16_t, 16> indices =
+    {
+        0, 1, 2, 3,
+        4, 5, 6, 7,
+        8, 9, 10, 11,
+        12, 13, 14, 15
+    };
+
     const UINT vbByteSize = (UINT)vertices.size() * sizeof(XMFLOAT3);
     const UINT ibByteSize = (UINT)indices.size() * sizeof(int16_t);
 
@@ -361,7 +383,7 @@ void BasicTesselation::BuildQuadPatchGeometry()
     _geometries[geo->Name] = move(geo);
 }
 
-void BasicTesselation::BuildPSOs()
+void BezierPatch::BuildPSOs()
 {
     D3D12_GRAPHICS_PIPELINE_STATE_DESC opaquePsoDesc;
 
@@ -403,7 +425,7 @@ void BasicTesselation::BuildPSOs()
     ThrowIfFailed(_device->CreateGraphicsPipelineState(&opaquePsoDesc, IID_PPV_ARGS(&_PSOs["opaque"])));
 }
 
-void BasicTesselation::BuildFrameResources()
+void BezierPatch::BuildFrameResources()
 {
     for (int i = 0; i < FrameResourceBlending::NumFrameResources; i++)
     {
@@ -411,7 +433,7 @@ void BasicTesselation::BuildFrameResources()
     }
 }
 
-void BasicTesselation::BuildMaterials()
+void BezierPatch::BuildMaterials()
 {
     auto whiteMat = std::make_unique<Material>();
     whiteMat->Name = "quadMat";
@@ -424,7 +446,7 @@ void BasicTesselation::BuildMaterials()
     _materials["whiteMat"] = move(whiteMat);
 }
 
-void BasicTesselation::BuildRenderItems()
+void BezierPatch::BuildRenderItems()
 {
     auto quadPatchRitem = std::make_unique<RenderItem>();
     quadPatchRitem->Model = MathHelper::Identity4x4();
@@ -441,7 +463,7 @@ void BasicTesselation::BuildRenderItems()
     _allRenderItems.push_back(move(quadPatchRitem));
 }
 
-void BasicTesselation::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& renderItems)
+void BezierPatch::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& renderItems)
 {
     UINT objCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(FrameResource::ObjectConstants));
     UINT matCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(MaterialConstants));
