@@ -50,12 +50,12 @@ cbuffer cbMaterial : register(b2)
 
 struct vIn
 {
-    float4 pos : POSITION;
+    float3 pos : POSITION;
 };
 
 struct vOut
 {
-    float4 pos : POSITION;
+    float3 pos : POSITION;
 };
 
 vOut vert(vIn i)
@@ -114,7 +114,7 @@ HullOut hull(InputPatch<vOut, 4> p, uint i : SV_OutputControlPointID, uint patch
 
 struct DomainOut
 {
-    float pos : SV_Position;
+    float4 pos : SV_Position;
 };
 
 [domain("quad")]

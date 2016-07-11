@@ -248,5 +248,6 @@
     <FxCompile Include="Shaders\BlendingOverdraw.hlsl" />
     <FxCompile Include="Shaders\StencilingOverdraw.hlsl" />
     <FxCompile Include="Shaders\TreeSprite.hlsl" />
+    <FxCompile Include="Shaders\Tessellation.hlsl" />
   </ItemGroup>
 </Project>

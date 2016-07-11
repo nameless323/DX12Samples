@@ -304,7 +304,7 @@ void BasicTesselation::BuildDescriptorHeaps()
 
     auto tex = _textures["white1x1Tex"]->Resource;
 
-    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc;
+    D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     srvDesc.Format = tex->GetDesc().Format;
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;

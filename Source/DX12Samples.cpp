@@ -15,12 +15,13 @@
 #include "Scenes/Overdraw/OverdrawBlending.h"
 #include "Scenes/Overdraw/OverdrawStenciling.h"
 #include "Scenes/BilboardTrees/BilboardTrees.h"
+#include "Scenes/Tesselation/BasicTesselation.h"
 
 Application* app;
 
 void CreateScene(HINSTANCE hInstance)
 {
-    app = new BilboardTrees(hInstance);
+    app = new BasicTesselation(hInstance);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
