@@ -195,6 +195,7 @@
     <ClInclude Include="Source\Scenes\Waves\WavesFrameResource.h" />
     <ClInclude Include="Source\Scenes\Waves\WavesRenderItem.h" />
     <ClInclude Include="Source\Scenes\Waves\WavesScene.h" />
+    <ClInclude Include="Source\Scenes\Tesselation\BasicTesselation.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Application.cpp" />
@@ -229,6 +230,7 @@
     <ClCompile Include="Source\Scenes\Waves\Waves.cpp" />
     <ClCompile Include="Source\Scenes\Waves\WavesFrameResource.cpp" />
     <ClCompile Include="Source\Scenes\Waves\WavesScene.cpp" />
+    <ClCompile Include="Source\Scenes\Tesselation\BasicTesselation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\Blending.hlsl">
