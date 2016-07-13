@@ -236,6 +236,31 @@ void GeomCylinder::BuildShapeGeometry()
 
 void GeomCylinder::BuildPSOs()
 {
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
+
+    ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
+
+    psoDesc.InputLayout = { _inputLayout.data(), (UINT)_inputLayout.size() };
+    psoDesc.pRootSignature = _rootSignature.Get();
+
+    psoDesc.VS = { reinterpret_cast<BYTE*>(_shaders["vert"]->GetBufferPointer()), _shaders["vert"]->GetBufferSize() };
+    psoDesc.GS = { reinterpret_cast<BYTE*>(_shaders["geom"]->GetBufferPointer()), _shaders["geom"]->GetBufferSize() };
+    psoDesc.PS = { reinterpret_cast<BYTE*>(_shaders["frag"]->GetBufferPointer()), _shaders["frag"]->GetBufferSize() };
+
+    psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+    psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+    psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+
+    psoDesc.DSVFormat = _dsvFormat;
+    psoDesc.NumRenderTargets = 1;
+    psoDesc.RTVFormats[0] = _backBufferFormat;
+    psoDesc.NodeMask = 0;
+    psoDesc.SampleMask = UINT_MAX;
+    psoDesc.SampleDesc.Count = _4xMsaa ? 4 : 1;
+    psoDesc.SampleDesc.Quality = _4xMsaa ? _4xMsaaQuality - 1 : 1;
+    psoDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
+    psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
+    ThrowIfFailed(_device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(_opaquePSO.GetAddressOf())));    
 }
 
 void GeomCylinder::BuildFrameResources()
@@ -246,6 +271,18 @@ void GeomCylinder::BuildFrameResources()
 
 void GeomCylinder::BuildRenderItems()
 {
+    auto renderItem = std::make_unique<CrateRenderItem>();
+    renderItem->ObjCBIndex = 0;
+    renderItem->Model = MathHelper::Identity4x4();
+    renderItem->Geo = _geometries["circle"].get();
+    renderItem->PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
+    renderItem->BaseVertexLocation = renderItem->Geo->DrawArgs["circle"].BaseVertexLocation;
+    renderItem->StartIndexLocation = renderItem->Geo->DrawArgs["circle"].StartIndexLocation;
+    renderItem->IndexCount = renderItem->Geo->DrawArgs["circle"].IndexCount;
+    renderItem->NumFramesDirty = CrateFrameResource::NumFrameResources;
+
+    _allRenderItems.push_back(move(renderItem));
+    _opaqueRenderItems.push_back(renderItem.get());
 }
 
 void GeomCylinder::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<CrateRenderItem*>& renderItems)
