@@ -1,4 +1,5 @@
 #include "GeomCylinder.h"
+#include "../../../Core/GeometryGenerator.h"
 
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
@@ -16,11 +17,12 @@ bool GeomCylinder::Init()
     ThrowIfFailed(_commandAllocator->Reset());
     ThrowIfFailed(_commandList->Reset(_commandAllocator.Get(), nullptr));
 
-    BuildShapeGeometry();
-    BuildShaderAndInputLayout();
     BuildRootSignature();
+    BuildShaderAndInputLayout();
+    BuildShapeGeometry();
     BuildRenderItems();
     BuildFrameResources();
+    BuildPSOs();
 
     ThrowIfFailed(_commandList->Close());
     ID3D12CommandList* cmdLists[] = { _commandList.Get() };
@@ -49,8 +51,8 @@ int GeomCylinder::Run()
 void GeomCylinder::OnResize()
 {
     Application::OnResize();
-    XMMATRIX p = XMMatrixPerspectiveFovLH(0.25f * MathHelper::Pi, AspectRatio(), 1.0f, 100.0f);
-    XMStoreFloat4x4(&_proj, XMMatrixTranspose(p));
+    XMMATRIX p = XMMatrixPerspectiveFovLH(0.25f * MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
+    XMStoreFloat4x4(&_proj, p);
 }
 
 void GeomCylinder::Update(const GameTimer& timer)
@@ -76,6 +78,36 @@ void GeomCylinder::Update(const GameTimer& timer)
 
 void GeomCylinder::Draw(const GameTimer& timer)
 {
+    auto cmdAllocator = _currFrameResource->CmdListAlloc;
+    ThrowIfFailed(cmdAllocator->Reset());
+    ThrowIfFailed(_commandList->Reset(cmdAllocator.Get(), _opaquePSO.Get()));
+
+    _commandList->RSSetViewports(1, &_screenViewport);
+    _commandList->RSSetScissorRects(1, &_scissorRect);
+
+    _commandList->SetGraphicsRootSignature(_rootSignature.Get());
+    _commandList->SetGraphicsRootConstantBufferView(1, _currFrameResource->PassCB->Resource()->GetGPUVirtualAddress());
+
+    CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+    _commandList->ResourceBarrier(1, &barrier);
+
+    _commandList->ClearRenderTargetView(CurrentBackBufferView(), DarkBlue, 0, nullptr);
+    _commandList->ClearDepthStencilView(DepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+    _commandList->OMSetRenderTargets(1, &CurrentBackBufferView(), true, &DepthStencilView());
+
+    DrawRenderItems(_commandList.Get(), _opaqueRenderItems);
+
+    barrier = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+    _commandList->ResourceBarrier(1, &barrier);
+    ThrowIfFailed(_commandList->Close());
+
+    ID3D12CommandList* cmdLists[] = { _commandList.Get() };
+    _commandQueue->ExecuteCommandLists(_countof(cmdLists), cmdLists);
+
+    _swapChain->Present(0, 0);
+    _currBackBuffer = (_currBackBuffer + 1) % _swapChainBufferCount;
+    _currFrameResource->Fence = ++_currentFence;
+    ThrowIfFailed(_commandQueue->Signal(_fence.Get(), _currFrameResource->Fence));
 
 }
 
@@ -117,7 +149,7 @@ void GeomCylinder::OnMouseMove(WPARAM btnState, int x, int y)
 }
 
 void GeomCylinder::OnKeyboardInput(const GameTimer& timer)
-{
+{    
 }
 
 void GeomCylinder::UpdateCamera(const GameTimer& timer)
@@ -213,8 +245,8 @@ void GeomCylinder::BuildRootSignature()
 void GeomCylinder::BuildShaderAndInputLayout()
 {
     _shaders["vs"] = D3DUtil::CompileShader(L"Shaders\\GeomCylinder.hlsl", nullptr, "vert", "vs_5_1");
-    _shaders["gs"] = D3DUtil::CompileShader(L"Shaders\\GeomCylinder.hlsl", nullptr, "geom", "gs_5_1");
-    _shaders["ps"] = D3DUtil::CompileShader(L"Shaders\\GeomCylinder.hlsl", nullptr, "frag", "fs_5_1");
+//    _shaders["gs"] = D3DUtil::CompileShader(L"Shaders\\GeomCylinder.hlsl", nullptr, "geom", "gs_5_1");
+    _shaders["ps"] = D3DUtil::CompileShader(L"Shaders\\GeomCylinder.hlsl", nullptr, "frag", "ps_5_1");
 
     D3D12_INPUT_ELEMENT_DESC element;
     element.SemanticName = "POSITION";
@@ -232,6 +264,39 @@ void GeomCylinder::BuildShaderAndInputLayout()
 
 void GeomCylinder::BuildShapeGeometry()
 {
+    const int step = 5;
+    const int stepCount = 360 / step;
+    const float radius = 1;
+    std::array<XMFLOAT3, stepCount> verts;
+    std::array<int16_t, stepCount> indices;
+    for (int i = 0; i < stepCount; i ++)
+    {
+        XMStoreFloat3(&verts[i], MathHelper::SphericalToCartesian(radius, i * step * MathHelper::Pi / 180.0f, MathHelper::Pi / 2.0f));
+        indices[i] = i;
+    }
+    
+    auto geo = std::make_unique<MeshGeometry>();
+    geo->Name = "circle";
+
+    size_t vetsByteSize = sizeof(XMFLOAT3) * stepCount;
+    size_t indByteSize = sizeof(int16_t) * stepCount;
+
+    geo->VertexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), verts.data(), vetsByteSize, geo->VertexBufferUploader);
+    geo->IndexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), indices.data(), indByteSize, geo->IndexBufferUploader);
+
+    SubmeshGeometry submesh;
+    submesh.BaseVertexLocation = 0;
+    submesh.StartIndexLocation = 0;
+    submesh.IndexCount = stepCount;
+
+    geo->IndexBufferByteSize = indByteSize;
+    geo->IndexFormat = DXGI_FORMAT_R16_UINT;
+    geo->VertexByteStride = sizeof(XMFLOAT3);
+    geo->VertexBufferByteSize = vetsByteSize;
+
+
+    geo->DrawArgs["circle"] = submesh;
+    _geometries[geo->Name] = std::move(geo);
 }
 
 void GeomCylinder::BuildPSOs()
@@ -243,30 +308,30 @@ void GeomCylinder::BuildPSOs()
     psoDesc.InputLayout = { _inputLayout.data(), (UINT)_inputLayout.size() };
     psoDesc.pRootSignature = _rootSignature.Get();
 
-    psoDesc.VS = { reinterpret_cast<BYTE*>(_shaders["vert"]->GetBufferPointer()), _shaders["vert"]->GetBufferSize() };
-    psoDesc.GS = { reinterpret_cast<BYTE*>(_shaders["geom"]->GetBufferPointer()), _shaders["geom"]->GetBufferSize() };
-    psoDesc.PS = { reinterpret_cast<BYTE*>(_shaders["frag"]->GetBufferPointer()), _shaders["frag"]->GetBufferSize() };
+    psoDesc.VS = { reinterpret_cast<BYTE*>(_shaders["vs"]->GetBufferPointer()), _shaders["vs"]->GetBufferSize() };
+//    psoDesc.GS = { reinterpret_cast<BYTE*>(_shaders["gs"]->GetBufferPointer()), _shaders["gs"]->GetBufferSize() };
+    psoDesc.PS = { reinterpret_cast<BYTE*>(_shaders["ps"]->GetBufferPointer()), _shaders["ps"]->GetBufferSize() };
 
     psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
     psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
     psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 
-    psoDesc.DSVFormat = _dsvFormat;
+    psoDesc.SampleMask = UINT_MAX;
+    psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
     psoDesc.NumRenderTargets = 1;
     psoDesc.RTVFormats[0] = _backBufferFormat;
-    psoDesc.NodeMask = 0;
-    psoDesc.SampleMask = UINT_MAX;
     psoDesc.SampleDesc.Count = _4xMsaa ? 4 : 1;
-    psoDesc.SampleDesc.Quality = _4xMsaa ? _4xMsaaQuality - 1 : 1;
-    psoDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
-    psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
-    ThrowIfFailed(_device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(_opaquePSO.GetAddressOf())));    
+    psoDesc.SampleDesc.Quality = _4xMsaa ? _4xMsaaQuality - 1 : 0;
+    psoDesc.DSVFormat = _dsvFormat;
+//    psoDesc.NodeMask = 0;
+//    psoDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
+    ThrowIfFailed(_device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&_opaquePSO)));    
 }
 
 void GeomCylinder::BuildFrameResources()
 {
     for (int i = 0; i < CrateFrameResource::NumFrameResources; i++)
-        _frameResources.push_back(std::make_unique<CrateFrameResource>(_device.Get(), 1, _allRenderItems.size(), 0));
+        _frameResources.push_back(std::make_unique<CrateFrameResource>(_device.Get(), 1, _allRenderItems.size(), _allRenderItems.size()));
 }
 
 void GeomCylinder::BuildRenderItems()
@@ -275,16 +340,26 @@ void GeomCylinder::BuildRenderItems()
     renderItem->ObjCBIndex = 0;
     renderItem->Model = MathHelper::Identity4x4();
     renderItem->Geo = _geometries["circle"].get();
-    renderItem->PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
+    renderItem->PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
     renderItem->BaseVertexLocation = renderItem->Geo->DrawArgs["circle"].BaseVertexLocation;
     renderItem->StartIndexLocation = renderItem->Geo->DrawArgs["circle"].StartIndexLocation;
     renderItem->IndexCount = renderItem->Geo->DrawArgs["circle"].IndexCount;
     renderItem->NumFramesDirty = CrateFrameResource::NumFrameResources;
 
-    _allRenderItems.push_back(move(renderItem));
     _opaqueRenderItems.push_back(renderItem.get());
+    _allRenderItems.push_back(move(renderItem));
 }
 
 void GeomCylinder::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<CrateRenderItem*>& renderItems)
 {
+    size_t objCbByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(CrateFrameResource::ObjectConstants));
+    for (auto renderItem : renderItems)
+    {
+        cmdList->IASetVertexBuffers(0, 1, &renderItem->Geo->VertexBufferView());
+        cmdList->IASetIndexBuffer(&renderItem->Geo->IndexBufferView());
+        cmdList->IASetPrimitiveTopology(renderItem->PrimitiveType);
+
+        cmdList->SetGraphicsRootConstantBufferView(0, _currFrameResource->ObjectCB->Resource()->GetGPUVirtualAddress() + renderItem->ObjCBIndex*objCbByteSize);
+        cmdList->DrawInstanced(renderItem->IndexCount, 1, 0, 0);
+    }
 }

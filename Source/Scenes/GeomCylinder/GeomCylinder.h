@@ -13,6 +13,7 @@ public:
     GeomCylinder(HINSTANCE hInstance);
     GeomCylinder(const GeomCylinder& rhs) = delete;
     GeomCylinder& operator=(const GeomCylinder& rhs) = delete;
+    void BuildBox();
     bool Init() override;
     ~GeomCylinder() override;
     LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
