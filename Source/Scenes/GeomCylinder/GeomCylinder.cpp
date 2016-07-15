@@ -265,7 +265,7 @@ void GeomCylinder::BuildShaderAndInputLayout()
 void GeomCylinder::BuildShapeGeometry()
 {
     const int step = 5;
-    const int stepCount = 360 / step;
+    const int stepCount = 360 / step + 1;
     const float radius = 1;
     std::array<XMFLOAT3, stepCount> verts;
     std::array<int16_t, stepCount> indices;
