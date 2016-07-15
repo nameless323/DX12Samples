@@ -27,13 +27,49 @@ cbuffer PassCB : register(b1)
     Light Lights[MaxLights];
 };
 
-float4 vert(float3 pos : POSITION) : SV_Position
+struct vOut
 {
-    float4 posW = mul(float4(pos, 1.0), Model);
-    return mul(posW, VP);
+    float3 pos : POSITION;
+};
+
+struct gOut
+{
+    float4 pos : SV_Position;
+};
+
+vOut vert(float3 pos : POSITION)
+{
+    vOut o;
+    o.pos = pos;
+    return o;
 }
 
-float4 frag(float4 pos : SV_Position) : SV_Target
+[maxvertexcount(4)]
+void geom(line vOut i[2], inout TriangleStream<gOut> o)
+{
+    float3 v1 = i[0].pos;
+    float3 v2 = i[0].pos + float3(0, 1, 0);
+    float3 v3 = i[1].pos;
+    float3 v4 = i[1].pos + float3(0, 1, 0);
+    gOut outV;
+    outV.pos = mul(float4(v1, 1.0), Model);
+    outV.pos = mul(outV.pos, VP);
+    o.Append(outV);
+
+    outV.pos = mul(float4(v2, 1.0), Model);
+    outV.pos = mul(outV.pos, VP);
+    o.Append(outV);
+
+    outV.pos = mul(float4(v3, 1.0), Model);
+    outV.pos = mul(outV.pos, VP);
+    o.Append(outV);
+
+    outV.pos = mul(float4(v4, 1.0), Model);
+    outV.pos = mul(outV.pos, VP);
+    o.Append(outV);
+}
+
+float4 frag(gOut i) : SV_Target
 {
     return 1.0;
 }

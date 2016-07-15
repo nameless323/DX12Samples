@@ -245,7 +245,7 @@ void GeomCylinder::BuildRootSignature()
 void GeomCylinder::BuildShaderAndInputLayout()
 {
     _shaders["vs"] = D3DUtil::CompileShader(L"Shaders\\GeomCylinder.hlsl", nullptr, "vert", "vs_5_1");
-//    _shaders["gs"] = D3DUtil::CompileShader(L"Shaders\\GeomCylinder.hlsl", nullptr, "geom", "gs_5_1");
+    _shaders["gs"] = D3DUtil::CompileShader(L"Shaders\\GeomCylinder.hlsl", nullptr, "geom", "gs_5_1");
     _shaders["ps"] = D3DUtil::CompileShader(L"Shaders\\GeomCylinder.hlsl", nullptr, "frag", "ps_5_1");
 
     D3D12_INPUT_ELEMENT_DESC element;
@@ -309,10 +309,12 @@ void GeomCylinder::BuildPSOs()
     psoDesc.pRootSignature = _rootSignature.Get();
 
     psoDesc.VS = { reinterpret_cast<BYTE*>(_shaders["vs"]->GetBufferPointer()), _shaders["vs"]->GetBufferSize() };
-//    psoDesc.GS = { reinterpret_cast<BYTE*>(_shaders["gs"]->GetBufferPointer()), _shaders["gs"]->GetBufferSize() };
+    psoDesc.GS = { reinterpret_cast<BYTE*>(_shaders["gs"]->GetBufferPointer()), _shaders["gs"]->GetBufferSize() };
     psoDesc.PS = { reinterpret_cast<BYTE*>(_shaders["ps"]->GetBufferPointer()), _shaders["ps"]->GetBufferSize() };
 
     psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+    psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+    psoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
     psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
     psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 
@@ -323,8 +325,8 @@ void GeomCylinder::BuildPSOs()
     psoDesc.SampleDesc.Count = _4xMsaa ? 4 : 1;
     psoDesc.SampleDesc.Quality = _4xMsaa ? _4xMsaaQuality - 1 : 0;
     psoDesc.DSVFormat = _dsvFormat;
-//    psoDesc.NodeMask = 0;
-//    psoDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
+    psoDesc.NodeMask = 0;
+    psoDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
     ThrowIfFailed(_device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&_opaquePSO)));    
 }
 
