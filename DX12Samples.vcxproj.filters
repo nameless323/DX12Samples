@@ -262,5 +262,6 @@
     <FxCompile Include="Shaders\TreeSprite.hlsl" />
     <FxCompile Include="Shaders\Tessellation.hlsl" />
     <FxCompile Include="Shaders\BezierTessellation.hlsl" />
+    <FxCompile Include="Shaders\GeomCylinder.hlsl" />
   </ItemGroup>
 </Project>
