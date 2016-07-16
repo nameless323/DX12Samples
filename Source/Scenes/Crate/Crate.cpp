@@ -1,6 +1,5 @@
 #include "Crate.h"
 #include "../../../Core/GeometryGenerator.h"
-#include "../../Common/FrameResource.h"
 
 
 using Microsoft::WRL::ComPtr;
@@ -183,7 +182,7 @@ void Crate::AnimateMaterials(const GameTimer& timer)
     XMMATRIX mat = XMMatrixTranslation(-0.5f, -0.5f, 0.0f) * XMMatrixRotationZ(0) * XMMatrixTranslation(0.5f, 0.5f, 0.0f);
     XMStoreFloat4x4(&_materials["woodCrate"]->MatTransform, mat);
 
-    _materials["woodCrate"]->NumFramesDirty = FrameResource::NumFrameResources;
+    _materials["woodCrate"]->NumFramesDirty = CrateFrameResource::NumFrameResources;
 }
 
 void Crate::UpdateObjectCBs(const GameTimer& timer)
@@ -289,7 +288,7 @@ void Crate::BuildRootSignature()
     slotRootParameter[2].InitAsConstantBufferView(1);
     slotRootParameter[3].InitAsConstantBufferView(2);
 
-    auto staticSamplers = FrameResource::GetStaticSamplers();
+    auto staticSamplers = CrateFrameResource::GetStaticSamplers();
 
     CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc(4, slotRootParameter, (UINT)staticSamplers.size(), staticSamplers.data(), D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
     ComPtr<ID3DBlob> serializedRootSig = nullptr;
