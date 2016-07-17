@@ -77,6 +77,7 @@ private:
     bool _isWireframe = false;
     bool _isGeomTesselated = true;
     bool _isTesselated = false;
+    bool _isExplode = false;
 
     POINT _lastMousePos;
 };

@@ -108,7 +108,16 @@ void IcosahedronGeoTesselation::Draw(const GameTimer& timer)
             ThrowIfFailed(_commandList->Reset(cmdAlloc, _PSOs["wireframe"].Get()));
         }
         else
-            ThrowIfFailed(_commandList->Reset(cmdAlloc, _PSOs["standard"].Get()));
+        {
+            if (_isExplode)
+            {
+                ThrowIfFailed(_commandList->Reset(cmdAlloc, _PSOs["explode"].Get()));
+            }
+            else
+                ThrowIfFailed(_commandList->Reset(cmdAlloc, _PSOs["standard"].Get()));
+        }
+
+        
     }
 
     _commandList->RSSetViewports(1, &_screenViewport);
@@ -199,6 +208,11 @@ void IcosahedronGeoTesselation::OnKeyboardInput(const GameTimer& timer)
         _isTesselated = true;
     else
         _isTesselated = false;
+
+    if (GetAsyncKeyState('4') & 0x8000)
+        _isExplode = true;
+    else
+        _isExplode = false;
 }
 
 void IcosahedronGeoTesselation::UpdateCamera(const GameTimer& timer)
@@ -361,6 +375,10 @@ void IcosahedronGeoTesselation::BuildShaderAndInputLayout()
     _shaders["tessGeoVS"] = D3DUtil::CompileShader(L"Shaders\\IcosahedronGeomTess.hlsl", nullptr, "vert", "vs_5_1");
     _shaders["tessGeoGS"] = D3DUtil::CompileShader(L"Shaders\\IcosahedronGeomTess.hlsl", nullptr, "geom", "gs_5_1");
     _shaders["tessGeoPS"] = D3DUtil::CompileShader(L"Shaders\\IcosahedronGeomTess.hlsl", nullptr, "frag", "ps_5_1");
+    
+    _shaders["explodeVS"] = D3DUtil::CompileShader(L"Shaders\\IcosahedronGeomTessAndExplode.hlsl", nullptr, "vert", "vs_5_1");
+    _shaders["explodeGS"] = D3DUtil::CompileShader(L"Shaders\\IcosahedronGeomTessAndExplode.hlsl", nullptr, "geom", "gs_5_1");
+    _shaders["explodePS"] = D3DUtil::CompileShader(L"Shaders\\IcosahedronGeomTessAndExplode.hlsl", nullptr, "frag", "ps_5_1");
 
     _shaders["tessVS"] = D3DUtil::CompileShader(L"Shaders\\IcosahedronTess.hlsl", nullptr, "vert", "vs_5_1");
     _shaders["tessHS"] = D3DUtil::CompileShader(L"Shaders\\IcosahedronTess.hlsl", nullptr, "hull", "hs_5_1");
@@ -459,6 +477,12 @@ void IcosahedronGeoTesselation::BuildPSOs()
     geomTessPso.GS = { reinterpret_cast<BYTE*>(_shaders["tessGeoGS"]->GetBufferPointer()), _shaders["tessGeoGS"]->GetBufferSize() };
     geomTessPso.PS = { reinterpret_cast<BYTE*>(_shaders["tessGeoPS"]->GetBufferPointer()), _shaders["tessGeoPS"]->GetBufferSize() };
     ThrowIfFailed(_device->CreateGraphicsPipelineState(&geomTessPso, IID_PPV_ARGS(_PSOs["geomTess"].GetAddressOf())));
+
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC explodePso = opaquePso;
+    explodePso.VS = { reinterpret_cast<BYTE*>(_shaders["explodeVS"]->GetBufferPointer()), _shaders["explodeVS"]->GetBufferSize() };
+    explodePso.GS = { reinterpret_cast<BYTE*>(_shaders["explodeGS"]->GetBufferPointer()), _shaders["explodeGS"]->GetBufferSize() };
+    explodePso.PS = { reinterpret_cast<BYTE*>(_shaders["explodePS"]->GetBufferPointer()), _shaders["explodePS"]->GetBufferSize() };
+    ThrowIfFailed(_device->CreateGraphicsPipelineState(&explodePso, IID_PPV_ARGS(_PSOs["explode"].GetAddressOf())));
 
     D3D12_GRAPHICS_PIPELINE_STATE_DESC wireframeGeomTessPso = geomTessPso;
     wireframeGeomTessPso.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;

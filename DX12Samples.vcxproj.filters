@@ -271,5 +271,6 @@
     <FxCompile Include="Shaders\GeomCylinder.hlsl" />
     <FxCompile Include="Shaders\IcosahedronGeomTess.hlsl" />
     <FxCompile Include="Shaders\IcosahedronTess.hlsl" />
+    <FxCompile Include="Shaders\IcosahedronGeomTessAndExplode.hlsl" />
   </ItemGroup>
 </Project>
