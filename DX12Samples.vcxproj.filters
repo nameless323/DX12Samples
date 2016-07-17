@@ -270,5 +270,6 @@
     <FxCompile Include="Shaders\BezierTessellation.hlsl" />
     <FxCompile Include="Shaders\GeomCylinder.hlsl" />
     <FxCompile Include="Shaders\IcosahedronGeomTess.hlsl" />
+    <FxCompile Include="Shaders\IcosahedronTess.hlsl" />
   </ItemGroup>
 </Project>

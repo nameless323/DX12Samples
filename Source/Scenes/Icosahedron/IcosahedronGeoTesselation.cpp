@@ -83,7 +83,7 @@ void IcosahedronGeoTesselation::Draw(const GameTimer& timer)
 {
     ID3D12CommandAllocator* cmdAlloc = _currFrameResource->CmdListAlloc.Get();
     ThrowIfFailed(cmdAlloc->Reset());
-    if(_isTesselated)
+    if(_isGeomTesselated)
     {
         if (_isWireframe)
         {
@@ -91,6 +91,15 @@ void IcosahedronGeoTesselation::Draw(const GameTimer& timer)
         }
         else
             ThrowIfFailed(_commandList->Reset(cmdAlloc, _PSOs["geomTess"].Get()));
+    }
+    else if (_isTesselated)
+    {
+        if (_isWireframe)
+        {
+            ThrowIfFailed(_commandList->Reset(cmdAlloc, _PSOs["tessWireframe"].Get()));
+        }
+        else
+            ThrowIfFailed(_commandList->Reset(cmdAlloc, _PSOs["tess"].Get()));
     }
     else
     {
@@ -182,6 +191,11 @@ void IcosahedronGeoTesselation::OnKeyboardInput(const GameTimer& timer)
         _isWireframe = false;
 
     if (GetAsyncKeyState('2') & 0x8000)
+        _isGeomTesselated = true;
+    else
+        _isGeomTesselated = false;
+
+    if (GetAsyncKeyState('3') & 0x8000)
         _isTesselated = true;
     else
         _isTesselated = false;
@@ -344,9 +358,14 @@ void IcosahedronGeoTesselation::BuildShaderAndInputLayout()
     _shaders["standardVS"] = D3DUtil::CompileShader(L"Shaders\\TexCrate.hlsl", nullptr, "vert", "vs_5_1");
     _shaders["standardPS"] = D3DUtil::CompileShader(L"Shaders\\TexCrate.hlsl", nullptr, "frag", "ps_5_1");
 
-    _shaders["tessVS"] = D3DUtil::CompileShader(L"Shaders\\IcosahedronGeomTess.hlsl", nullptr, "vert", "vs_5_1");
-    _shaders["tessGS"] = D3DUtil::CompileShader(L"Shaders\\IcosahedronGeomTess.hlsl", nullptr, "geom", "gs_5_1");
-    _shaders["tessPS"] = D3DUtil::CompileShader(L"Shaders\\IcosahedronGeomTess.hlsl", nullptr, "frag", "ps_5_1");
+    _shaders["tessGeoVS"] = D3DUtil::CompileShader(L"Shaders\\IcosahedronGeomTess.hlsl", nullptr, "vert", "vs_5_1");
+    _shaders["tessGeoGS"] = D3DUtil::CompileShader(L"Shaders\\IcosahedronGeomTess.hlsl", nullptr, "geom", "gs_5_1");
+    _shaders["tessGeoPS"] = D3DUtil::CompileShader(L"Shaders\\IcosahedronGeomTess.hlsl", nullptr, "frag", "ps_5_1");
+
+    _shaders["tessVS"] = D3DUtil::CompileShader(L"Shaders\\IcosahedronTess.hlsl", nullptr, "vert", "vs_5_1");
+    _shaders["tessHS"] = D3DUtil::CompileShader(L"Shaders\\IcosahedronTess.hlsl", nullptr, "hull", "hs_5_1");
+    _shaders["tessDS"] = D3DUtil::CompileShader(L"Shaders\\IcosahedronTess.hlsl", nullptr, "dom", "ds_5_1");
+    _shaders["tessPS"] = D3DUtil::CompileShader(L"Shaders\\IcosahedronTess.hlsl", nullptr, "frag", "ps_5_1");
 
     D3D12_INPUT_ELEMENT_DESC pos;
     pos.Format = DXGI_FORMAT_R32G32B32_FLOAT;
@@ -372,7 +391,7 @@ void IcosahedronGeoTesselation::BuildShaderAndInputLayout()
 void IcosahedronGeoTesselation::BuildShapeGeometry()
 {
     GeometryGenerator geoGen;
-    auto icoGeo = geoGen.CreateGeosphere(1.0f, 1);
+    auto icoGeo = geoGen.CreateGeosphere(1.0f, 0.5f);
     std::vector<CrateFrameResource::Vertex> verts;
     for (int i = 0; i < icoGeo.Vertices.size(); i++)
     {
@@ -436,15 +455,28 @@ void IcosahedronGeoTesselation::BuildPSOs()
     ThrowIfFailed(_device->CreateGraphicsPipelineState(&wireframePso, IID_PPV_ARGS(_PSOs["wireframe"].GetAddressOf())));
 
     D3D12_GRAPHICS_PIPELINE_STATE_DESC geomTessPso = opaquePso;
-    geomTessPso.VS = { reinterpret_cast<BYTE*>(_shaders["tessVS"]->GetBufferPointer()), _shaders["tessVS"]->GetBufferSize() };
-    geomTessPso.GS = { reinterpret_cast<BYTE*>(_shaders["tessGS"]->GetBufferPointer()), _shaders["tessGS"]->GetBufferSize() };
-    geomTessPso.PS = { reinterpret_cast<BYTE*>(_shaders["tessPS"]->GetBufferPointer()), _shaders["tessPS"]->GetBufferSize() };
+    geomTessPso.VS = { reinterpret_cast<BYTE*>(_shaders["tessGeoVS"]->GetBufferPointer()), _shaders["tessGeoVS"]->GetBufferSize() };
+    geomTessPso.GS = { reinterpret_cast<BYTE*>(_shaders["tessGeoGS"]->GetBufferPointer()), _shaders["tessGeoGS"]->GetBufferSize() };
+    geomTessPso.PS = { reinterpret_cast<BYTE*>(_shaders["tessGeoPS"]->GetBufferPointer()), _shaders["tessGeoPS"]->GetBufferSize() };
     ThrowIfFailed(_device->CreateGraphicsPipelineState(&geomTessPso, IID_PPV_ARGS(_PSOs["geomTess"].GetAddressOf())));
 
     D3D12_GRAPHICS_PIPELINE_STATE_DESC wireframeGeomTessPso = geomTessPso;
     wireframeGeomTessPso.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
     wireframeGeomTessPso.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
     ThrowIfFailed(_device->CreateGraphicsPipelineState(&wireframeGeomTessPso, IID_PPV_ARGS(_PSOs["geomTessWireframe"].GetAddressOf())));
+
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC tessPso = opaquePso;
+    tessPso.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_PATCH;
+    tessPso.VS = { reinterpret_cast<BYTE*>(_shaders["tessVS"]->GetBufferPointer()), _shaders["tessVS"]->GetBufferSize() };
+    tessPso.HS = { reinterpret_cast<BYTE*>(_shaders["tessHS"]->GetBufferPointer()), _shaders["tessHS"]->GetBufferSize() };
+    tessPso.DS = { reinterpret_cast<BYTE*>(_shaders["tessDS"]->GetBufferPointer()), _shaders["tessDS"]->GetBufferSize() };
+    tessPso.PS = { reinterpret_cast<BYTE*>(_shaders["tessPS"]->GetBufferPointer()), _shaders["tessPS"]->GetBufferSize() };
+    ThrowIfFailed(_device->CreateGraphicsPipelineState(&tessPso, IID_PPV_ARGS(_PSOs["tess"].GetAddressOf())));
+
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC wireframeTessPso = tessPso;
+    //wireframeTessPso.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+    wireframeTessPso.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
+    ThrowIfFailed(_device->CreateGraphicsPipelineState(&wireframeTessPso, IID_PPV_ARGS(_PSOs["tessWireframe"].GetAddressOf())));
 }
 
 void IcosahedronGeoTesselation::BuildFrameResources()
@@ -498,7 +530,12 @@ void IcosahedronGeoTesselation::DrawRenderItems(ID3D12GraphicsCommandList* cmdLi
 
         cmdList->IASetVertexBuffers(0, 1, &renderItem->Geo->VertexBufferView());
         cmdList->IASetIndexBuffer(&renderItem->Geo->IndexBufferView());
-        cmdList->IASetPrimitiveTopology(renderItem->PrimitiveType);
+
+        D3D12_PRIMITIVE_TOPOLOGY primitiveTopology = renderItem->PrimitiveType;
+        if (_isTesselated)
+            primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST;
+
+        cmdList->IASetPrimitiveTopology(primitiveTopology);
 
         cmdList->DrawIndexedInstanced(renderItem->IndexCount, 1, renderItem->StartIndexLocation, renderItem->BaseVertexLocation, 0);
     }

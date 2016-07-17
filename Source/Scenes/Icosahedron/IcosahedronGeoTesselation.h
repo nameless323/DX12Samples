@@ -75,7 +75,8 @@ private:
     float _rotationAngle = 0.0f;
 
     bool _isWireframe = false;
-    bool _isTesselated = true;
+    bool _isGeomTesselated = true;
+    bool _isTesselated = false;
 
     POINT _lastMousePos;
 };
