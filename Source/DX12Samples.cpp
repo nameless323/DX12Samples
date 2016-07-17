@@ -18,12 +18,13 @@
 #include "Scenes/Tesselation/BasicTesselation.h"
 #include "Scenes/Tesselation/BezierPatch.h"
 #include "Scenes/GeomCylinder/GeomCylinder.h"
+#include "Scenes/Icosahedron/IcosahedronGeoTesselation.h"
 
 Application* app;
 
 void CreateScene(HINSTANCE hInstance)
 {
-    app = new GeomCylinder(hInstance);
+    app = new IcosahedronGeoTesselation(hInstance);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)

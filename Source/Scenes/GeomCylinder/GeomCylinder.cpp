@@ -308,9 +308,9 @@ void GeomCylinder::BuildPSOs()
     psoDesc.InputLayout = { _inputLayout.data(), (UINT)_inputLayout.size() };
     psoDesc.pRootSignature = _rootSignature.Get();
 
-    psoDesc.VS = { reinterpret_cast<BYTE*>(_shaders["vs"]->GetBufferPointer()), _shaders["vs"]->GetBufferSize() };
-    psoDesc.GS = { reinterpret_cast<BYTE*>(_shaders["gs"]->GetBufferPointer()), _shaders["gs"]->GetBufferSize() };
-    psoDesc.PS = { reinterpret_cast<BYTE*>(_shaders["ps"]->GetBufferPointer()), _shaders["ps"]->GetBufferSize() };
+    psoDesc.VS = { /*reinterpret_cast<BYTE*>*/(_shaders["vs"]->GetBufferPointer()), _shaders["vs"]->GetBufferSize() };
+    psoDesc.GS = { /*reinterpret_cast<BYTE*>*/(_shaders["gs"]->GetBufferPointer()), _shaders["gs"]->GetBufferSize() };
+    psoDesc.PS = { /*reinterpret_cast<BYTE*>*/(_shaders["ps"]->GetBufferPointer()), _shaders["ps"]->GetBufferSize() };
 
     psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
     psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;

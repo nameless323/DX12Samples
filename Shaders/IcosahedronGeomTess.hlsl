@@ -13,7 +13,7 @@
 #include "LightingUtil.hlsl"
 
 Texture2D _diffuseMap : register(t0);
-//Texture2D _fence : register(t1);
+Texture2D _fence : register(t1);
 
 SamplerState _samPointWrap : register(s0);
 SamplerState _samPointClamp : register(s1);
@@ -67,6 +67,13 @@ struct vIn
 
 struct vOut
 {
+    float3 pos : POSITION;
+    float3 normal : NORMAL;
+    float2 uv : TEXCOORD;
+};
+
+struct gOut
+{
     float4 pos : SV_Position;
     float3 posW : POSITION;
     float3 normalW : NORMAL;
@@ -75,22 +82,70 @@ struct vOut
 
 vOut vert(vIn i)
 {
-    vOut o = (vOut)0.0;
-    float4 posW = mul(float4(i.pos, 1.0f), Model);
-    o.posW = posW.xyz;
-    o.normalW = mul(i.normal, (float3x3) Model);
-    o.pos = mul(posW, VP);
-    float4 uv = mul(float4(i.uv, 0.0f, 1.0f), TexTransform);
-    o.uv = mul(uv, MatTransform).xy;
+    vOut o = (vOut) 0.0;
+    o.pos = i.pos;
+    o.normal = i.normal;
+    o.uv = i.uv;
 
     return o;
 }
 
-float4 frag(vOut i) : SV_Target
+[maxvertexcount(8)]
+void geom(triangle vOut i[3], inout TriangleStream<gOut> o)
+{
+    gOut outVerts[6];
+    [unroll]
+    for (int j = 0; j < 3; j++)
+    {
+        outVerts[j].pos.xyz = i[j].pos;
+        outVerts[j].pos.w = 1.0;
+        outVerts[j].normalW = i[j].normal;
+        outVerts[j].uv = i[j].uv;
+    }
+
+    gOut vert;
+    vert.pos.xyz = normalize(lerp(i[0].pos, i[1].pos, 0.5));
+    vert.pos.w = 1.0;
+    vert.normalW = vert.pos.xyz; // its just a sphere isnt it?
+    vert.uv = lerp(i[0].uv, i[1].uv, 0.5);
+    outVerts[3] = vert;
+
+    vert.pos.xyz = normalize(lerp(i[1].pos, i[2].pos, 0.5));
+    vert.normalW = vert.pos.xyz;
+    vert.uv = lerp(i[1].uv, i[2].uv, 0.5);
+    outVerts[4] = vert;
+
+    vert.pos.xyz = normalize(lerp(i[0].pos, i[2].pos, 0.5));
+    vert.normalW = vert.pos.xyz;
+    vert.uv = lerp(i[0].uv, i[2].uv, 0.5);
+    outVerts[5] = vert;
+
+    [unroll]
+    for (int k = 0; k < 6; k++)
+    {
+        float4 posw = mul(outVerts[k].pos, Model);
+        outVerts[k].posW = posw.xyz;
+        outVerts[k].normalW = mul(outVerts[k].normalW, (float3x3) Model);
+        outVerts[k].pos = mul(posw, VP);
+    }
+
+    o.Append(outVerts[0]);
+    o.Append(outVerts[3]);
+    o.Append(outVerts[5]);
+    o.Append(outVerts[4]);
+    o.Append(outVerts[2]);
+
+    o.RestartStrip();
+    o.Append(outVerts[3]);
+    o.Append(outVerts[1]);
+    o.Append(outVerts[4]);
+}
+
+float4 frag(gOut i) : SV_Target
 {
     //SamplerState st[] = { _samLinearClamp, _samPointClamp, _samAnisotropicClamp };
     float4 diffuseAlbedo = _diffuseMap.Sample(_samAnisotropicClamp, i.uv) * DiffuseAlbedo;
-   // float4 fenceColor = _fence.Sample(_samLinearWrap, i.uv) * DiffuseAlbedo;
+    //float4 fenceColor = _fence.Sample(_samLinearWrap, i.uv) * DiffuseAlbedo;
     //diffuseAlbedo = lerp(diffuseAlbedo, fenceColor, fenceColor.a);
 
     i.normalW = normalize(i.normalW);

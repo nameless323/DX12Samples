@@ -81,6 +81,60 @@ void IcosahedronGeoTesselation::Update(const GameTimer& timer)
 
 void IcosahedronGeoTesselation::Draw(const GameTimer& timer)
 {
+    ID3D12CommandAllocator* cmdAlloc = _currFrameResource->CmdListAlloc.Get();
+    ThrowIfFailed(cmdAlloc->Reset());
+    if(_isTesselated)
+    {
+        if (_isWireframe)
+        {
+            ThrowIfFailed(_commandList->Reset(cmdAlloc, _PSOs["geomTessWireframe"].Get()));
+        }
+        else
+            ThrowIfFailed(_commandList->Reset(cmdAlloc, _PSOs["geomTess"].Get()));
+    }
+    else
+    {
+        if (_isWireframe)
+        {
+            ThrowIfFailed(_commandList->Reset(cmdAlloc, _PSOs["wireframe"].Get()));
+        }
+        else
+            ThrowIfFailed(_commandList->Reset(cmdAlloc, _PSOs["standard"].Get()));
+    }
+
+    _commandList->RSSetViewports(1, &_screenViewport);
+    _commandList->RSSetScissorRects(1, &_scissorRect);
+    
+
+    D3D12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+    _commandList->ResourceBarrier(1, &barrier);
+
+    _commandList->OMSetRenderTargets(1, &CurrentBackBufferView(), true, &DepthStencilView());
+    _commandList->ClearRenderTargetView(CurrentBackBufferView(), Colors::LightSteelBlue, 0, nullptr);
+    _commandList->ClearDepthStencilView(DepthStencilView(), D3D12_CLEAR_FLAG_STENCIL | D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
+    _commandList->SetGraphicsRootSignature(_rootSignature.Get());
+    ID3D12DescriptorHeap* heaps[] = { _srvHeap.Get() };
+    _commandList->SetDescriptorHeaps(1, heaps);
+    _commandList->SetGraphicsRootDescriptorTable(0, _srvHeap->GetGPUDescriptorHandleForHeapStart());
+    auto passResource = _currFrameResource->PassCB->Resource();
+    _commandList->SetGraphicsRootConstantBufferView(2, passResource->GetGPUVirtualAddress());
+
+    DrawRenderItems(_commandList.Get(), _opaqueRenderItems);
+
+    barrier = CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+    _commandList->ResourceBarrier(1, &barrier);
+
+    ThrowIfFailed(_commandList->Close());
+
+    ID3D12CommandList* cmdsLists[] = { _commandList.Get() };
+    _commandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
+
+    ThrowIfFailed(_swapChain->Present(0, 0));
+    _currBackBuffer = (_currBackBuffer + 1) % _swapChainBufferCount;
+
+    _currFrameResource->Fence = ++_currentFence;
+    ThrowIfFailed(_commandQueue->Signal(_fence.Get(), _currentFence));
 }
 
 void IcosahedronGeoTesselation::OnMouseDown(WPARAM btnState, int x, int y)
@@ -128,9 +182,9 @@ void IcosahedronGeoTesselation::OnKeyboardInput(const GameTimer& timer)
         _isWireframe = false;
 
     if (GetAsyncKeyState('2') & 0x8000)
-        _isTesselated = false;
-    else
         _isTesselated = true;
+    else
+        _isTesselated = false;
 }
 
 void IcosahedronGeoTesselation::UpdateCamera(const GameTimer& timer)
@@ -153,21 +207,85 @@ void IcosahedronGeoTesselation::AnimateMaterials(const GameTimer& timer)
 
 void IcosahedronGeoTesselation::UpdateObjectCBs(const GameTimer& timer)
 {
+    for (auto& ri : _allRenderItems)
+    {
+        if (ri->NumFramesDirty > 0)
+        {
+            XMMATRIX model = XMLoadFloat4x4(&ri->Model);
+            XMMATRIX texTransform = XMLoadFloat4x4(&ri->TexTransform);
+
+            CrateFrameResource::ObjectConstants objConst;
+            XMStoreFloat4x4(&objConst.Model, XMMatrixTranspose(model));
+            XMStoreFloat4x4(&objConst.TexTransform, XMMatrixTranspose(texTransform));
+
+            _currFrameResource->ObjectCB->CopyData(ri->ObjCBIndex, objConst);
+
+            ri->NumFramesDirty--;
+        }
+    }
 }
 
 void IcosahedronGeoTesselation::UpdateMaterialsCBs(const GameTimer& timer)
 {
+    for (const auto& material : _materials)
+    {
+        if (material.second->NumFramesDirty > 0)
+        {
+            MaterialConstants matConstants;
+            XMMATRIX matTransform = XMLoadFloat4x4(&material.second->MatTransform);
+            XMStoreFloat4x4(&matConstants.MatTransform, XMMatrixTranspose(matTransform));
+            matConstants.DiffuseAlbedo = material.second->DiffuseAlbedo;
+            matConstants.FresnelR0 = material.second->FresnelR0;
+            matConstants.Roughness = material.second->Roughness;
+
+            _currFrameResource->MaterialCB->CopyData(material.second->MatCBIndex, matConstants);
+
+            material.second->NumFramesDirty--;
+        }
+    }
 }
 
 void IcosahedronGeoTesselation::UpdateMainPassCB(const GameTimer& timer)
 {
+    XMMATRIX view = XMLoadFloat4x4(&_view);
+    XMMATRIX proj = XMLoadFloat4x4(&_proj);
+
+    XMMATRIX viewProj = XMMatrixMultiply(view, proj);
+    XMMATRIX invView = XMMatrixInverse(&XMMatrixDeterminant(view), view);
+    XMMATRIX invProj = XMMatrixInverse(&XMMatrixDeterminant(proj), proj);
+    XMMATRIX invViewProj = XMMatrixInverse(&XMMatrixDeterminant(viewProj), viewProj);
+
+    XMStoreFloat4x4(&_mainPassCB.View, XMMatrixTranspose(view));
+    XMStoreFloat4x4(&_mainPassCB.InvView, XMMatrixTranspose(invView));
+    XMStoreFloat4x4(&_mainPassCB.Proj, XMMatrixTranspose(proj));
+    XMStoreFloat4x4(&_mainPassCB.InvProj, XMMatrixTranspose(invProj));
+    XMStoreFloat4x4(&_mainPassCB.VP, XMMatrixTranspose(viewProj));
+    XMStoreFloat4x4(&_mainPassCB.InvVP, XMMatrixTranspose(invViewProj));
+    _mainPassCB.EyePosW = _eyePos;
+    _mainPassCB.RenderTargetSize = XMFLOAT2((float)_clientWidth, (float)_clientHeight);
+    _mainPassCB.InvRenderTargetSize = XMFLOAT2(1.0f / _clientWidth, 1.0f / _clientHeight);
+    _mainPassCB.NearZ = 1.0f;
+    _mainPassCB.FarZ = 1000.0f;
+    _mainPassCB.TotalTime = timer.TotalTime();
+    _mainPassCB.DeltaTime = timer.DeltaTime();
+    _mainPassCB.AmbientLight = { 0.25f, 0.25f, 0.35f, 1.0f };
+
+    _mainPassCB.Lights[0].Direction = { 0.57735f, -0.57735f, 0.57735f };
+    _mainPassCB.Lights[0].Strength = { 0.6f, 0.6f, 0.6f };
+    _mainPassCB.Lights[1].Direction = { -0.57735f, -0.57735f, 0.57735f };
+    _mainPassCB.Lights[1].Strength = { 0.3f, 0.3f, 0.3f };
+    _mainPassCB.Lights[2].Direction = { 0.0f, -0.707f, -0.707f };
+    _mainPassCB.Lights[2].Strength = { 0.15f, 0.15f, 0.15f };
+
+    auto currPassCB = _currFrameResource->PassCB.get();
+    currPassCB->CopyData(0, _mainPassCB);
 }
 
 void IcosahedronGeoTesselation::LoadTextures()
 {
     auto tex = std::make_unique<Texture>();
     tex->Name = "WoodCrate";
-    tex->Filename = L"Textures\\WoodCrate0.dds";
+    tex->Filename = L"Textures\\WoodCrate01_mod.dds";
     ThrowIfFailed(CreateDDSTextureFromFile12(_device.Get(), _commandList.Get(), tex->Filename.c_str(), tex->Resource, tex->UploadHeap));
     _textures[tex->Name] = std::move(tex);
 }
@@ -182,7 +300,7 @@ void IcosahedronGeoTesselation::BuildRootSignature()
     table.RegisterSpace = 0;
 
 
-    CD3DX12_ROOT_PARAMETER rootParams[3];
+    CD3DX12_ROOT_PARAMETER rootParams[4];
     rootParams[0].InitAsDescriptorTable(1, &table, D3D12_SHADER_VISIBILITY_PIXEL);
     rootParams[1].InitAsConstantBufferView(0);
     rootParams[2].InitAsConstantBufferView(1);
@@ -223,8 +341,8 @@ void IcosahedronGeoTesselation::BuildDescriptorHeaps()
 
 void IcosahedronGeoTesselation::BuildShaderAndInputLayout()
 {
-    _shaders["standardVS"] = D3DUtil::CompileShader(L"Shaders\\IcosahedronSimple.hlsl", nullptr, "vert", "vs_5_1");
-    _shaders["standardPS"] = D3DUtil::CompileShader(L"Shaders\\IcosahedronSimple.hlsl", nullptr, "frag", "ps_5_1");
+    _shaders["standardVS"] = D3DUtil::CompileShader(L"Shaders\\TexCrate.hlsl", nullptr, "vert", "vs_5_1");
+    _shaders["standardPS"] = D3DUtil::CompileShader(L"Shaders\\TexCrate.hlsl", nullptr, "frag", "ps_5_1");
 
     _shaders["tessVS"] = D3DUtil::CompileShader(L"Shaders\\IcosahedronGeomTess.hlsl", nullptr, "vert", "vs_5_1");
     _shaders["tessGS"] = D3DUtil::CompileShader(L"Shaders\\IcosahedronGeomTess.hlsl", nullptr, "geom", "gs_5_1");
@@ -254,7 +372,7 @@ void IcosahedronGeoTesselation::BuildShaderAndInputLayout()
 void IcosahedronGeoTesselation::BuildShapeGeometry()
 {
     GeometryGenerator geoGen;
-    auto icoGeo = geoGen.CreateGeosphere(1.0f, 4);
+    auto icoGeo = geoGen.CreateGeosphere(1.0f, 1);
     std::vector<CrateFrameResource::Vertex> verts;
     for (int i = 0; i < icoGeo.Vertices.size(); i++)
     {
@@ -266,8 +384,8 @@ void IcosahedronGeoTesselation::BuildShapeGeometry()
     }
     auto indices = icoGeo.GetIndices16();
 
-    size_t vertSize = sizeof(GeometryGenerator::Vertex) * verts.size();
-    size_t indSize = sizeof(uint16_t) * indices.size();
+    UINT vertSize = sizeof(CrateFrameResource::Vertex) * verts.size();
+    UINT indSize = sizeof(uint16_t) * indices.size();
     auto geo = std::make_unique<MeshGeometry>();
     geo->Name = "icosahedron";
 
@@ -277,7 +395,7 @@ void IcosahedronGeoTesselation::BuildShapeGeometry()
     geo->IndexBufferByteSize = indSize;
     geo->IndexFormat = DXGI_FORMAT_R16_UINT;
     geo->VertexBufferByteSize = vertSize;
-    geo->VertexByteStride = sizeof(GeometryGenerator::Vertex);
+    geo->VertexByteStride = sizeof(CrateFrameResource::Vertex);
     
     SubmeshGeometry submesh;
     submesh.BaseVertexLocation = 0;
@@ -302,7 +420,7 @@ void IcosahedronGeoTesselation::BuildPSOs()
     opaquePso.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
     opaquePso.pRootSignature = _rootSignature.Get();
     
-    opaquePso.InputLayout = { _inputLayout.data(), _inputLayout.size() };
+    opaquePso.InputLayout = { _inputLayout.data(), (UINT)_inputLayout.size() };
     opaquePso.NodeMask = 0;
     opaquePso.SampleMask = UINT_MAX;
     opaquePso.SampleDesc.Count = _4xMsaa ? 4 : 1;
@@ -369,4 +487,19 @@ void IcosahedronGeoTesselation::BuildRenderItems()
 
 void IcosahedronGeoTesselation::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<CrateRenderItem*>& renderItems)
 {
+    UINT objCbByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(CrateFrameResource::ObjectCB));
+    UINT matCbByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(CrateFrameResource::MaterialCB));
+    D3D12_GPU_VIRTUAL_ADDRESS objCbAddress = _currFrameResource->ObjectCB.get()->Resource()->GetGPUVirtualAddress();
+    D3D12_GPU_VIRTUAL_ADDRESS matCbAddress = _currFrameResource->MaterialCB.get()->Resource()->GetGPUVirtualAddress();
+    for (auto renderItem : renderItems)
+    {        
+        cmdList->SetGraphicsRootConstantBufferView(1, objCbAddress + renderItem->ObjCBIndex*objCbByteSize);
+        cmdList->SetGraphicsRootConstantBufferView(3, matCbAddress + renderItem->Mat->MatCBIndex * matCbByteSize);
+
+        cmdList->IASetVertexBuffers(0, 1, &renderItem->Geo->VertexBufferView());
+        cmdList->IASetIndexBuffer(&renderItem->Geo->IndexBufferView());
+        cmdList->IASetPrimitiveTopology(renderItem->PrimitiveType);
+
+        cmdList->DrawIndexedInstanced(renderItem->IndexCount, 1, renderItem->StartIndexLocation, renderItem->BaseVertexLocation, 0);
+    }
 }
