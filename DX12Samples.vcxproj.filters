@@ -98,9 +98,6 @@
     <ClInclude Include="Source\Scenes\Crate\Crate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Common\FrameResource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Common\RenderItem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -141,6 +138,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Scenes\Icosahedron\IcosahedronGeoTesselation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Common\FrameResourceFogged.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Common\FrameResourceUnfogged.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -211,9 +214,6 @@
     <ClCompile Include="Source\Scenes\Crate\Crate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Common\FrameResource.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Scenes\TexColumns\TexColumns.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -251,6 +251,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Scenes\Icosahedron\IcosahedronGeoTesselation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Common\FrameResourceFogged.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Common\FrameResourceUnfogged.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

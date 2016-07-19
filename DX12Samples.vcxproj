@@ -166,6 +166,7 @@
     <ClInclude Include="Core\GeometryGenerator.h" />
     <ClInclude Include="Core\MathHelper.h" />
     <ClInclude Include="Core\UploadBuffer.h" />
+    <ClInclude Include="Source\Common\FrameResourceFogged.h" />
     <ClInclude Include="Source\Scenes\BilboardTrees\BilboardTrees.h" />
     <ClInclude Include="Source\Scenes\Blending\Blending.h" />
     <ClInclude Include="Source\Scenes\Blending\FrameResourceBlending.h" />
@@ -187,7 +188,7 @@
     <ClInclude Include="Source\Scenes\Shapes\Shapes.h" />
     <ClInclude Include="Source\Scenes\Shapes\ShapesFrameResource.h" />
     <ClInclude Include="Source\Scenes\Shapes\ShapesRenderItem.h" />
-    <ClInclude Include="Source\Common\FrameResource.h" />
+    <ClInclude Include="Source\Common\FrameResourceUnfogged.h" />
     <ClInclude Include="Source\Common\RenderItem.h" />
     <ClInclude Include="Source\Scenes\Stenciling\Stenciling.h" />
     <ClInclude Include="Source\Scenes\Stenciling\StencilingFrameResource.h" />
@@ -208,7 +209,8 @@
     <ClCompile Include="Core\GameTimer.cpp" />
     <ClCompile Include="Core\GeometryGenerator.cpp" />
     <ClCompile Include="Core\MathHelper.cpp" />
-    <ClCompile Include="Source\Common\FrameResource.cpp" />
+    <ClCompile Include="Source\Common\FrameResourceUnfogged.cpp" />
+    <ClCompile Include="Source\Common\FrameResourceFogged.cpp" />
     <ClCompile Include="Source\Scenes\BilboardTrees\BilboardTrees.cpp" />
     <ClCompile Include="Source\Scenes\Blending\Blending.cpp" />
     <ClCompile Include="Source\Scenes\Blending\FrameResourceBlending.cpp" />

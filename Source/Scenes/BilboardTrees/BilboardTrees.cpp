@@ -377,7 +377,7 @@ void BilboardTrees::BuildRootSignature()
     slotRootParameter[2].InitAsConstantBufferView(1);
     slotRootParameter[3].InitAsConstantBufferView(2);
 
-    auto staticSamplers = FrameResource::GetStaticSamplers();
+    auto staticSamplers = FrameResourceUnfogged::GetStaticSamplers();
 
     CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(4, slotRootParameter, (UINT)staticSamplers.size(), staticSamplers.data(), D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
@@ -475,7 +475,7 @@ void BilboardTrees::BuildLandGeometry()
     GeometryGenerator geoGen;
     GeometryGenerator::MeshData grid = geoGen.CreateGrid(160.0f, 160.0f, 50, 50);
 
-    std::vector<FrameResource::Vertex> vertices(grid.Vertices.size());
+    std::vector<FrameResourceUnfogged::Vertex> vertices(grid.Vertices.size());
     for (size_t i = 0; i < grid.Vertices.size(); i++)
     {
         auto& p = grid.Vertices[i].Position;
@@ -484,7 +484,7 @@ void BilboardTrees::BuildLandGeometry()
         vertices[i].Normal = GetHillsNormal(p.z, p.z);
         vertices[i].TexC = grid.Vertices[i].TexCoord;
     }
-    const UINT vbByteSize = (UINT)vertices.size() * sizeof(FrameResource::Vertex);
+    const UINT vbByteSize = (UINT)vertices.size() * sizeof(FrameResourceUnfogged::Vertex);
     std::vector<uint16_t> indices = grid.GetIndices16();
     const UINT ibByteSize = (UINT)indices.size() * sizeof(uint16_t);
 
@@ -494,7 +494,7 @@ void BilboardTrees::BuildLandGeometry()
     geo->VertexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), vertices.data(), vbByteSize, geo->VertexBufferUploader);
     geo->IndexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), indices.data(), ibByteSize, geo->IndexBufferUploader);
 
-    geo->VertexByteStride = sizeof(FrameResource::Vertex);
+    geo->VertexByteStride = sizeof(FrameResourceUnfogged::Vertex);
     geo->VertexBufferByteSize = vbByteSize;
     geo->IndexFormat = DXGI_FORMAT_R16_UINT;
     geo->IndexBufferByteSize = ibByteSize;
@@ -533,7 +533,7 @@ void BilboardTrees::BuildWavesGeometry()
         }
     }
 
-    UINT vbByteSize = _waves->VertexCount() * sizeof(FrameResource::Vertex);
+    UINT vbByteSize = _waves->VertexCount() * sizeof(FrameResourceUnfogged::Vertex);
     UINT ibByteSize = (UINT)indices.size() * sizeof(uint16_t);
 
     auto geo = std::make_unique<MeshGeometry>();
@@ -543,7 +543,7 @@ void BilboardTrees::BuildWavesGeometry()
 
     geo->IndexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), indices.data(), ibByteSize, geo->IndexBufferUploader);
 
-    geo->VertexByteStride = sizeof(FrameResource::Vertex);
+    geo->VertexByteStride = sizeof(FrameResourceUnfogged::Vertex);
     geo->VertexBufferByteSize = vbByteSize;
     geo->IndexFormat = DXGI_FORMAT_R16_UINT;
     geo->IndexBufferByteSize = ibByteSize;
@@ -567,7 +567,7 @@ void BilboardTrees::BuildBoxGeometry()
     boxSubmesh.StartIndexLocation = 0;
     boxSubmesh.BaseVertexLocation = 0;
 
-    std::vector<FrameResource::Vertex> vertices(box.Vertices.size());
+    std::vector<FrameResourceUnfogged::Vertex> vertices(box.Vertices.size());
 
     for (size_t i = 0; i < box.Vertices.size(); i++)
     {
@@ -576,7 +576,7 @@ void BilboardTrees::BuildBoxGeometry()
         vertices[i].TexC = box.Vertices[i].TexCoord;
     }
     std::vector<uint16_t> indices = box.GetIndices16();
-    const UINT vbByteSize = sizeof(FrameResource::Vertex) * (UINT)vertices.size();
+    const UINT vbByteSize = sizeof(FrameResourceUnfogged::Vertex) * (UINT)vertices.size();
     const UINT ibByteSize = sizeof(uint16_t) * (UINT)indices.size();
 
     auto geo = std::make_unique<MeshGeometry>();
@@ -585,7 +585,7 @@ void BilboardTrees::BuildBoxGeometry()
     geo->VertexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), vertices.data(), vbByteSize, geo->VertexBufferUploader);
     geo->IndexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), indices.data(), ibByteSize, geo->IndexBufferUploader);
 
-    geo->VertexByteStride = sizeof(FrameResource::Vertex);
+    geo->VertexByteStride = sizeof(FrameResourceUnfogged::Vertex);
     geo->VertexBufferByteSize = vbByteSize;
     geo->IndexFormat = DXGI_FORMAT_R16_UINT;
     geo->IndexBufferByteSize = ibByteSize;
@@ -831,7 +831,7 @@ void BilboardTrees::BuildRenderItems()
 
 void BilboardTrees::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& renderItems)
 {
-    UINT objCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(FrameResource::ObjectConstants));
+    UINT objCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(FrameResourceUnfogged::ObjectConstants));
     UINT matCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(MaterialConstants));
 
     auto objectCB = _currFrameResource->ObjectCB->Resource();

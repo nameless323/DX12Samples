@@ -279,7 +279,7 @@ void BasicTesselation::BuildRootSignature()
     slotRootParameter[2].InitAsConstantBufferView(1);
     slotRootParameter[3].InitAsConstantBufferView(2);
 
-    auto staticSamplers = FrameResource::GetStaticSamplers();
+    auto staticSamplers = FrameResourceUnfogged::GetStaticSamplers();
 
     CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(4, slotRootParameter, (UINT)staticSamplers.size(), staticSamplers.data(), D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
@@ -443,7 +443,7 @@ void BasicTesselation::BuildRenderItems()
 
 void BasicTesselation::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& renderItems)
 {
-    UINT objCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(FrameResource::ObjectConstants));
+    UINT objCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(FrameResourceUnfogged::ObjectConstants));
     UINT matCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(MaterialConstants));
 
     auto objectCB = _currFrameResource->ObjectCB->Resource();

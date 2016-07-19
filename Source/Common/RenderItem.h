@@ -2,7 +2,7 @@
 #include <DirectXMath.h>
 #include "../../Core/MathHelper.h"
 #include "../../Core/D3DUtil.h"
-#include "FrameResource.h"
+#include "FrameResourceUnfogged.h"
 
 struct RenderItem
 {
@@ -11,7 +11,7 @@ struct RenderItem
     DirectX::XMFLOAT4X4 Model = MathHelper::Identity4x4();
     DirectX::XMFLOAT4X4 TexTransform = MathHelper::Identity4x4();
 
-    int NumFramesDirty = FrameResource::NumFrameResources;
+    int NumFramesDirty = FrameResourceUnfogged::NumFrameResources;
 
     UINT ObjCBIndex = -1;
     Material* Mat = nullptr;

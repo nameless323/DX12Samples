@@ -2,12 +2,17 @@
 #include "../../Core/D3DUtil.h"
 #include "../../Core/UploadBuffer.h"
 
-struct FrameResource
+struct FrameResourceBlending
 {
     static const int NumFrameResources = 3;
 
     struct Vertex
     {
+        Vertex() = default;
+        Vertex(float x, float y, float z, float nx, float ny, float nz, float u, float v) :
+            Pos(x, y, z),
+            Normal(nx, ny, nz),
+            TexC(u, v) {}
         DirectX::XMFLOAT3 Pos;
         DirectX::XMFLOAT3 Normal;
         DirectX::XMFLOAT2 TexC;
@@ -35,17 +40,22 @@ struct FrameResource
         float DeltaTime = 0.0f;
 
         DirectX::XMFLOAT4 AmbientLight = { 0.0f, 0.0f, 0.0f, 1.0f };
+        DirectX::XMFLOAT4 FogColor = { 0.7f, 0.7f, 0.7f, 1.0f };
+        float FogStart = 5.0f;
+        float FogRange = 150.0f;
+        DirectX::XMFLOAT2 cbPerObjectPad2;
+
         Light Lights[MaxLights];
     };
 
-    FrameResource(ID3D12Device* device, UINT passCount, UINT objectCount, UINT materialCount);
-    FrameResource(ID3D12Device* device, UINT passCount, UINT objectCount, UINT materialCount, UINT waveVertCount) : FrameResource(device, passCount, objectCount, materialCount)
+    FrameResourceBlending(ID3D12Device* device, UINT passCount, UINT objectCount, UINT materialCount);
+    FrameResourceBlending(ID3D12Device* device, UINT passCount, UINT objectCount, UINT materialCount, UINT waveVertCount) : FrameResourceBlending(device, passCount, objectCount, materialCount)
     {
         WavesVB = std::make_unique<UploadBuffer<Vertex>>(device, waveVertCount, false);
     }
-    FrameResource(const FrameResource& rhs) = delete;
-    FrameResource& operator= (const FrameResource& rhs) = delete;
-    ~FrameResource();
+    FrameResourceBlending(const FrameResourceBlending& rhs) = delete;
+    FrameResourceBlending& operator= (const FrameResourceBlending& rhs) = delete;
+    ~FrameResourceBlending();
 
     Microsoft::WRL::ComPtr<ID3D12CommandAllocator> CmdListAlloc;
 

@@ -4,7 +4,7 @@
 #include "../../../Core/D3DUtil.h"
 
 #include "../../Common/RenderItem.h"
-#include "../../Common/FrameResource.h"
+#include "../../Common/FrameResourceUnfogged.h"
 #include "../Waves/Waves.h"
 
 class TexWaves : public Application
@@ -51,8 +51,8 @@ protected:
     float GetHillsHeight(float x, float z) const;
     DirectX::XMFLOAT3 GetHillsNormal(float x, float z) const;
 private:
-    std::vector<std::unique_ptr<FrameResource>> _frameResources;
-    FrameResource* _currFrameResource = nullptr;
+    std::vector<std::unique_ptr<FrameResourceUnfogged>> _frameResources;
+    FrameResourceUnfogged* _currFrameResource = nullptr;
     int _currentFrameResourceIndex = 0;
 
     UINT _cbvSrvDescriptorSize = 0;
@@ -73,7 +73,7 @@ private:
     std::vector<RenderItem*> _renderItemLayer[(int)RenderItem::RenderLayer::Count];
     std::unique_ptr<Waves> _waves;
 
-    FrameResource::PassConstants _mainPassCB;
+    FrameResourceUnfogged::PassConstants _mainPassCB;
 
     bool _isWireframe = false;
 

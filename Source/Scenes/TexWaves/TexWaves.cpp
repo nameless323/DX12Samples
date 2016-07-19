@@ -66,7 +66,7 @@ void TexWaves::Update(const GameTimer& timer)
     OnKeyboardInput(timer);
     UpdateCamera(timer);
 
-    _currentFrameResourceIndex = (_currentFrameResourceIndex + 1) % FrameResource::NumFrameResources;
+    _currentFrameResourceIndex = (_currentFrameResourceIndex + 1) % FrameResourceUnfogged::NumFrameResources;
     _currFrameResource = _frameResources[_currentFrameResourceIndex].get();
 
     if (_currFrameResource->Fence != 0 && _fence->GetCompletedValue() < _currFrameResource->Fence)
@@ -218,7 +218,7 @@ void TexWaves::AnimateMaterials(const GameTimer& timer)
     waterMat->MatTransform(3, 0) = tu;
     waterMat->MatTransform(3, 1) = tv;
 
-    waterMat->NumFramesDirty = FrameResource::NumFrameResources;
+    waterMat->NumFramesDirty = FrameResourceUnfogged::NumFrameResources;
 }
 
 void TexWaves::UpdateObjectCBs(const GameTimer& timer)
@@ -231,7 +231,7 @@ void TexWaves::UpdateObjectCBs(const GameTimer& timer)
             XMMATRIX model = XMLoadFloat4x4(&e->Model);
             XMMATRIX texTransform = XMLoadFloat4x4(&e->TexTransform);
 
-            FrameResource::ObjectConstants objConstants;
+            FrameResourceUnfogged::ObjectConstants objConstants;
             XMStoreFloat4x4(&objConstants.Model, XMMatrixTranspose(model));
             XMStoreFloat4x4(&objConstants.TexTransform, XMMatrixTranspose(texTransform));
             currObjCB->CopyData(e->ObjCBIndex, objConstants);
@@ -318,7 +318,7 @@ void TexWaves::UpdateWaves(const GameTimer& timer)
     auto currWavesVB = _currFrameResource->WavesVB.get();
     for (int i = 0; i < _waves->VertexCount(); i++)
     {
-        FrameResource::Vertex v;
+        FrameResourceUnfogged::Vertex v;
         v.Pos = _waves->Position(i);
         v.Normal = _waves->Normal(i);
 
@@ -363,7 +363,7 @@ void TexWaves::BuildRootSignature()
     slotRootParameter[2].InitAsConstantBufferView(1);
     slotRootParameter[3].InitAsConstantBufferView(2);
 
-    auto staticSamplers = FrameResource::GetStaticSamplers();
+    auto staticSamplers = FrameResourceUnfogged::GetStaticSamplers();
 
     CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(4, slotRootParameter, (UINT)staticSamplers.size(), staticSamplers.data(), D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
@@ -428,7 +428,7 @@ void TexWaves::BuildLandGeometry()
     GeometryGenerator geoGen;
     GeometryGenerator::MeshData grid = geoGen.CreateGrid(160.0f, 160.0f, 50, 50);
 
-    std::vector<FrameResource::Vertex> vertices(grid.Vertices.size());
+    std::vector<FrameResourceUnfogged::Vertex> vertices(grid.Vertices.size());
     for (size_t i = 0; i < grid.Vertices.size(); i++)
     {
         auto& p = grid.Vertices[i].Position;
@@ -437,7 +437,7 @@ void TexWaves::BuildLandGeometry()
         vertices[i].Normal = GetHillsNormal(p.z, p.z);
         vertices[i].TexC = grid.Vertices[i].TexCoord;
     }
-    const UINT vbByteSize = (UINT)vertices.size() * sizeof(FrameResource::Vertex);
+    const UINT vbByteSize = (UINT)vertices.size() * sizeof(FrameResourceUnfogged::Vertex);
     std::vector<std::uint16_t> indices = grid.GetIndices16();
     const UINT ibByteSize = (UINT)indices.size() * sizeof(uint16_t);
 
@@ -447,7 +447,7 @@ void TexWaves::BuildLandGeometry()
     geo->VertexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), vertices.data(), vbByteSize, geo->VertexBufferUploader);
     geo->IndexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), indices.data(), ibByteSize, geo->IndexBufferUploader);
 
-    geo->VertexByteStride = sizeof(FrameResource::Vertex);
+    geo->VertexByteStride = sizeof(FrameResourceUnfogged::Vertex);
     geo->VertexBufferByteSize = vbByteSize;
     geo->IndexFormat = DXGI_FORMAT_R16_UINT;
     geo->IndexBufferByteSize = ibByteSize;
@@ -486,7 +486,7 @@ void TexWaves::BuildWavesGeometryBuffers()
         }
     }
 
-    UINT vbByteSize = _waves->VertexCount() * sizeof(FrameResource::Vertex);
+    UINT vbByteSize = _waves->VertexCount() * sizeof(FrameResourceUnfogged::Vertex);
     UINT ibByteSize = (UINT)indices.size() * sizeof(uint16_t);
 
     auto geo = std::make_unique<MeshGeometry>();
@@ -496,7 +496,7 @@ void TexWaves::BuildWavesGeometryBuffers()
 
     geo->IndexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), indices.data(), ibByteSize, geo->IndexBufferUploader);
 
-    geo->VertexByteStride = sizeof(FrameResource::Vertex);
+    geo->VertexByteStride = sizeof(FrameResourceUnfogged::Vertex);
     geo->VertexBufferByteSize = vbByteSize;
     geo->IndexFormat = DXGI_FORMAT_R16_UINT;
     geo->IndexBufferByteSize = ibByteSize;
@@ -520,7 +520,7 @@ void TexWaves::BuildBoxGeometry()
     boxSubmesh.StartIndexLocation = 0;
     boxSubmesh.BaseVertexLocation = 0;
 
-    std::vector<FrameResource::Vertex> vertices(box.Vertices.size());
+    std::vector<FrameResourceUnfogged::Vertex> vertices(box.Vertices.size());
 
     for (size_t i = 0; i < box.Vertices.size(); i++)
     {
@@ -529,7 +529,7 @@ void TexWaves::BuildBoxGeometry()
         vertices[i].TexC = box.Vertices[i].TexCoord;
     }
     std::vector<uint16_t> indices = box.GetIndices16();
-    const UINT vbByteSize = sizeof(FrameResource::Vertex) * (UINT)vertices.size();
+    const UINT vbByteSize = sizeof(FrameResourceUnfogged::Vertex) * (UINT)vertices.size();
     const UINT ibByteSize = sizeof(uint16_t) * (UINT)indices.size();
 
     auto geo = std::make_unique<MeshGeometry>();
@@ -538,7 +538,7 @@ void TexWaves::BuildBoxGeometry()
     geo->VertexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), vertices.data(), vbByteSize, geo->VertexBufferUploader);
     geo->IndexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), indices.data(), ibByteSize, geo->IndexBufferUploader);
 
-    geo->VertexByteStride = sizeof(FrameResource::Vertex);
+    geo->VertexByteStride = sizeof(FrameResourceUnfogged::Vertex);
     geo->VertexBufferByteSize = vbByteSize;
     geo->IndexFormat = DXGI_FORMAT_R16_UINT;
     geo->IndexBufferByteSize = ibByteSize;
@@ -585,8 +585,8 @@ void TexWaves::BuildPSOs()
 
 void TexWaves::BuildFrameResources()
 {
-    for (int i = 0; i < FrameResource::NumFrameResources; i++)
-        _frameResources.push_back(std::make_unique<FrameResource>(_device.Get(), 1, (UINT)_allRenderItems.size(), (UINT)_materials.size(), _waves->VertexCount()));
+    for (int i = 0; i < FrameResourceUnfogged::NumFrameResources; i++)
+        _frameResources.push_back(std::make_unique<FrameResourceUnfogged>(_device.Get(), 1, (UINT)_allRenderItems.size(), (UINT)_materials.size(), _waves->VertexCount()));
 }
 
 void TexWaves::BuildMaterials()
@@ -669,7 +669,7 @@ void TexWaves::BuildRenderItems()
 
 void TexWaves::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& renderItems)
 {
-    UINT objCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(FrameResource::ObjectConstants));
+    UINT objCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(FrameResourceUnfogged::ObjectConstants));
     UINT matCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(MaterialConstants));
 
     auto objectCB = _currFrameResource->ObjectCB->Resource();

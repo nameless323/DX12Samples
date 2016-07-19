@@ -4,7 +4,7 @@
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace PackedVector;
-using Vertex = FrameResource::Vertex;
+using Vertex = FrameResourceUnfogged::Vertex;
 
 TexColumns::TexColumns(HINSTANCE hInstance) : Application(hInstance)
 {
@@ -62,7 +62,7 @@ void TexColumns::Update(const GameTimer& timer)
     OnKeyboardInput(timer);
     UpdateCamera(timer);
 
-    _currentFrameResourceIndex = (_currentFrameResourceIndex + 1) % FrameResource::NumFrameResources;
+    _currentFrameResourceIndex = (_currentFrameResourceIndex + 1) % FrameResourceUnfogged::NumFrameResources;
     _currFrameResource = _frameResources[_currentFrameResourceIndex].get();
 
     if (_currFrameResource->Fence != 0 && _fence->GetCompletedValue() < _currFrameResource->Fence)
@@ -188,7 +188,7 @@ void TexColumns::UpdateObjectCBs(const GameTimer& timer)
             XMMATRIX model = XMLoadFloat4x4(&e->Model);
             XMMATRIX texTransform = XMLoadFloat4x4(&e->TexTransform);
 
-            FrameResource::ObjectConstants objConstants;
+            FrameResourceUnfogged::ObjectConstants objConstants;
             XMStoreFloat4x4(&objConstants.Model, XMMatrixTranspose(model));
             XMStoreFloat4x4(&objConstants.TexTransform, XMMatrixTranspose(texTransform));
 
@@ -286,7 +286,7 @@ void TexColumns::BuildRootSignature()
     slotRootParameter[2].InitAsConstantBufferView(1);
     slotRootParameter[3].InitAsConstantBufferView(2);
 
-    auto staticSamplers = FrameResource::GetStaticSamplers();
+    auto staticSamplers = FrameResourceUnfogged::GetStaticSamplers();
     CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(4, slotRootParameter, (UINT)staticSamplers.size(), staticSamplers.data(), D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
     ComPtr<ID3DBlob> serializedRootSig = nullptr;
     ComPtr<ID3DBlob> errorBlob = nullptr;
@@ -492,9 +492,9 @@ void TexColumns::BuildPSOs()
 
 void TexColumns::BuildFrameResources()
 {
-    for (int i = 0; i < FrameResource::NumFrameResources; i++)
+    for (int i = 0; i < FrameResourceUnfogged::NumFrameResources; i++)
     {
-        _frameResources.push_back(std::make_unique<FrameResource>(_device.Get(), 1, (UINT)_allRenderItems.size(), (UINT)_materials.size()));
+        _frameResources.push_back(std::make_unique<FrameResourceUnfogged>(_device.Get(), 1, (UINT)_allRenderItems.size(), (UINT)_materials.size()));
     }
 }
 
@@ -623,7 +623,7 @@ void TexColumns::BuildRenderItems()
 
 void TexColumns::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& renderItems)
 {
-    UINT objCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(FrameResource::ObjectConstants));
+    UINT objCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(FrameResourceUnfogged::ObjectConstants));
     UINT matCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(MaterialConstants));
 
     auto objectCB = _currFrameResource->ObjectCB->Resource();

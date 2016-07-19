@@ -3,7 +3,7 @@
 #include "../../../Core/D3DUtil.h"
 
 #include "../../Common/RenderItem.h"
-#include "../../Common/FrameResource.h"
+#include "../../Common/FrameResourceUnfogged.h"
 
 class TexColumns : public Application
 {
@@ -43,8 +43,8 @@ protected:
     void DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& renderItems);
 
 private:
-    std::vector<std::unique_ptr<FrameResource>> _frameResources;
-    FrameResource* _currFrameResource = nullptr;
+    std::vector<std::unique_ptr<FrameResourceUnfogged>> _frameResources;
+    FrameResourceUnfogged* _currFrameResource = nullptr;
     int _currentFrameResourceIndex = 0;
 
     Microsoft::WRL::ComPtr<ID3D12RootSignature> _rootSignature = nullptr;
@@ -62,7 +62,7 @@ private:
     std::vector<std::unique_ptr<RenderItem>> _allRenderItems;
     std::vector<RenderItem*> _opaqueRenderItems;
 
-    FrameResource::PassConstants _mainPassCB;
+    FrameResourceUnfogged::PassConstants _mainPassCB;
 
     DirectX::XMFLOAT3 _eyePos = { 0.0f, 0.0f, 0.0f };
     DirectX::XMFLOAT4X4 _view = MathHelper::Identity4x4();
