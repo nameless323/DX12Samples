@@ -140,10 +140,16 @@
     <ClInclude Include="Source\Scenes\Icosahedron\IcosahedronGeoTesselation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Common\FrameResourceFogged.h">
+    <ClInclude Include="Source\Common\FrameResourceUnfogged.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Common\FrameResourceUnfogged.h">
+    <ClInclude Include="Source\Common\FrameResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scenes\GaussBlur\GaussBlurFilter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scenes\GaussBlur\GaussBlur.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -253,10 +259,16 @@
     <ClCompile Include="Source\Scenes\Icosahedron\IcosahedronGeoTesselation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Common\FrameResourceFogged.cpp">
+    <ClCompile Include="Source\Common\FrameResourceUnfogged.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Common\FrameResourceUnfogged.cpp">
+    <ClCompile Include="Source\Common\FrameResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scenes\GaussBlur\GaussBlurFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scenes\GaussBlur\GaussBlur.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

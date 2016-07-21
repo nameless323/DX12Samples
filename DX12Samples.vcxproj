@@ -166,7 +166,9 @@
     <ClInclude Include="Core\GeometryGenerator.h" />
     <ClInclude Include="Core\MathHelper.h" />
     <ClInclude Include="Core\UploadBuffer.h" />
-    <ClInclude Include="Source\Common\FrameResourceFogged.h" />
+    <ClInclude Include="Source\Common\FrameResource.h" />
+    <ClInclude Include="Source\Scenes\GaussBlur\GaussBlur.h" />
+    <ClInclude Include="Source\Scenes\GaussBlur\GaussBlurFilter.h" />
     <ClInclude Include="Source\Scenes\BilboardTrees\BilboardTrees.h" />
     <ClInclude Include="Source\Scenes\Blending\Blending.h" />
     <ClInclude Include="Source\Scenes\Blending\FrameResourceBlending.h" />
@@ -210,7 +212,7 @@
     <ClCompile Include="Core\GeometryGenerator.cpp" />
     <ClCompile Include="Core\MathHelper.cpp" />
     <ClCompile Include="Source\Common\FrameResourceUnfogged.cpp" />
-    <ClCompile Include="Source\Common\FrameResourceFogged.cpp" />
+    <ClCompile Include="Source\Common\FrameResource.cpp" />
     <ClCompile Include="Source\Scenes\BilboardTrees\BilboardTrees.cpp" />
     <ClCompile Include="Source\Scenes\Blending\Blending.cpp" />
     <ClCompile Include="Source\Scenes\Blending\FrameResourceBlending.cpp" />
@@ -219,6 +221,8 @@
     <ClCompile Include="Source\Exercises\Ch6Ex.cpp" />
     <ClCompile Include="Source\Scenes\Crate\Crate.cpp" />
     <ClCompile Include="Source\Scenes\Crate\CrateFrameResource.cpp" />
+    <ClCompile Include="Source\Scenes\GaussBlur\GaussBlur.cpp" />
+    <ClCompile Include="Source\Scenes\GaussBlur\GaussBlurFilter.cpp" />
     <ClCompile Include="Source\Scenes\GeomCylinder\GeomCylinder.cpp" />
     <ClCompile Include="Source\Scenes\Icosahedron\IcosahedronGeoTesselation.cpp" />
     <ClCompile Include="Source\Scenes\InitDX\InitDX.cpp" />
