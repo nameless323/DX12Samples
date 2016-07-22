@@ -56,6 +56,7 @@ LRESULT GaussBlur::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 int GaussBlur::Run()
 {
+    return Application::Run();
 }
 
 void GaussBlur::OnResize()
@@ -110,6 +111,8 @@ void GaussBlur::Draw(const GameTimer& timer)
     _commandList->OMSetRenderTargets(1, &CurrentBackBufferView(), true, &DepthStencilView());
 
     ID3D12DescriptorHeap* descriptorHeaps[] = { _srvHeap.Get() };
+    _commandList->SetDescriptorHeaps(1, descriptorHeaps);
+
     _commandList->SetGraphicsRootSignature(_rootSignature.Get());
 
     auto passCB = _currFrameResource->PassCB->Resource();
@@ -404,7 +407,7 @@ void GaussBlur::BuildPostProcessRootSignature()
     CD3DX12_ROOT_PARAMETER slotRootParameter[3];
     slotRootParameter[0].InitAsConstants(12, 0);
     slotRootParameter[1].InitAsDescriptorTable(1, &srvTable);
-    slotRootParameter[1].InitAsDescriptorTable(1, &uavTable);
+    slotRootParameter[2].InitAsDescriptorTable(1, &uavTable);
 
     CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(3, slotRootParameter, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
     ComPtr<ID3DBlob> serializedRootSig = nullptr;

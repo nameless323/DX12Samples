@@ -290,5 +290,6 @@
     <FxCompile Include="Shaders\IcosahedronGeomTess.hlsl" />
     <FxCompile Include="Shaders\IcosahedronTess.hlsl" />
     <FxCompile Include="Shaders\IcosahedronGeomTessAndExplode.hlsl" />
+    <FxCompile Include="Shaders\GaussBlur.hlsl" />
   </ItemGroup>
 </Project>

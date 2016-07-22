@@ -19,12 +19,13 @@
 #include "Scenes/Tesselation/BezierPatch.h"
 #include "Scenes/GeomCylinder/GeomCylinder.h"
 #include "Scenes/Icosahedron/IcosahedronGeoTesselation.h"
+#include "Scenes/GaussBlur/GaussBlur.h"
 
 Application* app;
 
 void CreateScene(HINSTANCE hInstance)
 {
-    app = new IcosahedronGeoTesselation(hInstance);
+    app = new GaussBlur(hInstance);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)

@@ -43,6 +43,7 @@ bool Stenciling::Init()
     _commandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
 
     FlushCommandQueue();
+    return true;
 }
 
 LRESULT Stenciling::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)

@@ -37,7 +37,7 @@ void HorizBlurCS(int3 groupThreadID : SV_GroupThreadID, int3 dispatchThreadID : 
     if (groupThreadID.x >= N - BlurRadius)
     {
         int x = min(dispatchThreadID.x + BlurRadius, _input.Length.x - 1);
-        _cache[groupThreadID.x + 2 * BlurRadius] = _input[int(x, dispatchThreadID.y)];
+        _cache[groupThreadID.x + 2 * BlurRadius] = _input[int2(x, dispatchThreadID.y)];
     }
 
     _cache[groupThreadID.x + BlurRadius] = _input[min(dispatchThreadID.xy, _input.Length.xy - 1)];
@@ -66,8 +66,8 @@ void VertBlurCS(int3 groupThreadID : SV_GroupThreadID, int3 dispatchThreadID : S
     }
     if (groupThreadID.y >= N - BlurRadius)
     {
-        int x = min(dispatchThreadID.y + BlurRadius, _input.Length.y - 1);
-        _cache[groupThreadID.y + 2 * BlurRadius] = _input[int(dispatchThreadID.x, y)];
+        int y = min(dispatchThreadID.y + BlurRadius, _input.Length.y - 1);
+        _cache[groupThreadID.y + 2 * BlurRadius] = _input[int2(dispatchThreadID.x, y)];
     }
 
     _cache[groupThreadID.y + BlurRadius] = _input[min(dispatchThreadID.xy, _input.Length.xy - 1)];
