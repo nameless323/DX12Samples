@@ -167,6 +167,7 @@
     <ClInclude Include="Core\MathHelper.h" />
     <ClInclude Include="Core\UploadBuffer.h" />
     <ClInclude Include="Source\Common\FrameResource.h" />
+    <ClInclude Include="Source\Scenes\CSVectorAdd\CSVectorAdd.h" />
     <ClInclude Include="Source\Scenes\GaussBlur\GaussBlur.h" />
     <ClInclude Include="Source\Scenes\GaussBlur\GaussBlurFilter.h" />
     <ClInclude Include="Source\Scenes\BilboardTrees\BilboardTrees.h" />
@@ -221,6 +222,7 @@
     <ClCompile Include="Source\Exercises\Ch6Ex.cpp" />
     <ClCompile Include="Source\Scenes\Crate\Crate.cpp" />
     <ClCompile Include="Source\Scenes\Crate\CrateFrameResource.cpp" />
+    <ClCompile Include="Source\Scenes\CSVectorAdd\CSVectorAdd.cpp" />
     <ClCompile Include="Source\Scenes\GaussBlur\GaussBlur.cpp" />
     <ClCompile Include="Source\Scenes\GaussBlur\GaussBlurFilter.cpp" />
     <ClCompile Include="Source\Scenes\GeomCylinder\GeomCylinder.cpp" />
@@ -387,6 +389,17 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Shaders\TreeSprite.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Shaders\VecAdd.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
