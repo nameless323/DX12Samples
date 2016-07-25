@@ -6,6 +6,7 @@ using namespace PackedVector;
 
 CsVecLen::CsVecLen(HINSTANCE hInstance) : Application(hInstance)
 {
+    
 }
 
 CsVecLen::~CsVecLen()
@@ -16,6 +17,24 @@ CsVecLen::~CsVecLen()
 
 bool CsVecLen::Init()
 {
+    if (!Application::Init())
+        return false;
+    ThrowIfFailed(_commandAllocator->Reset());
+    ThrowIfFailed(_commandList->Reset(_commandAllocator.Get(), nullptr));
+
+    BuildBuffers();
+    BuildShaderAndInputLayout();
+    BuildRootSignature();
+    BuildPSOs();
+
+    ThrowIfFailed(_commandList->Close());
+
+    ID3D12CommandList* lists[] = { _commandList.Get() };
+    _commandQueue->ExecuteCommandLists(1, lists);
+    FlushCommandQueue();
+
+    DoComputeWork();
+    return true;
 }
 
 LRESULT CsVecLen::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -30,6 +49,7 @@ int CsVecLen::Run()
 
 void CsVecLen::OnResize()
 {
+    Application::OnResize();
 }
 
 void CsVecLen::Update(const GameTimer& timer)
@@ -38,21 +58,33 @@ void CsVecLen::Update(const GameTimer& timer)
 
 void CsVecLen::Draw(const GameTimer& timer)
 {
+    FlushCommandQueue();
 }
 
 void CsVecLen::DoComputeWork()
 {
-    CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(_outputBuffer.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_DEST);
+    ThrowIfFailed(_commandAllocator->Reset());
+    ThrowIfFailed(_commandList->Reset(_commandAllocator.Get(), _PSOs["vecLen"].Get()));
+    _commandList->SetComputeRootSignature(_rootSignature.Get());
+
+    _commandList->SetComputeRootShaderResourceView(0, _inputBuffer->GetGPUVirtualAddress());
+    _commandList->SetComputeRootUnorderedAccessView(1, _outputBuffer->GetGPUVirtualAddress());
+
+    _commandList->Dispatch(1, 1, 1);
+
+    CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(_outputBuffer.Get(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_COPY_SOURCE);
     
     _commandList->ResourceBarrier(1, &barrier);
     _commandList->CopyResource(_readBackBuffer.Get(), _outputBuffer.Get());
-    barrier = CD3DX12_RESOURCE_BARRIER::Transition(_outputBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+    barrier = CD3DX12_RESOURCE_BARRIER::Transition(_outputBuffer.Get(), D3D12_RESOURCE_STATE_COPY_SOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
     _commandList->ResourceBarrier(1, &barrier);
     ThrowIfFailed(_commandList->Close());
+
     ID3D12CommandList* lists[] = { _commandList.Get() };
     _commandQueue->ExecuteCommandLists(1, lists);
     FlushCommandQueue();
-    float data[NumDataElements];
+
+    float* data;
     _readBackBuffer->Map(0, nullptr, (void**)&data);
     std::ofstream out("lenOut.txt");
     for (int i = 0; i < NumDataElements; i++)
@@ -69,7 +101,7 @@ void CsVecLen::BuildBuffers()
     std::ofstream out("lenIn.txt");
     for (int i = 0; i < NumDataElements; i++)
     {
-        XMStoreFloat3(&data[i], MathHelper::RandUnitVec3() * MathHelper::Rand(0, 3));
+        XMStoreFloat3(&data[i], MathHelper::RandUnitVec3() * MathHelper::RandF(1, 15));
         out << "(" << data[i].x << ", " << data[i].y << ", " << data[i].z << ")" << std::endl;
     }
     out.close();
@@ -86,6 +118,7 @@ void CsVecLen::BuildBuffers()
         D3D12_RESOURCE_STATE_UNORDERED_ACCESS, 
         nullptr, 
         IID_PPV_ARGS(_outputBuffer.GetAddressOf()));
+
     _device->CreateCommittedResource(
         &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_READBACK),
         D3D12_HEAP_FLAG_NONE,
@@ -99,7 +132,7 @@ void CsVecLen::BuildBuffers()
 void CsVecLen::BuildRootSignature()
 {
     CD3DX12_ROOT_PARAMETER p[2];
-    p[0].InitAsConstantBufferView(0);
+    p[0].InitAsShaderResourceView(0);
     p[1].InitAsUnorderedAccessView(0);
 
     CD3DX12_ROOT_SIGNATURE_DESC desc;
@@ -115,7 +148,7 @@ void CsVecLen::BuildRootSignature()
 
 void CsVecLen::BuildShaderAndInputLayout()
 {
-    _shaders["vecLen"] = D3DUtil::CompileShader(L"Shaders\VecLength.hlsl", nullptr, "main", "cs_5_1");
+    _shaders["vecLen"] = D3DUtil::CompileShader(L"Shaders\\VecLength.hlsl", nullptr, "main", "cs_5_1");
 }
 
 void CsVecLen::BuildPSOs()

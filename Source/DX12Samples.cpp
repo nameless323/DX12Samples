@@ -21,12 +21,13 @@
 #include "Scenes/Icosahedron/IcosahedronGeoTesselation.h"
 #include "Scenes/GaussBlur/GaussBlur.h"
 #include "Scenes/CSVectorAdd/CSVectorAdd.h"
+#include "Scenes/CSVecLen/CSVecLen.h"
 
 Application* app;
 
 void CreateScene(HINSTANCE hInstance)
 {
-    app = new CSVectorAdd(hInstance);
+    app = new CsVecLen(hInstance);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
