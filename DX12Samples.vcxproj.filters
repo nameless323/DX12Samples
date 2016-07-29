@@ -158,6 +158,15 @@
     <ClInclude Include="Source\Scenes\CsVecLen\CsVecLen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Scenes\WavesCS\WavesCS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scenes\WavesCS\GpuWaves.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scenes\WavesCS\GpuWavesFrameResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Camera.cpp">
@@ -283,6 +292,15 @@
     <ClCompile Include="Source\Scenes\CsVecLen\CsVecLen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Scenes\WavesCS\WavesCS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scenes\WavesCS\GpuWaves.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scenes\WavesCS\GpuWavesFrameResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\Color.hlsl" />
@@ -305,5 +323,6 @@
     <FxCompile Include="Shaders\GaussBlur.hlsl" />
     <FxCompile Include="Shaders\VecAdd.hlsl" />
     <FxCompile Include="Shaders\VecLength.hlsl" />
+    <FxCompile Include="Shaders\GpuWaves.hlsl" />
   </ItemGroup>
 </Project>

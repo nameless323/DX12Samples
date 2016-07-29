@@ -199,11 +199,14 @@
     <ClInclude Include="Source\Scenes\Tesselation\BezierPatch.h" />
     <ClInclude Include="Source\Scenes\TexColumns\TexColumns.h" />
     <ClInclude Include="Source\Scenes\TexWaves\TexWaves.h" />
+    <ClInclude Include="Source\Scenes\WavesCS\GpuWaves.h" />
+    <ClInclude Include="Source\Scenes\WavesCS\GpuWavesFrameResource.h" />
     <ClInclude Include="Source\Scenes\Waves\Waves.h" />
     <ClInclude Include="Source\Scenes\Waves\WavesFrameResource.h" />
     <ClInclude Include="Source\Scenes\Waves\WavesRenderItem.h" />
     <ClInclude Include="Source\Scenes\Waves\WavesScene.h" />
     <ClInclude Include="Source\Scenes\Tesselation\BasicTesselation.h" />
+    <ClInclude Include="Source\Scenes\WavesCS\WavesCS.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Application.cpp" />
@@ -243,10 +246,13 @@
     <ClCompile Include="Source\Scenes\Tesselation\BezierPatch.cpp" />
     <ClCompile Include="Source\Scenes\TexColumns\TexColumns.cpp" />
     <ClCompile Include="Source\Scenes\TexWaves\TexWaves.cpp" />
+    <ClCompile Include="Source\Scenes\WavesCS\GpuWaves.cpp" />
+    <ClCompile Include="Source\Scenes\WavesCS\GpuWavesFrameResource.cpp" />
     <ClCompile Include="Source\Scenes\Waves\Waves.cpp" />
     <ClCompile Include="Source\Scenes\Waves\WavesFrameResource.cpp" />
     <ClCompile Include="Source\Scenes\Waves\WavesScene.cpp" />
     <ClCompile Include="Source\Scenes\Tesselation\BasicTesselation.cpp" />
+    <ClCompile Include="Source\Scenes\WavesCS\WavesCS.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\BezierTessellation.hlsl">
@@ -272,6 +278,17 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Shaders\GpuWaves.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Shaders\IcosahedronGeomTess.hlsl">

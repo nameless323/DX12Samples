@@ -16,6 +16,8 @@ struct RenderItem
     UINT ObjCBIndex = -1;
     Material* Mat = nullptr;
     MeshGeometry* Geo = nullptr;
+    DirectX::XMFLOAT2 DisplacementMapTexelSize = { 1.0f, 1.0f };
+    float GridSpatialStep = 1.0f;
 
     D3D12_PRIMITIVE_TOPOLOGY PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
@@ -32,6 +34,7 @@ struct RenderItem
         Mirrors,
         Reflected,
         Shadow,
+        GpuWaves,
         Count
     };
 };

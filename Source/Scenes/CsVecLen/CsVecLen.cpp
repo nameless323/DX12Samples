@@ -83,7 +83,7 @@ void CsVecLen::DoComputeWork()
     ID3D12CommandList* lists[] = { _commandList.Get() };
     _commandQueue->ExecuteCommandLists(1, lists);
     FlushCommandQueue();
-
+    
     float* data;
     _readBackBuffer->Map(0, nullptr, (void**)&data);
     std::ofstream out("lenOut.txt");
@@ -134,7 +134,7 @@ void CsVecLen::BuildRootSignature()
     CD3DX12_ROOT_PARAMETER p[2];
     p[0].InitAsShaderResourceView(0);
     p[1].InitAsUnorderedAccessView(0);
-
+    
     CD3DX12_ROOT_SIGNATURE_DESC desc;
     desc.Init(2, p, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
     ComPtr<ID3DBlob> sigBlob = nullptr;
