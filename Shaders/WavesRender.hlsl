@@ -85,14 +85,17 @@ vOut vert(vIn i)
     vOut o = (vOut) 0.0;
 
 #ifdef DISPLACEMENT_MAP
-    i.pos.y += _displacementMap.SampleLevel(_samLinearWrap, i.uv, 1.0f).r;
+	i.pos.y += _displacementMap.SampleLevel(_samLinearWrap, i.uv, 1.0f).r;
+	
+	// Estimate normal using finite difference.
     float du = DisplacementMapTexelSize.x;
     float dv = DisplacementMapTexelSize.y;
-    float l = _displacementMap.SampleLevel(_samPointClamp, i.uv - float2(du, 0.0f), 0.0f).r;
+	float l = _displacementMap.SampleLevel(_samPointClamp, i.uv -float2(du, 0.0f), 0.0f ).r;
     float r = _displacementMap.SampleLevel(_samPointClamp, i.uv + float2(du, 0.0f), 0.0f).r;
     float t = _displacementMap.SampleLevel(_samPointClamp, i.uv - float2(0.0f, dv), 0.0f).r;
     float b = _displacementMap.SampleLevel(_samPointClamp, i.uv + float2(0.0f, dv), 0.0f).r;
-    i.normal = normalize(float3(-r + l, 2.0f * GridSpatialStep, b - t));
+	i.normal = normalize( float3(-r+l, 2.0f*GridSpatialStep, b-t) );
+	
 #endif
 
     float4 posW = mul(float4(i.pos, 1.0f), Model);

@@ -17,7 +17,7 @@ GpuWaves::GpuWaves(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int
     _spatialStep = dx;
 
     float d = damping * dt + 2.0f;
-    float e = speed * speed * dt * dt / (dx * dx);
+    float e = (speed * speed) * (dt * dt) / (dx * dx);
     _K[0] = (damping * dt - 2.0f) / d;
     _K[1] = (4.0f - 8.0f * e) / d;
     _K[2] = (2.0f * e) / d;

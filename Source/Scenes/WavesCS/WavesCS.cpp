@@ -95,6 +95,13 @@ void WavesCS::Draw(const GameTimer& timer)
     auto cmdListAlloc = _currFrameResource->CmdListAlloc;
     ThrowIfFailed(cmdListAlloc->Reset());
     ThrowIfFailed(_commandList->Reset(cmdListAlloc.Get(), _PSOs["opaque"].Get()));
+
+    ID3D12DescriptorHeap* descriptorHeaps[] = { _srvHeap.Get() };
+    _commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
+
+    UpdateWavesGPU(timer);
+
+    _commandList->SetPipelineState(_PSOs["opaque"].Get());
     _commandList->RSSetViewports(1, &_screenViewport);
     _commandList->RSSetScissorRects(1, &_scissorRect);
 
@@ -104,13 +111,7 @@ void WavesCS::Draw(const GameTimer& timer)
     _commandList->ClearDepthStencilView(DepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 
     _commandList->OMSetRenderTargets(1, &CurrentBackBufferView(), true, &DepthStencilView());
-
-    ID3D12DescriptorHeap* descriptorHeaps[] = { _srvHeap.Get() };
-    _commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
-
-    UpdateWavesGPU(timer);
-    _commandList->SetPipelineState(_PSOs["opaque"].Get());
-
+    
     _commandList->SetGraphicsRootSignature(_rootSignature.Get());
 
     auto passCB = _currFrameResource->PassCB->Resource();
@@ -725,6 +726,8 @@ void WavesCS::BuildRenderItems()
     auto wavesRenderItem = std::make_unique<RenderItem>();
     wavesRenderItem->Model = MathHelper::Identity4x4();
     XMStoreFloat4x4(&wavesRenderItem->TexTransform, XMMatrixScaling(5.0f, 5.0f, 1.0f));
+    wavesRenderItem->DisplacementMapTexelSize.x = 1.0f / _waves->ColumnCount();
+    wavesRenderItem->DisplacementMapTexelSize.y = 1.0f / _waves->RowCount();
     wavesRenderItem->ObjCBIndex = 0;
     wavesRenderItem->Mat = _materials["water"].get();
     wavesRenderItem->Geo = _geometries["waterGeo"].get();
