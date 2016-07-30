@@ -331,7 +331,7 @@ void WavesCS::UpdateWavesGPU(const GameTimer& timer)
 
         _waves->Disturb(_commandList.Get(), _wavesRootSignature.Get(), _PSOs["wavesDisturb"].Get(), i, j, r);
     }
-    _waves->Update(timer, _commandList.Get(), _rootSignature.Get(), _PSOs["wavesUpdate"].Get());
+    _waves->Update(timer, _commandList.Get(), _wavesRootSignature.Get(), _PSOs["wavesUpdate"].Get());
 }
 
 void WavesCS::LoadTextures()

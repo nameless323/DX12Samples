@@ -324,5 +324,6 @@
     <FxCompile Include="Shaders\VecAdd.hlsl" />
     <FxCompile Include="Shaders\VecLength.hlsl" />
     <FxCompile Include="Shaders\GpuWaves.hlsl" />
+    <FxCompile Include="Shaders\WavesRender.hlsl" />
   </ItemGroup>
 </Project>

@@ -122,7 +122,7 @@ void GpuWaves::BuildResources(ID3D12GraphicsCommandList* cmdList)
             &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
         D3D12_HEAP_FLAG_NONE,
         &CD3DX12_RESOURCE_DESC::Buffer(uploadBufferSize),
-        D3D12_RESOURCE_STATE_COMMON,
+        D3D12_RESOURCE_STATE_GENERIC_READ,
         nullptr,
         IID_PPV_ARGS(&_currUploadBuffer)
         ));
@@ -131,7 +131,7 @@ void GpuWaves::BuildResources(ID3D12GraphicsCommandList* cmdList)
             &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
         D3D12_HEAP_FLAG_NONE,
         &CD3DX12_RESOURCE_DESC::Buffer(uploadBufferSize),
-        D3D12_RESOURCE_STATE_COMMON,
+        D3D12_RESOURCE_STATE_GENERIC_READ,
         nullptr,
         IID_PPV_ARGS(&_prevUploadBuffer)
         ));
@@ -151,7 +151,7 @@ void GpuWaves::BuildResources(ID3D12GraphicsCommandList* cmdList)
     cmdList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_currSol.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_COPY_DEST));
     UpdateSubresources(cmdList, _currSol.Get(), _prevUploadBuffer.Get(), 0, 0, num2DSubresources, &subResourceData);
     cmdList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_currSol.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_GENERIC_READ));
-    
+
     cmdList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_nextSol.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
 }
 
@@ -232,7 +232,7 @@ void GpuWaves::Disturb(ID3D12GraphicsCommandList* cmdList, ID3D12RootSignature* 
     cmdList->SetPipelineState(pso);
     cmdList->SetComputeRootSignature(rootSig);
 
-    UINT disturbIndex[2] = { j, i };
+    UINT disturbIndex[2] = {j, i};
     cmdList->SetComputeRoot32BitConstants(0, 1, &magnitude, 3);
     cmdList->SetComputeRoot32BitConstants(0, 2, disturbIndex, 4);
 

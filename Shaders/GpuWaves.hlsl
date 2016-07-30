@@ -20,7 +20,7 @@ void UpdateWavesCS (int3 dispatchThreadID : SV_DispatchThreadID)
 
     _output[int2(x, y)] =
     WaveConstant0 * _prevSolInput[int2(x, y)].r +
-    WaveConstant1 * _prevSolInput[int2(x, y)].r +
+    WaveConstant1 * _currSolInput[int2(x, y)].r +
     WaveConstant2 * (
         _currSolInput[int2(x, y + 1)].r +
         _currSolInput[int2(x, y - 1)].r +
