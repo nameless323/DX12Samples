@@ -201,6 +201,7 @@
     <ClInclude Include="Source\Scenes\TexWaves\TexWaves.h" />
     <ClInclude Include="Source\Scenes\WavesCS\GpuWaves.h" />
     <ClInclude Include="Source\Scenes\WavesCS\GpuWavesFrameResource.h" />
+    <ClInclude Include="Source\Scenes\WavesCS\SobelFilter.h" />
     <ClInclude Include="Source\Scenes\Waves\Waves.h" />
     <ClInclude Include="Source\Scenes\Waves\WavesFrameResource.h" />
     <ClInclude Include="Source\Scenes\Waves\WavesRenderItem.h" />
@@ -248,6 +249,7 @@
     <ClCompile Include="Source\Scenes\TexWaves\TexWaves.cpp" />
     <ClCompile Include="Source\Scenes\WavesCS\GpuWaves.cpp" />
     <ClCompile Include="Source\Scenes\WavesCS\GpuWavesFrameResource.cpp" />
+    <ClCompile Include="Source\Scenes\WavesCS\SobelFilter.cpp" />
     <ClCompile Include="Source\Scenes\Waves\Waves.cpp" />
     <ClCompile Include="Source\Scenes\Waves\WavesFrameResource.cpp" />
     <ClCompile Include="Source\Scenes\Waves\WavesScene.cpp" />
