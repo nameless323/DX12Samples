@@ -331,5 +331,6 @@
     <FxCompile Include="Shaders\VecLength.hlsl" />
     <FxCompile Include="Shaders\GpuWaves.hlsl" />
     <FxCompile Include="Shaders\WavesRender.hlsl" />
+    <FxCompile Include="Shaders\SobelFilter.hlsl" />
   </ItemGroup>
 </Project>
