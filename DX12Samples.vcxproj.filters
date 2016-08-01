@@ -170,6 +170,9 @@
     <ClInclude Include="Source\Scenes\WavesCS\SobelFilter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Common\RenderTarget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Camera.cpp">
@@ -307,6 +310,9 @@
     <ClCompile Include="Source\Scenes\WavesCS\SobelFilter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Common\RenderTarget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\Color.hlsl" />
@@ -332,5 +338,6 @@
     <FxCompile Include="Shaders\GpuWaves.hlsl" />
     <FxCompile Include="Shaders\WavesRender.hlsl" />
     <FxCompile Include="Shaders\SobelFilter.hlsl" />
+    <FxCompile Include="Shaders\SobelFilterMerge.hlsl" />
   </ItemGroup>
 </Project>
