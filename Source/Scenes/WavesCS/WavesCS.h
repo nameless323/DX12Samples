@@ -6,6 +6,8 @@
 #include "../../Common/RenderItem.h"
 #include "GpuWavesFrameResource.h"
 #include "GpuWaves.h"
+#include "../../Common/RenderTarget.h"
+#include "SobelFilter.h"
 
 class WavesCS : public Application
 {
@@ -19,6 +21,7 @@ public:
     LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
     int Run() override;
 protected:
+    void CreateRtvAndDsvDescriptorHeaps() override;
     void OnResize() override;
     void Update(const GameTimer& timer) override;
     void Draw(const GameTimer& timer) override;
@@ -38,6 +41,7 @@ protected:
     void LoadTextures();
     void BuildRootSignature();
     void BuildWavesRootSignature();
+    void BuildPostProcessRootSignature();
     void BuildDescriptorHeaps();
     void BuildShaderAndInputLayout();
     void BuildLandGeometry();
@@ -48,6 +52,8 @@ protected:
     void BuildMaterials();
     void BuildRenderItems();
     void DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& renderItems);
+    void DrawFullscreenQuad(ID3D12GraphicsCommandList* cmdList);
+
     float GetHillsHeight(float x, float z) const;
     DirectX::XMFLOAT3 GetHillsNormal(float x, float z) const;
 private:
@@ -57,6 +63,7 @@ private:
 
     Microsoft::WRL::ComPtr<ID3D12RootSignature> _rootSignature = nullptr;
     Microsoft::WRL::ComPtr<ID3D12RootSignature> _wavesRootSignature = nullptr;
+    Microsoft::WRL::ComPtr<ID3D12RootSignature> _postProcessRootSignature = nullptr;
     Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> _srvHeap = nullptr;
 
     std::unordered_map<std::string, std::unique_ptr<MeshGeometry>> _geometries;
@@ -70,6 +77,9 @@ private:
     std::vector<std::unique_ptr<RenderItem>> _allRenderItems;
     std::vector<RenderItem*> _renderItemLayer[(int)RenderItem::RenderLayer::Count];
     std::unique_ptr<GpuWaves> _waves;
+
+    std::unique_ptr<RenderTarget> _offscreenRT = nullptr;
+    std::unique_ptr<SobelFilter> _sobelFilter = nullptr;
 
     GpuWavesFrameResource::PassConstants _mainPassCB;
 

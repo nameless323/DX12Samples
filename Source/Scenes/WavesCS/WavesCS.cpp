@@ -1,6 +1,8 @@
 #include "WavesCS.h"
 
 #include "../../Common/RenderItem.h"
+#include "../../Common/RenderTarget.h"
+#include "SobelFilter.h"
 #include "../../../Core/GeometryGenerator.h"
 
 using Microsoft::WRL::ComPtr;
@@ -27,10 +29,14 @@ bool WavesCS::Init()
     ThrowIfFailed(_commandList->Reset(_commandAllocator.Get(), nullptr));
 
     _waves = std::make_unique<GpuWaves>(_device.Get(), _commandList.Get(), 256, 256, 0.25f, 0.03f, 2.0f, 0.2f);
+    _sobelFilter = std::make_unique<SobelFilter>(_device.Get(), _clientWidth, _clientHeight, _backBufferFormat);
+    _offscreenRT = std::make_unique<RenderTarget>(_device.Get(), _clientWidth, _clientHeight, _backBufferFormat);
+
 
     LoadTextures();
     BuildRootSignature();
     BuildWavesRootSignature();
+    BuildPostProcessRootSignature();
     BuildDescriptorHeaps();
     BuildShaderAndInputLayout();
     BuildLandGeometry();
@@ -60,12 +66,35 @@ int WavesCS::Run()
     return Application::Run();
 }
 
+void WavesCS::CreateRtvAndDsvDescriptorHeaps()
+{
+    D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc;
+    rtvHeapDesc.NumDescriptors = _swapChainBufferCount + 1;
+    rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+    rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+    rtvHeapDesc.NodeMask = 0;
+    ThrowIfFailed(_device->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(_rtvHeap.GetAddressOf())));
+
+    D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc;
+    dsvHeapDesc.NumDescriptors = 1;
+    dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+    dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+    dsvHeapDesc.NodeMask = 0;
+    ThrowIfFailed(_device->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(_dsvHeap.GetAddressOf())));
+}
+
 void WavesCS::OnResize()
 {
     Application::OnResize();
 
     XMMATRIX p = XMMatrixPerspectiveFovLH(0.25f * MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
     XMStoreFloat4x4(&_proj, p);
+
+    if (_sobelFilter != nullptr)
+        _sobelFilter->OnResize(_clientWidth, _clientHeight);
+
+    if (_offscreenRT != nullptr)
+        _offscreenRT->OnResize(_clientWidth, _clientHeight);
 }
 
 void WavesCS::Update(const GameTimer& timer)
@@ -93,6 +122,7 @@ void WavesCS::Update(const GameTimer& timer)
 void WavesCS::Draw(const GameTimer& timer)
 {
     auto cmdListAlloc = _currFrameResource->CmdListAlloc;
+
     ThrowIfFailed(cmdListAlloc->Reset());
     ThrowIfFailed(_commandList->Reset(cmdListAlloc.Get(), _PSOs["opaque"].Get()));
 
@@ -102,15 +132,16 @@ void WavesCS::Draw(const GameTimer& timer)
     UpdateWavesGPU(timer);
 
     _commandList->SetPipelineState(_PSOs["opaque"].Get());
+
     _commandList->RSSetViewports(1, &_screenViewport);
     _commandList->RSSetScissorRects(1, &_scissorRect);
 
-    _commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+    _commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_offscreenRT->Resource(), D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_RENDER_TARGET));
 
-    _commandList->ClearRenderTargetView(CurrentBackBufferView(), (float*)&_mainPassCB.FogColor, 0, nullptr);
+    _commandList->ClearRenderTargetView(_offscreenRT->Rtv(), (float*)&_mainPassCB.FogColor, 0, nullptr);
     _commandList->ClearDepthStencilView(DepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
 
-    _commandList->OMSetRenderTargets(1, &CurrentBackBufferView(), true, &DepthStencilView());
+    _commandList->OMSetRenderTargets(1, &_offscreenRT->Rtv(), true, &DepthStencilView());
     
     _commandList->SetGraphicsRootSignature(_rootSignature.Get());
 
@@ -130,8 +161,20 @@ void WavesCS::Draw(const GameTimer& timer)
     DrawRenderItems(_commandList.Get(), _renderItemLayer[(int)RenderItem::RenderLayer::GpuWaves]);
 
 
-    _commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+    _commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_offscreenRT->Resource(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_GENERIC_READ));
+    _sobelFilter->Execute(_commandList.Get(), _postProcessRootSignature.Get(), _PSOs["sobel"].Get(), _offscreenRT->Srv());
 
+    _commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+    _commandList->OMSetRenderTargets(1, &CurrentBackBufferView(), true, &DepthStencilView());
+    
+    _commandList->SetGraphicsRootSignature(_postProcessRootSignature.Get());
+    _commandList->SetPipelineState(_PSOs["composite"].Get());
+    _commandList->SetGraphicsRootDescriptorTable(0, _offscreenRT->Srv());
+    _commandList->SetGraphicsRootDescriptorTable(1, _sobelFilter->OutputSrv());
+    DrawFullscreenQuad(_commandList.Get());
+    
+    _commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+    
     ThrowIfFailed(_commandList->Close());
 
     ID3D12CommandList* cmdsLists[] = { _commandList.Get() };
@@ -417,11 +460,45 @@ void WavesCS::BuildWavesRootSignature()
     ThrowIfFailed(_device->CreateRootSignature(0, serializedRootSig->GetBufferPointer(), serializedRootSig->GetBufferSize(), IID_PPV_ARGS(_wavesRootSignature.GetAddressOf())));
 }
 
+void WavesCS::BuildPostProcessRootSignature()
+{
+    CD3DX12_DESCRIPTOR_RANGE srvTable0;
+    srvTable0.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+
+    CD3DX12_DESCRIPTOR_RANGE srvTable1;
+    srvTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
+
+    CD3DX12_DESCRIPTOR_RANGE uavTable0;
+    uavTable0.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
+
+    CD3DX12_ROOT_PARAMETER slotRootParameter[3];
+    slotRootParameter[0].InitAsDescriptorTable(1, &srvTable0);
+    slotRootParameter[1].InitAsDescriptorTable(1, &srvTable1);
+    slotRootParameter[2].InitAsDescriptorTable(1, &uavTable0);
+
+    auto staticSamplers = GpuWavesFrameResource::GetStaticSamplers();
+    CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(3, slotRootParameter, static_cast<UINT>(staticSamplers.size()), staticSamplers.data(), D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+
+    ComPtr<ID3DBlob> serializedRootSig = nullptr;
+    ComPtr<ID3DBlob> errorBlob = nullptr;
+
+    HRESULT hr = D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1, serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf());
+    if (errorBlob != nullptr)
+        OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+    ThrowIfFailed(hr);
+    ThrowIfFailed(_device->CreateRootSignature(0, serializedRootSig->GetBufferPointer(), serializedRootSig->GetBufferSize(), IID_PPV_ARGS(_postProcessRootSignature.GetAddressOf())));
+}
+
 void WavesCS::BuildDescriptorHeaps()
 {
+    int rtvOffset = _swapChainBufferCount;
     UINT srvCount = 3;
+    int waveSrvOffset = srvCount;
+    int sobelSrvOffset = waveSrvOffset + _waves->DescriptorCount();
+    int offscreenSrvOffset = sobelSrvOffset + _sobelFilter->DescriptorCount();
+
     D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-    srvHeapDesc.NumDescriptors = srvCount + _waves->DescriptorCount();
+    srvHeapDesc.NumDescriptors = srvCount + _waves->DescriptorCount() + _sobelFilter->DescriptorCount() + 1;
     srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
     srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
     ThrowIfFailed(_device->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(_srvHeap.GetAddressOf())));
@@ -449,8 +526,15 @@ void WavesCS::BuildDescriptorHeaps()
     srvDesc.Format = fenceTex->GetDesc().Format;
     _device->CreateShaderResourceView(fenceTex.Get(), &srvDesc, hDescriptor);
 
-    _waves->BuildDescriptors(CD3DX12_CPU_DESCRIPTOR_HANDLE(_srvHeap->GetCPUDescriptorHandleForHeapStart(), srvCount, _cbvSrvUavDescriptorSize),
-        CD3DX12_GPU_DESCRIPTOR_HANDLE(_srvHeap->GetGPUDescriptorHandleForHeapStart(), srvCount, _cbvSrvUavDescriptorSize), _cbvSrvUavDescriptorSize);
+    _waves->BuildDescriptors(CD3DX12_CPU_DESCRIPTOR_HANDLE(_srvHeap->GetCPUDescriptorHandleForHeapStart(), waveSrvOffset, _cbvSrvUavDescriptorSize),
+        CD3DX12_GPU_DESCRIPTOR_HANDLE(_srvHeap->GetGPUDescriptorHandleForHeapStart(), waveSrvOffset, _cbvSrvUavDescriptorSize), _cbvSrvUavDescriptorSize);
+
+    _sobelFilter->BuildDescriptors(CD3DX12_CPU_DESCRIPTOR_HANDLE(_srvHeap->GetCPUDescriptorHandleForHeapStart(), sobelSrvOffset, _cbvSrvUavDescriptorSize),
+        CD3DX12_GPU_DESCRIPTOR_HANDLE(_srvHeap->GetGPUDescriptorHandleForHeapStart(), sobelSrvOffset, _cbvSrvUavDescriptorSize), _cbvSrvUavDescriptorSize);
+
+    _offscreenRT->BuildDescriptors(CD3DX12_CPU_DESCRIPTOR_HANDLE(_srvHeap->GetCPUDescriptorHandleForHeapStart(), offscreenSrvOffset, _cbvSrvUavDescriptorSize),
+        CD3DX12_GPU_DESCRIPTOR_HANDLE(_srvHeap->GetGPUDescriptorHandleForHeapStart(), offscreenSrvOffset, _cbvSrvUavDescriptorSize), 
+        CD3DX12_CPU_DESCRIPTOR_HANDLE(_rtvHeap->GetCPUDescriptorHandleForHeapStart(), rtvOffset, _rtvDescriptorSize));
 }
 
 void WavesCS::BuildShaderAndInputLayout()
@@ -477,7 +561,10 @@ void WavesCS::BuildShaderAndInputLayout()
     _shaders["alphaTestedPS"] = D3DUtil::CompileShader(L"Shaders\\WavesRender.hlsl", alphaTestDefines, "frag", "ps_5_0");
     _shaders["wavesUpdateCS"] = D3DUtil::CompileShader(L"Shaders\\GpuWaves.hlsl", nullptr, "UpdateWavesCS", "cs_5_0");
     _shaders["wavesDisturbCS"] = D3DUtil::CompileShader(L"Shaders\\GpuWaves.hlsl", nullptr, "DisturbWavesCS", "cs_5_0");
-
+    _shaders["compositeVS"] = D3DUtil::CompileShader(L"Shaders\\SobelFilterMerge.hlsl", nullptr, "vert", "vs_5_0");
+    _shaders["compositePS"] = D3DUtil::CompileShader(L"Shaders\\SobelFilterMerge.hlsl", nullptr, "frag", "ps_5_0");
+    _shaders["sobelCS"] = D3DUtil::CompileShader(L"Shaders\\SobelFilter.hlsl", nullptr, "SobelCS", "cs_5_0");
+    
     _inputLayout =
     {
         { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
@@ -682,12 +769,39 @@ void WavesCS::BuildPSOs()
     };
     wavesDisturbPSO.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
     ThrowIfFailed(_device->CreateComputePipelineState(&wavesDisturbPSO, IID_PPV_ARGS(&_PSOs["wavesDisturb"])));
+
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC compositePSO = opaquePsoDesc;
+    compositePSO.pRootSignature = _postProcessRootSignature.Get();
+    compositePSO.DepthStencilState.DepthEnable = false;
+    compositePSO.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+    compositePSO.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+    compositePSO.VS =
+    {
+        reinterpret_cast<BYTE*>(_shaders["compositeVS"]->GetBufferPointer()),
+        _shaders["compositeVS"]->GetBufferSize()
+    };
+    compositePSO.PS =
+    {
+        reinterpret_cast<BYTE*>(_shaders["compositePS"]->GetBufferPointer()),
+        _shaders["compositePS"]->GetBufferSize()
+    };
+    ThrowIfFailed(_device->CreateGraphicsPipelineState(&compositePSO, IID_PPV_ARGS(&_PSOs["composite"])));
+
+    D3D12_COMPUTE_PIPELINE_STATE_DESC sobelPSO = {};
+    sobelPSO.pRootSignature = _postProcessRootSignature.Get();
+    sobelPSO.CS =
+    {
+        reinterpret_cast<BYTE*>(_shaders["sobelCS"]->GetBufferPointer()),
+        _shaders["sobelCS"]->GetBufferSize()
+    };
+    sobelPSO.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
+    ThrowIfFailed(_device->CreateComputePipelineState(&sobelPSO, IID_PPV_ARGS(&_PSOs["sobel"])));
 }
 
 void WavesCS::BuildFrameResources()
 {
     for (int i = 0; i < GpuWavesFrameResource::NumFrameResources; i++)
-        _frameResources.push_back(std::make_unique<GpuWavesFrameResource>(_device.Get(), 1, (UINT)_allRenderItems.size(), (UINT)_materials.size()));
+        _frameResources.push_back(std::make_unique<GpuWavesFrameResource>(_device.Get(), 1, static_cast<UINT>(_allRenderItems.size()), static_cast<UINT>(_materials.size())));
 }
 
 void WavesCS::BuildMaterials()
@@ -796,6 +910,14 @@ void WavesCS::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vec
 
         cmdList->DrawIndexedInstanced(ri->IndexCount, 1, ri->StartIndexLocation, ri->BaseVertexLocation, 0);
     }
+}
+
+void WavesCS::DrawFullscreenQuad(ID3D12GraphicsCommandList* cmdList)
+{
+    cmdList->IASetVertexBuffers(0, 1, nullptr);
+    cmdList->IASetIndexBuffer(nullptr);
+    cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    cmdList->DrawInstanced(6, 1, 0, 0);
 }
 
 float WavesCS::GetHillsHeight(float x, float z) const

@@ -28,7 +28,7 @@ vOut vert(uint vid : SV_VertexID)
 {
     vOut o;
     o.uv = uv[vid];
-    o.pos = float4(2.0 * o.uv.x - 1.0, 2.0 * o.uv.y - 1.0, 0.0, 1.0);
+    o.pos = float4(2.0 * o.uv.x - 1.0,  1.0 - 2.0 * o.uv.y, 0.0, 1.0);
 
     return o;
 }
