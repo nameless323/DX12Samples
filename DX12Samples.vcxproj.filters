@@ -173,6 +173,12 @@
     <ClInclude Include="Source\Common\RenderTarget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Scenes\DynamicIndexing\DynamicIndexing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scenes\DynamicIndexing\DynamicIndexingFrameResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Camera.cpp">
@@ -313,6 +319,12 @@
     <ClCompile Include="Source\Common\RenderTarget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Scenes\DynamicIndexing\DynamicIndexing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scenes\DynamicIndexing\DynamicIndexingFrameResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\Color.hlsl" />
@@ -339,5 +351,6 @@
     <FxCompile Include="Shaders\WavesRender.hlsl" />
     <FxCompile Include="Shaders\SobelFilter.hlsl" />
     <FxCompile Include="Shaders\SobelFilterMerge.hlsl" />
+    <FxCompile Include="Shaders\DynamicIndexing.hlsl" />
   </ItemGroup>
 </Project>

@@ -48,7 +48,7 @@ public:
     void Pitch(float angle);
     void RotateY(float angle);
 
-    void UpdageViewMatrix();
+    void UpdateViewMatrix();
 
 private:
     DirectX::XMFLOAT3 _position = { 0.0f, 0.0f, 0.0f };

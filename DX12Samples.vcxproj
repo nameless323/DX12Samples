@@ -170,6 +170,8 @@
     <ClInclude Include="Source\Common\RenderTarget.h" />
     <ClInclude Include="Source\Scenes\CsVecLen\CsVecLen.h" />
     <ClInclude Include="Source\Scenes\CSVectorAdd\CSVectorAdd.h" />
+    <ClInclude Include="Source\Scenes\DynamicIndexing\DynamicIndexing.h" />
+    <ClInclude Include="Source\Scenes\DynamicIndexing\DynamicIndexingFrameResource.h" />
     <ClInclude Include="Source\Scenes\GaussBlur\GaussBlur.h" />
     <ClInclude Include="Source\Scenes\GaussBlur\GaussBlurFilter.h" />
     <ClInclude Include="Source\Scenes\BilboardTrees\BilboardTrees.h" />
@@ -231,6 +233,8 @@
     <ClCompile Include="Source\Scenes\Crate\CrateFrameResource.cpp" />
     <ClCompile Include="Source\Scenes\CsVecLen\CsVecLen.cpp" />
     <ClCompile Include="Source\Scenes\CSVectorAdd\CSVectorAdd.cpp" />
+    <ClCompile Include="Source\Scenes\DynamicIndexing\DynamicIndexing.cpp" />
+    <ClCompile Include="Source\Scenes\DynamicIndexing\DynamicIndexingFrameResource.cpp" />
     <ClCompile Include="Source\Scenes\GaussBlur\GaussBlur.cpp" />
     <ClCompile Include="Source\Scenes\GaussBlur\GaussBlurFilter.cpp" />
     <ClCompile Include="Source\Scenes\GeomCylinder\GeomCylinder.cpp" />
@@ -264,6 +268,17 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Shaders\DynamicIndexing.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Shaders\GaussBlur.hlsl">

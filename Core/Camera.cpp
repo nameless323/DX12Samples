@@ -208,7 +208,7 @@ void Camera::RotateY(float angle)
     _isViewDirty = true;
 }
 
-void Camera::UpdageViewMatrix()
+void Camera::UpdateViewMatrix()
 {
     if (_isViewDirty)
     {

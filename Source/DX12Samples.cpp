@@ -23,12 +23,13 @@
 #include "Scenes/CSVectorAdd/CSVectorAdd.h"
 #include "Scenes/CSVecLen/CSVecLen.h"
 #include "Scenes/WavesCS/WavesCS.h"
+#include "Scenes/DynamicIndexing/DynamicIndexing.h"
 
 Application* app;
 
 void CreateScene(HINSTANCE hInstance)
 {
-    app = new WavesCS(hInstance);
+    app = new DynamicIndexing(hInstance);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
