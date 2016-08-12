@@ -185,6 +185,8 @@
     <ClInclude Include="Source\Scenes\GeomCylinder\GeomCylinder.h" />
     <ClInclude Include="Source\Scenes\Icosahedron\IcosahedronGeoTesselation.h" />
     <ClInclude Include="Source\Scenes\InitDX\InitDX.h" />
+    <ClInclude Include="Source\Scenes\Instancing\InstancingFrameResource.h" />
+    <ClInclude Include="Source\Scenes\Instancing\InstancingRenderItem.h" />
     <ClInclude Include="Source\Scenes\LitColumns\LitColumns.h" />
     <ClInclude Include="Source\Scenes\LitColumns\LitColumnsFrameResource.h" />
     <ClInclude Include="Source\Scenes\LitColumns\LitColumnsRenderItem.h" />
@@ -240,6 +242,7 @@
     <ClCompile Include="Source\Scenes\GeomCylinder\GeomCylinder.cpp" />
     <ClCompile Include="Source\Scenes\Icosahedron\IcosahedronGeoTesselation.cpp" />
     <ClCompile Include="Source\Scenes\InitDX\InitDX.cpp" />
+    <ClCompile Include="Source\Scenes\Instancing\InstancingFrameResource.cpp" />
     <ClCompile Include="Source\Scenes\LitColumns\LitColumns.cpp" />
     <ClCompile Include="Source\Scenes\LitColumns\LitColumnsFrameResource.cpp" />
     <ClCompile Include="Source\Scenes\LitWaves\LitWaves.cpp" />
