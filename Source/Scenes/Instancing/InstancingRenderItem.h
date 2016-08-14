@@ -4,10 +4,10 @@
 #include <DirectXPackedVector.h>
 #include "InstancingFrameResource.h"
 
-struct RenderItem
+struct InstancingRenderItem
 {
-    RenderItem() = default;
-    RenderItem(const RenderItem& rhs) = delete;
+    InstancingRenderItem() = default;
+    InstancingRenderItem(const InstancingRenderItem& rhs) = delete;
 
     DirectX::XMFLOAT4X4 Model = MathHelper::Identity4x4();
     DirectX::XMFLOAT4X4 TexTransform = MathHelper::Identity4x4();

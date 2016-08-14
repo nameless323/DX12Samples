@@ -185,6 +185,9 @@
     <ClInclude Include="Source\Scenes\Instancing\InstancingRenderItem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Scenes\Instancing\Instancing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Camera.cpp">
@@ -334,6 +337,9 @@
     <ClCompile Include="Source\Scenes\Instancing\InstancingFrameResource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Scenes\Instancing\Instancing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\Color.hlsl" />
@@ -361,5 +367,6 @@
     <FxCompile Include="Shaders\SobelFilter.hlsl" />
     <FxCompile Include="Shaders\SobelFilterMerge.hlsl" />
     <FxCompile Include="Shaders\DynamicIndexing.hlsl" />
+    <FxCompile Include="Shaders\Instancing.hlsl" />
   </ItemGroup>
 </Project>
