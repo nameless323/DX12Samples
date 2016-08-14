@@ -204,7 +204,7 @@ void Instancing::UpdateInstanceData(const GameTimer& timer)
             BoundingFrustum localSpaceFrustum;
             _camFrustum.Transform(localSpaceFrustum, viewToLocal);
 
-            if (!_frustumCullingEnabled || localSpaceFrustum.Contains(e->Bounds) != DISJOINT)
+            if (_frustumCullingEnabled == false || localSpaceFrustum.Contains(e->Bounds) != DISJOINT)
             {
                 FrameResource::InstanceData data;
                 XMStoreFloat4x4(&data.Model, XMMatrixTranspose(model));
@@ -549,7 +549,7 @@ void Instancing::BuildFrameResources()
 {
     for (int i = 0; i < FrameResource::NumFrameResources; i++)
     {
-        _frameResources.push_back(std::make_unique<FrameResource>(_device.Get(), 1, (UINT)_allRenderItems.size(), (UINT)_materials.size()));
+        _frameResources.push_back(std::make_unique<FrameResource>(_device.Get(), 1, _numInstances, (UINT)_materials.size()));
     }
 }
 
@@ -635,12 +635,12 @@ void Instancing::BuildRenderItems()
     skullRenderItem->BaseVertexLocation = skullRenderItem->Geo->DrawArgs["skull"].BaseVertexLocation;
     skullRenderItem->Bounds = skullRenderItem->Geo->DrawArgs["skull"].Bounds;
 
-    const int n = 5;
+    const int n = cbrt(_numInstances);
     skullRenderItem->Instances.resize(n * n * n);
 
-    float width = 200.0f;
-    float height = 200.0f;
-    float depth = 200.0f;
+    float width = 150.0f;
+    float height = 150.0f;
+    float depth = 150.0f;
 
     float x = -0.5f * width;
     float y = -0.5f * height;

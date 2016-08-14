@@ -68,6 +68,8 @@ private:
     InstancingFrameResource::PassConstants _passCB;
     Camera _camera;
 
+    const int _numInstances = 8 * 8 * 8;
+
     POINT _lastMousePos;
 };
 
