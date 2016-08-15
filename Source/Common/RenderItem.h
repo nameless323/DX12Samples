@@ -1,4 +1,5 @@
 #pragma once
+#include <DirectXCollision.h>
 #include <DirectXMath.h>
 #include "../../Core/MathHelper.h"
 #include "../../Core/D3DUtil.h"
@@ -24,6 +25,9 @@ struct RenderItem
     UINT IndexCount = 0;
     UINT StartIndexLocation = 0;
     int BaseVertexLocation = 0;
+    bool Visible = true;
+
+    DirectX::BoundingBox Bounds;
 
     enum class RenderLayer : int
     {
@@ -35,6 +39,7 @@ struct RenderItem
         Reflected,
         Shadow,
         GpuWaves,
+        Highlight,
         Count
     };
 };
