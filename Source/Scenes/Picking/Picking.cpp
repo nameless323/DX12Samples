@@ -428,7 +428,7 @@ void Picking::BuildPSOs()
         _shaders["opaquePS"]->GetBufferSize()
     };
     opaquePsoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-    opaquePsoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
+//    opaquePsoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
     opaquePsoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
     opaquePsoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
     opaquePsoDesc.SampleMask = UINT_MAX;
@@ -441,7 +441,8 @@ void Picking::BuildPSOs()
     ThrowIfFailed(_device->CreateGraphicsPipelineState(&opaquePsoDesc, IID_PPV_ARGS(&_PSOs["opaque"])));
 
     D3D12_GRAPHICS_PIPELINE_STATE_DESC highlightPsoDesc = opaquePsoDesc;
-    highlightPsoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+    highlightPsoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+    highlightPsoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
 
     D3D12_RENDER_TARGET_BLEND_DESC transparencyBlendDesc;
     transparencyBlendDesc.BlendEnable = true;
@@ -481,7 +482,7 @@ void Picking::BuildMaterials()
     highlight0->Name = "highlight";
     highlight0->MatCBIndex = 1;
     highlight0->DiffuseSrvHeapIndex = 0;
-    highlight0->DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 0.6f);
+    highlight0->DiffuseAlbedo = XMFLOAT4(1.0f, 0.0f, 0.0f, 0.4f);
     highlight0->FresnelR0 = XMFLOAT3(0.06f, 0.06f, 0.06f);
     highlight0->Roughness = 0.0f;
 
@@ -516,6 +517,7 @@ void Picking::BuildRenderItems()
     pickedRenderItem->IndexCount = 0;
     pickedRenderItem->StartIndexLocation = 0;
     pickedRenderItem->BaseVertexLocation = 0;
+    _pickedRenderItem = pickedRenderItem.get();
     _renderItemLayer[(int)RenderLayer::Highlight].push_back(pickedRenderItem.get());
 
     _allRenderItems.push_back(move(carRenderItem));
@@ -535,6 +537,7 @@ void Picking::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vec
 
         if (ri->Visible == false)
             continue;
+        
 
         cmdList->IASetVertexBuffers(0, 1, &ri->Geo->VertexBufferView());
         cmdList->IASetIndexBuffer(&ri->Geo->IndexBufferView());

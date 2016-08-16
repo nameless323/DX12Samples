@@ -25,12 +25,13 @@
 #include "Scenes/WavesCS/WavesCS.h"
 #include "Scenes/DynamicIndexing/DynamicIndexing.h"
 #include "Scenes/Instancing/Instancing.h"
+#include "Scenes/Picking/Picking.h"
 
 Application* app;
 
 void CreateScene(HINSTANCE hInstance)
 {
-    app = new Instancing(hInstance);
+    app = new Picking(hInstance);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
