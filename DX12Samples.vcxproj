@@ -170,6 +170,8 @@
     <ClInclude Include="Source\Common\RenderTarget.h" />
     <ClInclude Include="Source\Scenes\CsVecLen\CsVecLen.h" />
     <ClInclude Include="Source\Scenes\CSVectorAdd\CSVectorAdd.h" />
+    <ClInclude Include="Source\Scenes\Cubemapping\Cubemapping.h" />
+    <ClInclude Include="Source\Scenes\Cubemapping\CubemappingFrameResource.h" />
     <ClInclude Include="Source\Scenes\DynamicIndexing\DynamicIndexing.h" />
     <ClInclude Include="Source\Scenes\DynamicIndexing\DynamicIndexingFrameResource.h" />
     <ClInclude Include="Source\Scenes\GaussBlur\GaussBlur.h" />
@@ -237,6 +239,8 @@
     <ClCompile Include="Source\Scenes\Crate\CrateFrameResource.cpp" />
     <ClCompile Include="Source\Scenes\CsVecLen\CsVecLen.cpp" />
     <ClCompile Include="Source\Scenes\CSVectorAdd\CSVectorAdd.cpp" />
+    <ClCompile Include="Source\Scenes\Cubemapping\Cubemapping.cpp" />
+    <ClCompile Include="Source\Scenes\Cubemapping\CubemappingFrameResource.cpp" />
     <ClCompile Include="Source\Scenes\DynamicIndexing\DynamicIndexing.cpp" />
     <ClCompile Include="Source\Scenes\DynamicIndexing\DynamicIndexingFrameResource.cpp" />
     <ClCompile Include="Source\Scenes\GaussBlur\GaussBlur.cpp" />

@@ -39,6 +39,7 @@ struct RenderItem
         Reflected,
         Shadow,
         GpuWaves,
+        Sky,
         Highlight,
         Count
     };
