@@ -386,5 +386,7 @@
     <FxCompile Include="Shaders\SobelFilterMerge.hlsl" />
     <FxCompile Include="Shaders\DynamicIndexing.hlsl" />
     <FxCompile Include="Shaders\Instancing.hlsl" />
+    <FxCompile Include="Shaders\CommonInclude.hlsl" />
+    <FxCompile Include="Shaders\Sky.hlsl" />
   </ItemGroup>
 </Project>
