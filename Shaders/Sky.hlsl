@@ -18,8 +18,8 @@ vOut vert(vIn i)
     vOut o = (vOut) 0.0;
     o.cubeUV = i.pos;
     float4 posW = mul(float4(i.pos, 1.0), Model);
-    posW.xyz += EyePosW;
-    o.pos = mul(posW, VP).xyww;
+    posW.xyz += EyePosW; // skydome to cam
+    o.pos = mul(posW, VP).xyww; // w div w we'll get 1 - far clip plane
 
     return o;
 }
