@@ -26,12 +26,13 @@
 #include "Scenes/DynamicIndexing/DynamicIndexing.h"
 #include "Scenes/Instancing/Instancing.h"
 #include "Scenes/Picking/Picking.h"
+#include "Scenes/Cubemapping/Cubemapping.h"
 
 Application* app;
 
 void CreateScene(HINSTANCE hInstance)
 {
-    app = new Picking(hInstance);
+    app = new Cubemapping(hInstance);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)

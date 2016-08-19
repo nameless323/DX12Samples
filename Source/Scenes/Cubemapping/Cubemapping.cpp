@@ -34,6 +34,7 @@ bool Cubemapping::Init()
 
     ThrowIfFailed(_commandList->Close());
     ID3D12CommandList* cmdLists[] = { _commandList.Get() };
+    _commandQueue->ExecuteCommandLists(_countof(cmdLists), cmdLists);
     FlushCommandQueue();
 
     return true;
@@ -109,7 +110,8 @@ void Cubemapping::Draw(const GameTimer& timer)
     auto matBuf = _currFrameResource->MaterialBuffer->Resource();
     _commandList->SetGraphicsRootShaderResourceView(2, matBuf->GetGPUVirtualAddress());
 
-    CD3DX12_GPU_DESCRIPTOR_HANDLE skyTexDescriptor(_srvHeap->GetGPUDescriptorHandleForHeapStart(), _skyTexHeapIndex);
+    CD3DX12_GPU_DESCRIPTOR_HANDLE skyTexDescriptor(_srvHeap->GetGPUDescriptorHandleForHeapStart());
+    skyTexDescriptor.Offset(_skyTexHeapIndex, _cbvSrvUavDescriptorSize);
     _commandList->SetGraphicsRootDescriptorTable(3, skyTexDescriptor);
 
     _commandList->SetGraphicsRootDescriptorTable(4, _srvHeap->GetGPUDescriptorHandleForHeapStart());
@@ -366,8 +368,8 @@ void Cubemapping::BuildDescriptorHeaps()
 
 void Cubemapping::BuildShaderAndInputLayout()
 {
-    _shaders["standardVS"] = D3DUtil::CompileShader(L"Shaders\\Cubemappling.hlsl", nullptr, "vert", "vs_5_1");
-    _shaders["opaquePS"] = D3DUtil::CompileShader(L"Shaders\\Cubemappling.hlsl", nullptr, "frag", "ps_5_1");
+    _shaders["standardVS"] = D3DUtil::CompileShader(L"Shaders\\Cubemapping.hlsl", nullptr, "vert", "vs_5_1");
+    _shaders["opaquePS"] = D3DUtil::CompileShader(L"Shaders\\Cubemapping.hlsl", nullptr, "frag", "ps_5_1");
 
     _shaders["skyVS"] = D3DUtil::CompileShader(L"Shaders\\Sky.hlsl", nullptr, "vert", "vs_5_1");
     _shaders["skyPS"] = D3DUtil::CompileShader(L"Shaders\\Sky.hlsl", nullptr, "frag", "ps_5_1");
@@ -679,7 +681,7 @@ void Cubemapping::BuildMaterials()
     _materials["tile0"] = move(tile0);
     _materials["mirror0"] = move(mirror0);
     _materials["skullMat"] = move(skullMat);
-    _materials["sky"] = move(skullMat);
+    _materials["sky"] = move(sky);
 }
 
 void Cubemapping::BuildRenderItems()
@@ -711,7 +713,7 @@ void Cubemapping::BuildRenderItems()
     _allRenderItems.push_back(move(boxRitem));
 
     auto skullRitem = std::make_unique<RenderItem>();
-    XMStoreFloat4x4(&skullRitem->Model, XMMatrixScaling(0.4f, 0.4f, 0.0f)*XMMatrixTranslation(0.0f, 1.0f, 0.0f));
+    XMStoreFloat4x4(&skullRitem->Model, XMMatrixScaling(0.4f, 0.4f, 0.4f)*XMMatrixTranslation(0.0f, 1.0f, 0.0f));
     skullRitem->TexTransform = MathHelper::Identity4x4();
     skullRitem->ObjCBIndex = 2;
     skullRitem->Mat = _materials["skullMat"].get();
@@ -721,7 +723,7 @@ void Cubemapping::BuildRenderItems()
     skullRitem->StartIndexLocation = skullRitem->Geo->DrawArgs["skull"].StartIndexLocation;
     skullRitem->BaseVertexLocation = skullRitem->Geo->DrawArgs["skull"].BaseVertexLocation;
     _renderItemLayer[(int)RenderLayer::Opaque].push_back(skullRitem.get());
-    _allRenderItems.push_back(move(boxRitem));
+    _allRenderItems.push_back(move(skullRitem));
 
     auto gridRitem = std::make_unique<RenderItem>();
     gridRitem->Model = MathHelper::Identity4x4();
@@ -774,7 +776,7 @@ void Cubemapping::BuildRenderItems()
         XMStoreFloat4x4(&leftSphereRitem->Model, leftSphereWorld);
         leftSphereRitem->TexTransform = MathHelper::Identity4x4();
         leftSphereRitem->ObjCBIndex = objCBIndex++;
-        leftSphereRitem->Mat = _materials["stone0"].get();
+        leftSphereRitem->Mat = _materials["mirror0"].get();
         leftSphereRitem->Geo = _geometries["shapeGeo"].get();
         leftSphereRitem->PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
         leftSphereRitem->IndexCount = leftSphereRitem->Geo->DrawArgs["sphere"].IndexCount;
@@ -784,7 +786,7 @@ void Cubemapping::BuildRenderItems()
         XMStoreFloat4x4(&rightSphereRitem->Model, rightSphereWorld);
         rightSphereRitem->TexTransform = MathHelper::Identity4x4();
         rightSphereRitem->ObjCBIndex = objCBIndex++;
-        rightSphereRitem->Mat = _materials["stone0"].get();
+        rightSphereRitem->Mat = _materials["mirror0"].get();
         rightSphereRitem->Geo = _geometries["shapeGeo"].get();
         rightSphereRitem->PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
         rightSphereRitem->IndexCount = rightSphereRitem->Geo->DrawArgs["sphere"].IndexCount;
