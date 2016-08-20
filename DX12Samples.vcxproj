@@ -197,6 +197,8 @@
     <ClInclude Include="Source\Scenes\LitColumns\LitColumnsRenderItem.h" />
     <ClInclude Include="Source\Scenes\LitWaves\LitWaves.h" />
     <ClInclude Include="Source\Scenes\LitWaves\LitWavesFrameResource.h" />
+    <ClInclude Include="Source\Scenes\NormalMapping\NormalMapping.h" />
+    <ClInclude Include="Source\Scenes\NormalMapping\NormalMappingFrameResource.h" />
     <ClInclude Include="Source\Scenes\Overdraw\OverdrawBlending.h" />
     <ClInclude Include="Source\Scenes\Overdraw\OverdrawStenciling.h" />
     <ClInclude Include="Source\Scenes\Picking\Picking.h" />
@@ -258,6 +260,8 @@
     <ClCompile Include="Source\Scenes\LitColumns\LitColumnsFrameResource.cpp" />
     <ClCompile Include="Source\Scenes\LitWaves\LitWaves.cpp" />
     <ClCompile Include="Source\Scenes\LitWaves\LitWavesFrameResource.cpp" />
+    <ClCompile Include="Source\Scenes\NormalMapping\NormalMapping.cpp" />
+    <ClCompile Include="Source\Scenes\NormalMapping\NormalMapplingFrameResoruce.cpp" />
     <ClCompile Include="Source\Scenes\Overdraw\OverdrawBlending.cpp" />
     <ClCompile Include="Source\Scenes\Overdraw\OverdrawStenciling.cpp" />
     <ClCompile Include="Source\Scenes\Picking\Picking.cpp" />

@@ -203,6 +203,12 @@
     <ClInclude Include="Source\Scenes\Cubemapping\DynamicCubemap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Scenes\NormalMapping\NormalMappingFrameResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scenes\NormalMapping\NormalMapping.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Camera.cpp">
@@ -368,6 +374,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Scenes\Cubemapping\DynamicCubemap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scenes\NormalMapping\NormalMapplingFrameResoruce.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scenes\NormalMapping\NormalMapping.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
