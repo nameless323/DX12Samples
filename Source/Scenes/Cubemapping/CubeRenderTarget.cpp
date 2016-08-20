@@ -1,4 +1,5 @@
 #include "CubeRenderTarget.h"
+#include <DirectXPackedVector.h>
 
 CubeRenderTarget::CubeRenderTarget(ID3D12Device* device, UINT width, UINT height, DXGI_FORMAT format)
 {
@@ -103,5 +104,12 @@ void CubeRenderTarget::BuildResource()
     texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
     texDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
 
-    ThrowIfFailed(_device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, &texDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&_cubemap)));
+    D3D12_CLEAR_VALUE optClear = {};
+    optClear.Format = _format;
+    optClear.Color[0] = DirectX::Colors::LightSteelBlue.f[0];
+    optClear.Color[1] = DirectX::Colors::LightSteelBlue.f[1];
+    optClear.Color[2] = DirectX::Colors::LightSteelBlue.f[2];
+    optClear.Color[3] = DirectX::Colors::LightSteelBlue.f[3];
+    
+    ThrowIfFailed(_device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, &texDesc, D3D12_RESOURCE_STATE_GENERIC_READ, &optClear, IID_PPV_ARGS(&_cubemap)));
 }

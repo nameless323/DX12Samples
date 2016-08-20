@@ -41,6 +41,7 @@ struct RenderItem
         GpuWaves,
         Sky,
         Highlight,
+        OpaqueDynamicReflectors,
         Count
     };
 };
