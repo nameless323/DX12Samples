@@ -413,5 +413,8 @@
     <FxCompile Include="Shaders\CommonInclude.hlsl" />
     <FxCompile Include="Shaders\Sky.hlsl" />
     <FxCompile Include="Shaders\Cubemapping.hlsl" />
+    <FxCompile Include="Shaders\SkyNM.hlsl" />
+    <FxCompile Include="Shaders\Normalmapping.hlsl" />
+    <FxCompile Include="Shaders\CommonIncludeNM.hlsl" />
   </ItemGroup>
 </Project>

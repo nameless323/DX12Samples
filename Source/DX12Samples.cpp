@@ -28,12 +28,13 @@
 #include "Scenes/Picking/Picking.h"
 #include "Scenes/Cubemapping/Cubemapping.h"
 #include "Scenes/Cubemapping/DynamicCubemap.h"
+#include "Scenes/NormalMapping/NormalMapping.h"
 
 Application* app;
 
 void CreateScene(HINSTANCE hInstance)
 {
-    app = new DynamicCubemap(hInstance);
+    app = new NormalMapping(hInstance);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)

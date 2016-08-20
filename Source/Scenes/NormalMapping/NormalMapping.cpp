@@ -281,7 +281,7 @@ void NormalMapping::LoadTextures()
         L"Textures/bricks2.dds",
         L"Textures/bricks2_nmap.dds",
         L"Textures/tile.dds",
-        L"Textures/tile_map.dds",
+        L"Textures/tile_nmap.dds",
         L"Textures/white1x1.dds",
         L"Textures/default_nmap.dds",
         L"Textures/snowcube1024.dds"

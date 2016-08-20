@@ -1,4 +1,4 @@
-#include "CommonInclude.hlsl"
+#include "CommonIncludeNM.hlsl"
 
 struct vIn
 {
@@ -26,5 +26,5 @@ vOut vert(vIn i)
 
 float4 frag(vOut i) : SV_Target
 {
-    return _cubeMap.Sample(_samLinearWrap, i.cubeUV);
+    return _cubeMap.Sample(_samAnisotropicWrap, i.cubeUV);
 }
