@@ -209,10 +209,13 @@
     <ClInclude Include="Source\Scenes\NormalMapping\NormalMapping.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Scenes\Shadowmaping\ShadowmappingFrameResource.h">
+    <ClInclude Include="Source\Scenes\Shadowmapping\ShadowMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Scenes\Shadowmaping\ShadowMap.h">
+    <ClInclude Include="Source\Scenes\Shadowmapping\ShadowmappingFrameResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scenes\Shadowmapping\Shadowmapping.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -388,10 +391,13 @@
     <ClCompile Include="Source\Scenes\NormalMapping\NormalMapping.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Scenes\Shadowmaping\ShadowmappingFrameResource.cpp">
+    <ClCompile Include="Source\Scenes\Shadowmapping\ShadowMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Scenes\Shadowmaping\ShadowMap.cpp">
+    <ClCompile Include="Source\Scenes\Shadowmapping\ShadowmappingFrameResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scenes\Shadowmapping\Shadowmapping.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

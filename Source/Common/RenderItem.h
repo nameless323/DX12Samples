@@ -42,6 +42,7 @@ struct RenderItem
         Sky,
         Highlight,
         OpaqueDynamicReflectors,
+        Debug,
         Count
     };
 };
