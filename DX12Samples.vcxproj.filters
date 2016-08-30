@@ -434,5 +434,10 @@
     <FxCompile Include="Shaders\SkyNM.hlsl" />
     <FxCompile Include="Shaders\Normalmapping.hlsl" />
     <FxCompile Include="Shaders\CommonIncludeNM.hlsl" />
+    <FxCompile Include="Shaders\CommonIncludeSM.hlsl" />
+    <FxCompile Include="Shaders\ShadowDebug.hlsl" />
+    <FxCompile Include="Shaders\SkySM.hlsl" />
+    <FxCompile Include="Shaders\ShadowsRender.hlsl" />
+    <FxCompile Include="Shaders\Shadowmapping.hlsl" />
   </ItemGroup>
 </Project>

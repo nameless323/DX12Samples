@@ -29,12 +29,13 @@
 #include "Scenes/Cubemapping/Cubemapping.h"
 #include "Scenes/Cubemapping/DynamicCubemap.h"
 #include "Scenes/NormalMapping/NormalMapping.h"
+#include "Scenes/Shadowmapping/Shadowmapping.h"
 
 Application* app;
 
 void CreateScene(HINSTANCE hInstance)
 {
-    app = new NormalMapping(hInstance);
+    app = new Shadowmapping(hInstance);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)

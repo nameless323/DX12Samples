@@ -65,6 +65,7 @@ void Shadowmapping::CreateRtvAndDsvDescriptorHeaps()
     D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc;
     rtvHeapDesc.NumDescriptors = _swapChainBufferCount;
     rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+    rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
     rtvHeapDesc.NodeMask = 0;
     ThrowIfFailed(_device->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(_rtvHeap.GetAddressOf())));
 
@@ -434,7 +435,7 @@ void Shadowmapping::BuildRootSignature()
 void Shadowmapping::BuildDescriptorHeaps()
 {
     D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-    srvHeapDesc.NumDescriptors = 10;
+    srvHeapDesc.NumDescriptors = 14;
     srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
     srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
     ThrowIfFailed(_device->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&_srvHeap)));
@@ -498,7 +499,7 @@ void Shadowmapping::BuildDescriptorHeaps()
     (
         CD3DX12_CPU_DESCRIPTOR_HANDLE(srvCpuStart, _shadowMapHeapIndex, _cbvSrvUavDescriptorSize),
         CD3DX12_GPU_DESCRIPTOR_HANDLE(srvGpuStart, _shadowMapHeapIndex, _cbvSrvUavDescriptorSize),
-        CD3DX12_CPU_DESCRIPTOR_HANDLE(dsvCpuStart, 1, _cbvSrvUavDescriptorSize)
+        CD3DX12_CPU_DESCRIPTOR_HANDLE(dsvCpuStart, 1, _dsvDescriptorSize)
     );
 }
 
@@ -520,8 +521,8 @@ void Shadowmapping::BuildShaderAndInputLayout()
     _shaders["debugVS"] = D3DUtil::CompileShader(L"Shaders\\ShadowDebug.hlsl", nullptr, "vert", "vs_5_1");
     _shaders["debugPS"] = D3DUtil::CompileShader(L"Shaders\\ShadowDebug.hlsl", nullptr, "frag", "ps_5_1");
 
-    _shaders["skyVS"] = D3DUtil::CompileShader(L"Shaders\\Sky.hlsl", nullptr, "vert", "vs_5_1");
-    _shaders["skyPS"] = D3DUtil::CompileShader(L"Shaders\\Sky.hlsl", nullptr, "frag", "ps_5_1");
+    _shaders["skyVS"] = D3DUtil::CompileShader(L"Shaders\\SkySM.hlsl", nullptr, "vert", "vs_5_1");
+    _shaders["skyPS"] = D3DUtil::CompileShader(L"Shaders\\SkySM.hlsl", nullptr, "frag", "ps_5_1");
 
     _inputLayout =
     {
@@ -915,13 +916,13 @@ void Shadowmapping::BuildRenderItems()
     quadRitem->Model = MathHelper::Identity4x4();
     quadRitem->TexTransform = MathHelper::Identity4x4();
     quadRitem->ObjCBIndex = 1;
-    quadRitem->Mat = _materials["bicks0"].get();
+    quadRitem->Mat = _materials["bricks0"].get();
     quadRitem->Geo = _geometries["shapeGeo"].get();
     quadRitem->PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-    quadRitem->IndexCount = skyRitem->Geo->DrawArgs["quad"].IndexCount;
-    quadRitem->StartIndexLocation = skyRitem->Geo->DrawArgs["quad"].StartIndexLocation;
-    quadRitem->BaseVertexLocation = skyRitem->Geo->DrawArgs["quad"].BaseVertexLocation;
-    _renderItemLayer[(int)RenderLayer::Debug].push_back(skyRitem.get());
+    quadRitem->IndexCount = quadRitem->Geo->DrawArgs["quad"].IndexCount;
+    quadRitem->StartIndexLocation = quadRitem->Geo->DrawArgs["quad"].StartIndexLocation;
+    quadRitem->BaseVertexLocation = quadRitem->Geo->DrawArgs["quad"].BaseVertexLocation;
+    _renderItemLayer[(int)RenderLayer::Debug].push_back(quadRitem.get());
     _allRenderItems.push_back(move(quadRitem));
 
     auto boxRitem = std::make_unique<RenderItem>();
