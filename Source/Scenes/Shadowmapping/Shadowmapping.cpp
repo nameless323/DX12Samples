@@ -699,6 +699,19 @@ void Shadowmapping::BuildSkullGeometry()
         fin >> vertices[i].Normal.x >> vertices[i].Normal.y >> vertices[i].Normal.z;
 
         XMVECTOR P = XMLoadFloat3(&vertices[i].Pos);
+        XMVECTOR N = XMLoadFloat3(&vertices[i].Normal);
+        XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+        if (fabsf(XMVectorGetX(XMVector3Dot(N, up))) < 1.0f - 0.001f)
+        {
+            XMVECTOR T = XMVector3Normalize(XMVector3Cross(up, N));
+            XMStoreFloat3(&vertices[i].Tangent, T);
+        }
+        else
+        {
+            up = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+            XMVECTOR T = XMVector3Normalize(XMVector3Cross(N, up));
+            XMStoreFloat3(&vertices[i].Tangent, T);
+        }
 
         XMFLOAT3 spherePos;
         XMStoreFloat3(&spherePos, XMVector3Normalize(P));

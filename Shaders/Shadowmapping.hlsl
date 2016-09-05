@@ -84,6 +84,5 @@ float4 frag(vOut i) : SV_Target
     
     litColor.rgb += shininess * fresnelFactor * reflectionColor.rgb;
     litColor.a = diffuseAlbedo.a;
-
     return litColor;
 }
