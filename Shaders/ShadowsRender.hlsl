@@ -26,7 +26,7 @@ vOut vert(vIn i)
     return o;
 }
 
-float4 frag(vOut i) : SV_Target
+void frag(vOut i)
 {
     MaterialData matData = _materialData[MaterialIndex];
     float4 diffuseAlbedo = matData.DiffuseAlbedo;
@@ -37,5 +37,4 @@ float4 frag(vOut i) : SV_Target
 #ifdef ALPHA_TEST
     clip(diffuseAlbedo.a - 0.1f);
 #endif
-    return 0;
 }

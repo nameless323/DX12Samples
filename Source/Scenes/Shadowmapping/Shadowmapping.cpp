@@ -331,11 +331,11 @@ void Shadowmapping::UpdateMainPassCB(const GameTimer& timer)
     _mainPassCB.DeltaTime = timer.DeltaTime();
     _mainPassCB.AmbientLight = {0.25f, 0.25f, 0.35f, 1.0f};
 
-    _mainPassCB.Lights[0].Direction = {0.57735f, -0.57735f, 0.57735f};
-    _mainPassCB.Lights[0].Strength = {0.8f, 0.8f, 0.8f};
-    _mainPassCB.Lights[1].Direction = {-0.57735f, -0.57735f, 0.57735f};
+    _mainPassCB.Lights[0].Direction = _rotatedLightDirections[0];
+    _mainPassCB.Lights[0].Strength = {0.9f, 0.8f, 0.7f};
+    _mainPassCB.Lights[1].Direction = _rotatedLightDirections[1];
     _mainPassCB.Lights[1].Strength = {0.4f, 0.4f, 0.4f};
-    _mainPassCB.Lights[2].Direction = {0.0f, -0.707f, -0.707f};
+    _mainPassCB.Lights[2].Direction = _rotatedLightDirections[2];
     _mainPassCB.Lights[2].Strength = {0.2f, 0.2f, 0.2f};
 
     auto currPassCB = _currFrameResource->PassCB.get();
@@ -355,17 +355,17 @@ void Shadowmapping::UpdateShadowPassCB(const GameTimer& timer)
     UINT w = _shadowMap->Width();
     UINT h = _shadowMap->Height();
 
-    XMStoreFloat4x4(&_mainPassCB.View, XMMatrixTranspose(view));
-    XMStoreFloat4x4(&_mainPassCB.InvView, XMMatrixTranspose(invView));
-    XMStoreFloat4x4(&_mainPassCB.Proj, XMMatrixTranspose(proj));
-    XMStoreFloat4x4(&_mainPassCB.InvProj, XMMatrixTranspose(invProj));
-    XMStoreFloat4x4(&_mainPassCB.VP, XMMatrixTranspose(viewProj));
-    XMStoreFloat4x4(&_mainPassCB.InvVP, XMMatrixTranspose(invViewProj));
-    _mainPassCB.EyePosW = _lightPosW;
-    _mainPassCB.RenderTargetSize = XMFLOAT2((float)w, (float)h);
-    _mainPassCB.InvRenderTargetSize = XMFLOAT2(1.0f / w, 1.0f / h);
-    _mainPassCB.NearZ = _lightNearZ;
-    _mainPassCB.FarZ = _lightFarZ;
+    XMStoreFloat4x4(&_shadowPassCB.View, XMMatrixTranspose(view));
+    XMStoreFloat4x4(&_shadowPassCB.InvView, XMMatrixTranspose(invView));
+    XMStoreFloat4x4(&_shadowPassCB.Proj, XMMatrixTranspose(proj));
+    XMStoreFloat4x4(&_shadowPassCB.InvProj, XMMatrixTranspose(invProj));
+    XMStoreFloat4x4(&_shadowPassCB.VP, XMMatrixTranspose(viewProj));
+    XMStoreFloat4x4(&_shadowPassCB.InvVP, XMMatrixTranspose(invViewProj));
+    _shadowPassCB.EyePosW = _lightPosW;
+    _shadowPassCB.RenderTargetSize = XMFLOAT2((float)w, (float)h);
+    _shadowPassCB.InvRenderTargetSize = XMFLOAT2(1.0f / w, 1.0f / h);
+    _shadowPassCB.NearZ = _lightNearZ;
+    _shadowPassCB.FarZ = _lightFarZ;
 
     auto currPassCB = _currFrameResource->PassCB.get();
     currPassCB->CopyData(1, _shadowPassCB);
@@ -496,11 +496,11 @@ void Shadowmapping::BuildDescriptorHeaps()
     srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
     _device->CreateShaderResourceView(nullptr, &srvDesc, nullSrv);
     _shadowMap->BuildDescriptors
-    (
-        CD3DX12_CPU_DESCRIPTOR_HANDLE(srvCpuStart, _shadowMapHeapIndex, _cbvSrvUavDescriptorSize),
-        CD3DX12_GPU_DESCRIPTOR_HANDLE(srvGpuStart, _shadowMapHeapIndex, _cbvSrvUavDescriptorSize),
-        CD3DX12_CPU_DESCRIPTOR_HANDLE(dsvCpuStart, 1, _dsvDescriptorSize)
-    );
+        (
+            CD3DX12_CPU_DESCRIPTOR_HANDLE(srvCpuStart, _shadowMapHeapIndex, _cbvSrvUavDescriptorSize),
+            CD3DX12_GPU_DESCRIPTOR_HANDLE(srvGpuStart, _shadowMapHeapIndex, _cbvSrvUavDescriptorSize),
+            CD3DX12_CPU_DESCRIPTOR_HANDLE(dsvCpuStart, 1, _dsvDescriptorSize)
+            );
 }
 
 void Shadowmapping::BuildShaderAndInputLayout()
@@ -517,7 +517,7 @@ void Shadowmapping::BuildShaderAndInputLayout()
     _shaders["shadowVS"] = D3DUtil::CompileShader(L"Shaders\\ShadowsRender.hlsl", nullptr, "vert", "vs_5_1");
     _shaders["shadowOpaquePS"] = D3DUtil::CompileShader(L"Shaders\\ShadowsRender.hlsl", nullptr, "frag", "ps_5_1");
     _shaders["shadowAlphaTestedPS"] = D3DUtil::CompileShader(L"Shaders\\ShadowsRender.hlsl", alphaTestDefines, "frag", "ps_5_1");
-    
+
     _shaders["debugVS"] = D3DUtil::CompileShader(L"Shaders\\ShadowDebug.hlsl", nullptr, "vert", "vs_5_1");
     _shaders["debugPS"] = D3DUtil::CompileShader(L"Shaders\\ShadowDebug.hlsl", nullptr, "frag", "ps_5_1");
 
@@ -880,7 +880,7 @@ void Shadowmapping::BuildMaterials()
     skullMat->DiffuseAlbedo = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
     skullMat->FresnelR0 = XMFLOAT3(0.6f, 0.6f, 0.6f);
     skullMat->Roughness = 0.2f;
-    
+
     auto sky = std::make_unique<Material>();
     sky->Name = "sky";
     sky->MatCBIndex = 4;
@@ -1073,7 +1073,7 @@ void Shadowmapping::DrawSceneToShadowMap()
     _commandList->SetPipelineState(_PSOs["shadow_opaque"].Get());
     DrawRenderItems(_commandList.Get(), _renderItemLayer[(int)RenderLayer::Opaque]);
     _commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_shadowMap->Resource(),
-        D3D12_RESOURCE_STATE_DEPTH_WRITE, 
+        D3D12_RESOURCE_STATE_DEPTH_WRITE,
         D3D12_RESOURCE_STATE_GENERIC_READ));
 
 }
@@ -1145,3 +1145,4 @@ std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> Shadowmapping::GetStaticSampler
         shadow
     };
 }
+
