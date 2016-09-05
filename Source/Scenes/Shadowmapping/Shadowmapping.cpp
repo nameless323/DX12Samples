@@ -103,7 +103,7 @@ void Shadowmapping::Update(const GameTimer& timer)
     XMMATRIX R = XMMatrixRotationY(_lightRotationAngle);
     for (int i = 0; i < 3; i++)
     {
-        XMVECTOR lightDir = XMLoadFloat3(&_baseLightDirections[3]);
+        XMVECTOR lightDir = XMLoadFloat3(&_baseLightDirections[i]);
         lightDir = XMVector3TransformNormal(lightDir, R);
         XMStoreFloat3(&_rotatedLightDirections[i], lightDir);
     }
