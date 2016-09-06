@@ -128,7 +128,7 @@ void Shadowmapping::Draw(const GameTimer& timer)
     _commandList->SetGraphicsRootSignature(_rootSignature.Get());
     auto matBuf = _currFrameResource->MaterialBuffer->Resource();
     _commandList->SetGraphicsRootShaderResourceView(2, matBuf->GetGPUVirtualAddress());
-    _commandList->SetGraphicsRootDescriptorTable(3, _nullSrv);
+    //_commandList->SetGraphicsRootDescriptorTable(3, _nullSrv);
     _commandList->SetGraphicsRootDescriptorTable(4, _srvHeap->GetGPUDescriptorHandleForHeapStart());
     DrawSceneToShadowMap();
 

@@ -218,6 +218,9 @@
     <ClInclude Include="Source\Scenes\Shadowmapping\Shadowmapping.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Scenes\SSAO\SSAOFrameResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Camera.cpp">
