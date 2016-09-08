@@ -210,6 +210,7 @@
     <ClInclude Include="Source\Scenes\Shapes\ShapesRenderItem.h" />
     <ClInclude Include="Source\Common\FrameResourceUnfogged.h" />
     <ClInclude Include="Source\Common\RenderItem.h" />
+    <ClInclude Include="Source\Scenes\SSAO\SSAO.h" />
     <ClInclude Include="Source\Scenes\SSAO\SSAOFrameResource.h" />
     <ClInclude Include="Source\Scenes\Stenciling\Stenciling.h" />
     <ClInclude Include="Source\Scenes\Stenciling\StencilingFrameResource.h" />
@@ -274,6 +275,8 @@
     <ClCompile Include="Source\Scenes\Shadowmapping\ShadowmappingFrameResource.cpp" />
     <ClCompile Include="Source\Scenes\Shapes\Shapes.cpp" />
     <ClCompile Include="Source\Scenes\Shapes\ShapesFrameResource.cpp" />
+    <ClCompile Include="Source\Scenes\SSAO\SSAO.cpp" />
+    <ClCompile Include="Source\Scenes\SSAO\SSAOFrameResource.cpp" />
     <ClCompile Include="Source\Scenes\Stenciling\Stenciling.cpp" />
     <ClCompile Include="Source\Scenes\Stenciling\StencilingFrameResource.cpp" />
     <ClCompile Include="Source\Scenes\Tesselation\BezierPatch.cpp" />
