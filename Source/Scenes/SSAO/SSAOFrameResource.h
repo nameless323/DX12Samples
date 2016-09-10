@@ -26,6 +26,7 @@ public:
         DirectX::XMFLOAT4X4 InvProj = MathHelper::Identity4x4();
         DirectX::XMFLOAT4X4 VP = MathHelper::Identity4x4();
         DirectX::XMFLOAT4X4 InvVP = MathHelper::Identity4x4();
+        DirectX::XMFLOAT4X4 ViewProjTex = MathHelper::Identity4x4();
         DirectX::XMFLOAT4X4 ShadowTransform = MathHelper::Identity4x4();
         DirectX::XMFLOAT3 EyePosW = { 0.0f, 0.0f, 0.0f };
         float cbPerObjectPad1 = 0.0f;
