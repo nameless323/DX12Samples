@@ -56,7 +56,52 @@ vOut vert(uint vid : SV_VertexID)
     return o;
 }
 
+float NdcDepthToViewDepth(float zNdc)
+{
+    // z_ndc = A + B/viewZ, where gProj[2,2]=A and gProj[3,2]=B.
+    return Proj[3][2] / (zNdc - Proj[2][2]);
+}
+
 float4 frag(vOut i) : SV_Target
 {
-    
+    float blurWeights[12] =
+    {
+        BlurWeights[0].x, BlurWeights[0].y, BlurWeights[0].z, BlurWeights[0].w,
+        BlurWeights[1].x, BlurWeights[1].y, BlurWeights[1].z, BlurWeights[1].w,
+        BlurWeights[2].x, BlurWeights[2].y, BlurWeights[2].z, BlurWeights[2].w,
+    };
+    float2 texOffset;
+    if (HorizBlur)
+    {
+        texOffset = float2(InvRenderTargetSize.x, 0.0f);
+    }
+    else
+    {
+        texOffset = float2(0.0f, InvRenderTargetSize.y);
+    }
+
+    float4 color = BlurWeights[BlurRadius] * InputMap.SampleLevel(SamPointClamp, i.uv, 0.0);
+    float totalWeight = BlurWeights[BlurRadius];
+
+    float3 ceneterNormal = NormalMap.SampleLevel(SamPointClamp, i.uv, 0.0f).xyz;
+    float centerDepth = NdcDepthToViewDepth(DepthMap.SampleLevel(SamDepthMap, i.uv, 0.0f).r);
+
+    for (float i = -BlurRadius; i <= BlurRadius; i++)
+    {
+        if (i == 0)
+            continue;
+
+        float2 tex = i.uv + i * texOffset;
+
+        float3 neighborNormal = NormalMap.SampleLevel(SamPointClamp, tex, 0.0).xyz;
+        float neighborDepth = NdcDepthToViewDepth(DepthMap.SampleLevel(DepthMap, tex, 0.0).r);
+
+        if (dot(neighborNormal, centerNormal >= 0.8) && abs(neighborDepth - centerDepth) <= 0.2)
+        {
+            float weight = blurWeights[i + BlurRadius];
+            color += weight * InputMap.SampleLevel(SamPointClamp, tex, 0.0);
+            totalWeight += weight;
+        }
+    }
+    return color / totalWeight;
 }
