@@ -635,27 +635,27 @@ void SSAOScene::BuildShaderAndInputLayout()
         NULL, NULL
     };
 
-    _shaders["standardVS"] = D3DUtil::CompileShader(L"Shaders\\Default.hlsl", nullptr, "VS", "vs_5_1");
-    _shaders["opaquePS"] = D3DUtil::CompileShader(L"Shaders\\Default.hlsl", nullptr, "PS", "ps_5_1");
+    _shaders["standardVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAODefault.hlsl", nullptr, "VS", "vs_5_1");
+    _shaders["opaquePS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAODefault.hlsl", nullptr, "PS", "ps_5_1");
 
-    _shaders["shadowVS"] = D3DUtil::CompileShader(L"Shaders\\Shadows.hlsl", nullptr, "VS", "vs_5_1");
-    _shaders["shadowOpaquePS"] = D3DUtil::CompileShader(L"Shaders\\Shadows.hlsl", nullptr, "PS", "ps_5_1");
-    _shaders["shadowAlphaTestedPS"] = D3DUtil::CompileShader(L"Shaders\\Shadows.hlsl", alphaTestDefines, "PS", "ps_5_1");
+    _shaders["shadowVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\RenderShadows.hlsl", nullptr, "VS", "vs_5_1");
+    _shaders["shadowOpaquePS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\RenderShadows.hlsl", nullptr, "PS", "ps_5_1");
+    _shaders["shadowAlphaTestedPS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\RenderShadows.hlsl", alphaTestDefines, "PS", "ps_5_1");
 
-    _shaders["debugVS"] = D3DUtil::CompileShader(L"Shaders\\ShadowDebug.hlsl", nullptr, "VS", "vs_5_1");
-    _shaders["debugPS"] = D3DUtil::CompileShader(L"Shaders\\ShadowDebug.hlsl", nullptr, "PS", "ps_5_1");
+    _shaders["debugVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAODebug.hlsl", nullptr, "VS", "vs_5_1");
+    _shaders["debugPS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAODebug.hlsl", nullptr, "PS", "ps_5_1");
 
-    _shaders["drawNormalsVS"] = D3DUtil::CompileShader(L"Shaders\\DrawNormals.hlsl", nullptr, "VS", "vs_5_1");
-    _shaders["drawNormalsPS"] = D3DUtil::CompileShader(L"Shaders\\DrawNormals.hlsl", nullptr, "PS", "ps_5_1");
+    _shaders["drawNormalsVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\DrawNormals.hlsl", nullptr, "VS", "vs_5_1");
+    _shaders["drawNormalsPS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\DrawNormals.hlsl", nullptr, "PS", "ps_5_1");
 
-    _shaders["ssaoVS"] = D3DUtil::CompileShader(L"Shaders\\Ssao.hlsl", nullptr, "VS", "vs_5_1");
-    _shaders["ssaoPS"] = D3DUtil::CompileShader(L"Shaders\\Ssao.hlsl", nullptr, "PS", "ps_5_1");
+    _shaders["ssaoVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAO.hlsl", nullptr, "VS", "vs_5_1");
+    _shaders["ssaoPS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAO.hlsl", nullptr, "PS", "ps_5_1");
 
-    _shaders["ssaoBlurVS"] = D3DUtil::CompileShader(L"Shaders\\SsaoBlur.hlsl", nullptr, "VS", "vs_5_1");
-    _shaders["ssaoBlurPS"] = D3DUtil::CompileShader(L"Shaders\\SsaoBlur.hlsl", nullptr, "PS", "ps_5_1");
+    _shaders["ssaoBlurVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAOBlur.hlsl", nullptr, "VS", "vs_5_1");
+    _shaders["ssaoBlurPS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAOBlur.hlsl", nullptr, "PS", "ps_5_1");
 
-    _shaders["skyVS"] = D3DUtil::CompileShader(L"Shaders\\Sky.hlsl", nullptr, "VS", "vs_5_1");
-    _shaders["skyPS"] = D3DUtil::CompileShader(L"Shaders\\Sky.hlsl", nullptr, "PS", "ps_5_1");
+    _shaders["skyVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\Sky.hlsl", nullptr, "VS", "vs_5_1");
+    _shaders["skyPS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\Sky.hlsl", nullptr, "PS", "ps_5_1");
 
     _inputLayout =
     {

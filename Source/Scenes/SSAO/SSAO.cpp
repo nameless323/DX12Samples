@@ -323,7 +323,7 @@ void SSAO::BuildRandomVectorTexture(ID3D12GraphicsCommandList* cmdList)
     XMCOLOR initData[256 * 256];
     for (int i = 0; i < 256; i++)
     {
-        for (int j = 0; i < 256; j++)
+        for (int j = 0; j < 256; j++)
         {
             XMFLOAT3 v(MathHelper::RandF(), MathHelper::RandF(), MathHelper::RandF());
             initData[i * 256 + j] = XMCOLOR(v.x, v.y, v.z, 0.0f);
