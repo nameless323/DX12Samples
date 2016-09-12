@@ -464,5 +464,6 @@
     <FxCompile Include="Shaders\SSAO\RenderShadows.hlsl" />
     <FxCompile Include="Shaders\SSAO\DrawNormals.hlsl" />
     <FxCompile Include="Shaders\SSAO\SSAOBlur.hlsl" />
+    <FxCompile Include="Shaders\SSAO\SSAO.hlsl" />
   </ItemGroup>
 </Project>
