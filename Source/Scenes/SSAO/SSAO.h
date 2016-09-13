@@ -18,7 +18,7 @@ public:
     UINT SSAOMapWidth() const;
     UINT SSAOMapHeight() const;
 
-    void GetOffsetVectors(DirectX::XMFLOAT4 offsets[4]);
+    void GetOffsetVectors(DirectX::XMFLOAT4 offsets[14]);
     std::vector<float> CalcGaussWeights(float sigma);
 
     ID3D12Resource* NormalMap();
@@ -86,7 +86,7 @@ private:
     UINT _renderTargetWidth;
     UINT _renderTargetHeight;
 
-    DirectX::XMFLOAT4 _offsets[4];
+    DirectX::XMFLOAT4 _offsets[14];
     D3D12_VIEWPORT _viewport;
     D3D12_RECT _scissorRect;
 };

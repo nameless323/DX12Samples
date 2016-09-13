@@ -45,7 +45,7 @@ vOut vert(vIn i)
     return o;
 }
 
-void frag(vOut i)
+float4 frag(vOut i) : SV_Target
 {
     MaterialData matData = _materialData[MaterialIndex];
     float4 diffuseAlbedo = matData.DiffuseAlbedo;

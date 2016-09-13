@@ -12,14 +12,6 @@
 
 #include "../LightingUtil.hlsl"
 
-SamplerState _samPointWrap : register(s0);
-SamplerState _samPointClamp : register(s1);
-SamplerState _samLinearWrap : register(s2);
-SamplerState _samLinearClamp : register(s3);
-SamplerState _samAnisotropicWrap : register(s4);
-SamplerState _samAnisotropicClamp : register(s5);
-SamplerComparisonState _samShadow : register(s6);
-
 struct MaterialData
 {
     float4 DiffuseAlbedo;
@@ -35,9 +27,18 @@ struct MaterialData
 TextureCube _cubeMap : register(t0);
 Texture2D _shadowMap : register(t1);
 Texture2D _ssaoMap : register(t2);
+
 Texture2D _textureMaps[10] : register(t3);
 
 StructuredBuffer<MaterialData> _materialData : register(t0, space1);
+
+SamplerState _samPointWrap : register(s0);
+SamplerState _samPointClamp : register(s1);
+SamplerState _samLinearWrap : register(s2);
+SamplerState _samLinearClamp : register(s3);
+SamplerState _samAnisotropicWrap : register(s4);
+SamplerState _samAnisotropicClamp : register(s5);
+SamplerComparisonState _samShadow : register(s6);
 
 cbuffer cbPerObject : register(b0)
 {

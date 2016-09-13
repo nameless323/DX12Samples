@@ -28,8 +28,10 @@ UINT SSAO::SSAOMapHeight() const
 
 void SSAO::GetOffsetVectors(DirectX::XMFLOAT4 offsets[14])
 {
-    memcpy(&offsets, &_offsets, sizeof(offsets[0]) * 14);
-    //std::copy(&_offsets[0], &_offsets[14], &offsets[0]);
+    //    memcpy(&offsets, &_offsets, sizeof(offsets[0]) * 14);
+    //    std::copy(&_offsets[0], &_offsets[14], &offsets[0]);
+    for (int i = 0; i < 14; i++)
+        offsets[i] = _offsets[i];
 }
 
 std::vector<float> SSAO::CalcGaussWeights(float sigma)
@@ -295,8 +297,7 @@ void SSAO::BuildResources()
 
 void SSAO::BuildRandomVectorTexture(ID3D12GraphicsCommandList* cmdList)
 {
-    D3D12_RESOURCE_DESC texDesc;
-    ZeroMemory(&texDesc, sizeof(D3D12_RESOURCE_DESC));
+    D3D12_RESOURCE_DESC texDesc = {};
     texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
     texDesc.Alignment = 0;
     texDesc.Width = 256;
@@ -308,12 +309,19 @@ void SSAO::BuildRandomVectorTexture(ID3D12GraphicsCommandList* cmdList)
     texDesc.SampleDesc.Quality = 0;
     texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
     texDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-    ThrowIfFailed(_device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, &texDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&_randomVectorMap)));
+    ThrowIfFailed(_device->CreateCommittedResource(
+            &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+        D3D12_HEAP_FLAG_NONE,
+        &texDesc,
+        D3D12_RESOURCE_STATE_GENERIC_READ,
+        nullptr,
+        IID_PPV_ARGS(&_randomVectorMap)));
 
     const UINT num2DSubresources = texDesc.DepthOrArraySize * texDesc.MipLevels;
     const UINT64 uploadBufferSize = GetRequiredIntermediateSize(_randomVectorMap.Get(), 0, num2DSubresources);
 
-    ThrowIfFailed(_device->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+    ThrowIfFailed(_device->CreateCommittedResource(
+        &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
         D3D12_HEAP_FLAG_NONE,
         &CD3DX12_RESOURCE_DESC::Buffer(uploadBufferSize),
         D3D12_RESOURCE_STATE_GENERIC_READ,
@@ -346,20 +354,20 @@ void SSAO::BuildOffsetVectors()
 
     _offsets[2] = XMFLOAT4(-1.0f, +1.0f, +1.0f, 0.0f);
     _offsets[3] = XMFLOAT4(+1.0f, -1.0f, -1.0f, 0.0f);
-    
+
     _offsets[4] = XMFLOAT4(+1.0f, +1.0f, -1.0f, 0.0f);
     _offsets[5] = XMFLOAT4(-1.0f, -1.0f, +1.0f, 0.0f);
-    
+
     _offsets[6] = XMFLOAT4(-1.0f, +1.0f, -1.0f, 0.0f);
     _offsets[7] = XMFLOAT4(+1.0f, -1.0f, +1.0f, 0.0f);
-    
+
 
     _offsets[8] = XMFLOAT4(-1.0f, 0.0f, 0.0f, 0.0f);
     _offsets[9] = XMFLOAT4(+1.0f, 0.0f, 0.0f, 0.0f);
-    
+
     _offsets[10] = XMFLOAT4(0.0f, -1.0f, 0.0f, 0.0f);
     _offsets[11] = XMFLOAT4(0.0f, +1.0f, 0.0f, 0.0f);
-    
+
     _offsets[12] = XMFLOAT4(0.0f, 0.0f, -1.0f, 0.0f);
     _offsets[13] = XMFLOAT4(0.0f, 0.0f, +1.0f, 0.0f);
 

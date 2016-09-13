@@ -467,17 +467,20 @@ void SSAOScene::LoadTextures()
 void SSAOScene::BuildRootSignature()
 {
     CD3DX12_DESCRIPTOR_RANGE texTable0;
-    texTable0.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 0, 0);
-    CD3DX12_DESCRIPTOR_RANGE texTable1;
-    texTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 10, 3, 0);
+	texTable0.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 0, 0);
 
+	CD3DX12_DESCRIPTOR_RANGE texTable1;
+	texTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 10, 3, 0);
+
+    // Root parameter can be a table, root descriptor or root constants.
     CD3DX12_ROOT_PARAMETER slotRootParameter[5];
 
+	// Perfomance TIP: Order from most frequent to least frequent.
     slotRootParameter[0].InitAsConstantBufferView(0);
     slotRootParameter[1].InitAsConstantBufferView(1);
     slotRootParameter[2].InitAsShaderResourceView(0, 1);
-    slotRootParameter[3].InitAsDescriptorTable(1, &texTable0, D3D12_SHADER_VISIBILITY_PIXEL);
-    slotRootParameter[4].InitAsDescriptorTable(1, &texTable1, D3D12_SHADER_VISIBILITY_PIXEL);
+	slotRootParameter[3].InitAsDescriptorTable(1, &texTable0, D3D12_SHADER_VISIBILITY_PIXEL);
+	slotRootParameter[4].InitAsDescriptorTable(1, &texTable1, D3D12_SHADER_VISIBILITY_PIXEL);
 
     auto staticSamplers = GetStaticSamplers();
 
@@ -635,27 +638,27 @@ void SSAOScene::BuildShaderAndInputLayout()
         NULL, NULL
     };
 
-    _shaders["standardVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAODefault.hlsl", nullptr, "VS", "vs_5_1");
-    _shaders["opaquePS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAODefault.hlsl", nullptr, "PS", "ps_5_1");
+    _shaders["standardVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAODefault.hlsl", nullptr, "vert", "vs_5_1");
+    _shaders["opaquePS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAODefault.hlsl", nullptr, "frag", "ps_5_1");
 
-    _shaders["shadowVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\RenderShadows.hlsl", nullptr, "VS", "vs_5_1");
-    _shaders["shadowOpaquePS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\RenderShadows.hlsl", nullptr, "PS", "ps_5_1");
-    _shaders["shadowAlphaTestedPS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\RenderShadows.hlsl", alphaTestDefines, "PS", "ps_5_1");
+    _shaders["shadowVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\RenderShadows.hlsl", nullptr, "vert", "vs_5_1");
+    _shaders["shadowOpaquePS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\RenderShadows.hlsl", nullptr, "frag", "ps_5_1");
+    _shaders["shadowAlphaTestedPS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\RenderShadows.hlsl", alphaTestDefines, "frag", "ps_5_1");
 
-    _shaders["debugVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAODebug.hlsl", nullptr, "VS", "vs_5_1");
-    _shaders["debugPS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAODebug.hlsl", nullptr, "PS", "ps_5_1");
+    _shaders["debugVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAODebug.hlsl", nullptr, "vert", "vs_5_1");
+    _shaders["debugPS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAODebug.hlsl", nullptr, "frag", "ps_5_1");
 
-    _shaders["drawNormalsVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\DrawNormals.hlsl", nullptr, "VS", "vs_5_1");
-    _shaders["drawNormalsPS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\DrawNormals.hlsl", nullptr, "PS", "ps_5_1");
+    _shaders["drawNormalsVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\DrawNormals.hlsl", nullptr, "vert", "vs_5_1");
+    _shaders["drawNormalsPS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\DrawNormals.hlsl", nullptr, "frag", "ps_5_1");
 
-    _shaders["ssaoVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAO.hlsl", nullptr, "VS", "vs_5_1");
-    _shaders["ssaoPS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAO.hlsl", nullptr, "PS", "ps_5_1");
+    _shaders["ssaoVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAO.hlsl", nullptr, "vert", "vs_5_1");
+    _shaders["ssaoPS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAO.hlsl", nullptr, "frag", "ps_5_1");
 
-    _shaders["ssaoBlurVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAOBlur.hlsl", nullptr, "VS", "vs_5_1");
-    _shaders["ssaoBlurPS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAOBlur.hlsl", nullptr, "PS", "ps_5_1");
+    _shaders["ssaoBlurVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAOBlur.hlsl", nullptr, "vert", "vs_5_1");
+    _shaders["ssaoBlurPS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAOBlur.hlsl", nullptr, "frag", "ps_5_1");
 
-    _shaders["skyVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\Sky.hlsl", nullptr, "VS", "vs_5_1");
-    _shaders["skyPS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\Sky.hlsl", nullptr, "PS", "ps_5_1");
+    _shaders["skyVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\Sky.hlsl", nullptr, "vert", "vs_5_1");
+    _shaders["skyPS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\Sky.hlsl", nullptr, "frag", "ps_5_1");
 
     _inputLayout =
     {

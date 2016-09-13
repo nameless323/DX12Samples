@@ -62,7 +62,7 @@ float NdcDepthToViewDepth(float zNdc)
     return Proj[3][2] / (zNdc - Proj[2][2]);
 }
 
-float4 frag(vOut i) : SV_Target
+float4 frag(vOut fIn) : SV_Target
 {
     float blurWeights[12] =
     {
@@ -80,21 +80,21 @@ float4 frag(vOut i) : SV_Target
         texOffset = float2(0.0f, InvRenderTargetSize.y);
     }
 
-    float4 color = BlurWeights[BlurRadius] * InputMap.SampleLevel(SamPointClamp, i.uv, 0.0);
-    float totalWeight = BlurWeights[BlurRadius];
+    float4 color = blurWeights[BlurRadius] * InputMap.SampleLevel(SamPointClamp, fIn.uv, 0.0);
+    float totalWeight = blurWeights[BlurRadius];
 
-    float3 ceneterNormal = NormalMap.SampleLevel(SamPointClamp, i.uv, 0.0f).xyz;
-    float centerDepth = NdcDepthToViewDepth(DepthMap.SampleLevel(SamDepthMap, i.uv, 0.0f).r);
+    float3 centerNormal = NormalMap.SampleLevel(SamPointClamp, fIn.uv, 0.0f).xyz;
+    float centerDepth = NdcDepthToViewDepth(DepthMap.SampleLevel(SamDepthMap, fIn.uv, 0.0f).r);
 
     for (float i = -BlurRadius; i <= BlurRadius; i++)
     {
         if (i == 0)
             continue;
 
-        float2 tex = i.uv + i * texOffset;
+        float2 tex = fIn.uv + i * texOffset;
 
         float3 neighborNormal = NormalMap.SampleLevel(SamPointClamp, tex, 0.0).xyz;
-        float neighborDepth = NdcDepthToViewDepth(DepthMap.SampleLevel(DepthMap, tex, 0.0).r);
+        float neighborDepth = NdcDepthToViewDepth(DepthMap.SampleLevel(SamDepthMap, tex, 0.0).r);
 
         if (dot(neighborNormal, centerNormal >= 0.8) && abs(neighborDepth - centerDepth) <= 0.2)
         {

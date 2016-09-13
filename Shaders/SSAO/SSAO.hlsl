@@ -24,9 +24,9 @@ Texture2D DepthMap : register(t1);
 Texture2D RandomVecMap : register(t2);
 
 SamplerState SamPointClamp : register(s0);
-SamplerState SamLinearClamp : register(s0);
-SamplerState SamDepthMap : register(s0);
-SamplerState SamLinearWrap : register(s0);
+SamplerState SamLinearClamp : register(s1);
+SamplerState SamDepthMap : register(s2);
+SamplerState SamLinearWrap : register(s3);
 
 static const int SampleCount = 14;
 
@@ -84,7 +84,7 @@ float4 frag(vOut i) : SV_Target
     pz = NdcDepthToViewDepth(pz);
 
     float3 p = (pz / i.PosV.z) * i.PosV;
-    float3 randVec = 2.0f * RandomVecMap.SampleLevel(SamLinearWrap, 4.0f * i.uv, 0.0f);
+    float3 randVec = (2.0f * RandomVecMap.SampleLevel(SamLinearWrap, 4.0f * i.uv, 0.0f)).xyz;
 
     float occlusionSum = 0.0f;
 
