@@ -40,6 +40,9 @@ bool SSAOScene::Init()
 
     _ssao->SetPSOs(_PSOs["ssao"].Get(), _PSOs["ssaoBlur"].Get());
 
+
+    _commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_ssao->NormalMap(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_GENERIC_READ));
+
     ThrowIfFailed(_commandList->Close());
     ID3D12CommandList* cmdsLists[] = {_commandList.Get()};
     _commandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
@@ -1017,8 +1020,8 @@ void SSAOScene::BuildPSOs()
     };
     ssaoBlurPsoDesc.PS =
     {
-        reinterpret_cast<BYTE*>(_shaders["ssaoBlurVS"]->GetBufferPointer()),
-        _shaders["ssaoBlurVS"]->GetBufferSize()
+        reinterpret_cast<BYTE*>(_shaders["ssaoBlurPS"]->GetBufferPointer()),
+        _shaders["ssaoBlurPS"]->GetBufferSize()
     };
     ThrowIfFailed(_device->CreateGraphicsPipelineState(&ssaoBlurPsoDesc, IID_PPV_ARGS(&_PSOs["ssaoBlur"])));
 
