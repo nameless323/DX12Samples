@@ -77,14 +77,14 @@ float NdcDepthToViewDepth(float zNdc)
     return viewZ;
 }
 
-float4 frag(vOut i) : SV_Target
+float4 frag(vOut pin) : SV_Target
 {
-    float3 n = normalize(NormalMap.SampleLevel(SamPointClamp, i.uv, 0.0f).xyz);
-    float pz = DepthMap.SampleLevel(SamDepthMap, i.uv, 0.0f).r;
+    float3 n = normalize(NormalMap.SampleLevel(SamPointClamp, pin.uv, 0.0f).xyz);
+    float pz = DepthMap.SampleLevel(SamDepthMap, pin.uv, 0.0f).r;
     pz = NdcDepthToViewDepth(pz);
 
-    float3 p = (pz / i.PosV.z) * i.PosV;
-    float3 randVec = (2.0f * RandomVecMap.SampleLevel(SamLinearWrap, 4.0f * i.uv, 0.0f)).xyz;
+    float3 p = (pz / pin.PosV.z) * pin.PosV;
+    float3 randVec = (2.0f * RandomVecMap.SampleLevel(SamLinearWrap, 4.0f * pin.uv, 0.0f)).xyz - 1.0;
 
     float occlusionSum = 0.0f;
 
