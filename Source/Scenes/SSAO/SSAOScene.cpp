@@ -556,7 +556,7 @@ void SSAOScene::BuildSSAORootSignature()
         OutputDebugStringA((char*)errorBlob->GetBufferPointer());
     ThrowIfFailed(hr);
 
-    ThrowIfFailed(_device->CreateRootSignature(0, serializedRootSig->GetBufferPointer(), serializedRootSig->GetBufferSize(), IID_PPV_ARGS(_rootSignature.GetAddressOf())));
+    ThrowIfFailed(_device->CreateRootSignature(0, serializedRootSig->GetBufferPointer(), serializedRootSig->GetBufferSize(), IID_PPV_ARGS(_ssaoRootSignature.GetAddressOf())));
 }
 
 void SSAOScene::BuildDescriptorHeaps()

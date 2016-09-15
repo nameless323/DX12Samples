@@ -458,12 +458,12 @@
     <FxCompile Include="Shaders\ShadowsRender.hlsl" />
     <FxCompile Include="Shaders\Shadowmapping.hlsl" />
     <FxCompile Include="Shaders\SSAO\CommonInclude.hlsl" />
-    <FxCompile Include="Shaders\SSAO\SSAODefault.hlsl" />
-    <FxCompile Include="Shaders\SSAO\SSAODebug.hlsl" />
-    <FxCompile Include="Shaders\SSAO\Sky.hlsl" />
-    <FxCompile Include="Shaders\SSAO\RenderShadows.hlsl" />
     <FxCompile Include="Shaders\SSAO\DrawNormals.hlsl" />
-    <FxCompile Include="Shaders\SSAO\SSAOBlur.hlsl" />
+    <FxCompile Include="Shaders\SSAO\RenderShadows.hlsl" />
+    <FxCompile Include="Shaders\SSAO\Sky.hlsl" />
     <FxCompile Include="Shaders\SSAO\SSAO.hlsl" />
+    <FxCompile Include="Shaders\SSAO\SSAOBlur.hlsl" />
+    <FxCompile Include="Shaders\SSAO\SSAODebug.hlsl" />
+    <FxCompile Include="Shaders\SSAO\SSAODefault.hlsl" />
   </ItemGroup>
 </Project>
