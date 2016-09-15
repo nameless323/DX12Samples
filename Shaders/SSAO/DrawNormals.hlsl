@@ -32,14 +32,17 @@ struct vOut
 vOut vert(vIn i)
 {
     vOut o = (vOut) 0.0;
-    float4 posW = mul(float4(i.pos, 1.0f), Model);
-    o.pos = mul(posW, VP);
+
+
+    MaterialData matData = _materialData[MaterialIndex];
     o.normalW = mul(i.normalL, (float3x3) Model);
     o.tangentW = mul(i.tangent, (float3x3) Model);
 
+    float4 posW = mul(float4(i.pos, 1.0f), Model);
+    o.pos = mul(posW, VP);
+
     float4 uv = mul(float4(i.uv, 0.0f, 1.0f), TexTransform);
 
-    MaterialData matData = _materialData[MaterialIndex];
     o.uv = mul(uv, matData.MatTransform).xy;
 
     return o;

@@ -28,10 +28,10 @@ UINT SSAO::SSAOMapHeight() const
 
 void SSAO::GetOffsetVectors(DirectX::XMFLOAT4 offsets[14])
 {
-    //    memcpy(&offsets, &_offsets, sizeof(offsets[0]) * 14);
+        memcpy(offsets, _offsets, sizeof(offsets[0]) * 14);
     //    std::copy(&_offsets[0], &_offsets[14], &offsets[0]);
-    for (int i = 0; i < 14; i++)
-        offsets[i] = _offsets[i];
+//    for (int i = 0; i < 14; i++)
+//        offsets[i] = _offsets[i];
 }
 
 std::vector<float> SSAO::CalcGaussWeights(float sigma)
