@@ -157,6 +157,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Core\AnimationHelper.h" />
     <ClInclude Include="Core\Application.h" />
     <ClInclude Include="Core\Camera.h" />
     <ClInclude Include="Core\D3DUtil.h" />
@@ -229,6 +230,7 @@
     <ClInclude Include="Source\Scenes\WavesCS\WavesCS.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Core\AnimationHelper.cpp" />
     <ClCompile Include="Core\Application.cpp" />
     <ClCompile Include="Core\Camera.cpp" />
     <ClCompile Include="Core\D3DUtil.cpp" />

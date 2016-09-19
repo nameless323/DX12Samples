@@ -227,6 +227,9 @@
     <ClInclude Include="Source\Scenes\SSAO\SSAOScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Core\AnimationHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Camera.cpp">
@@ -416,6 +419,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Scenes\SSAO\SSAOScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\AnimationHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
