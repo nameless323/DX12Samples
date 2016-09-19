@@ -230,6 +230,12 @@
     <ClInclude Include="Core\AnimationHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Scenes\RotationScene\RotationSceneFrameResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scenes\RotationScene\RotationScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Camera.cpp">
@@ -422,6 +428,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Core\AnimationHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scenes\RotationScene\RotationSceneFrameResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scenes\RotationScene\RotationScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
