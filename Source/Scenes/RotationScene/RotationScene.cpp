@@ -21,6 +21,7 @@ bool RotationScene::Init()
 
     _camera.SetPosition(0.0f, 2.0f, -15.0f);
 
+    DefineScullAnimation();
     LoadTextures();
     BuildRootSignature();
     BuildDescriptorHeaps();
@@ -314,7 +315,7 @@ void RotationScene::LoadTextures()
         L"Textures/bricks2.dds",
         L"Textures/stone.dds",
         L"Textures/tile.dds",
-        L"Textures/WoodCrate01.dds"
+        L"Textures/WoodCrate01.dds",
         L"Textures/white1x1.dds"
     };
     for (int i = 0; i < (int)texNames.size(); i++)
@@ -778,7 +779,7 @@ void RotationScene::BuildRenderItems()
         XMStoreFloat4x4(&leftSphereRitem->Model, leftSphereWorld);
         leftSphereRitem->TexTransform = MathHelper::Identity4x4();
         leftSphereRitem->ObjCBIndex = objCBIndex++;
-        leftSphereRitem->Mat = _materials["mirror0"].get();
+        leftSphereRitem->Mat = _materials["stone0"].get();
         leftSphereRitem->Geo = _geometries["shapeGeo"].get();
         leftSphereRitem->PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
         leftSphereRitem->IndexCount = leftSphereRitem->Geo->DrawArgs["sphere"].IndexCount;
@@ -788,7 +789,7 @@ void RotationScene::BuildRenderItems()
         XMStoreFloat4x4(&rightSphereRitem->Model, rightSphereWorld);
         rightSphereRitem->TexTransform = MathHelper::Identity4x4();
         rightSphereRitem->ObjCBIndex = objCBIndex++;
-        rightSphereRitem->Mat = _materials["mirror0"].get();
+        rightSphereRitem->Mat = _materials["stone0"].get();
         rightSphereRitem->Geo = _geometries["shapeGeo"].get();
         rightSphereRitem->PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
         rightSphereRitem->IndexCount = rightSphereRitem->Geo->DrawArgs["sphere"].IndexCount;

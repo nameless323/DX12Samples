@@ -31,12 +31,13 @@
 #include "Scenes/NormalMapping/NormalMapping.h"
 #include "Scenes/Shadowmapping/Shadowmapping.h"
 #include "Scenes/SSAO/SSAOScene.h"
+#include "Scenes/RotationScene/RotationScene.h"
 
 Application* app;
 
 void CreateScene(HINSTANCE hInstance)
 {
-    app = new SSAOScene(hInstance);
+    app = new RotationScene(hInstance);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)

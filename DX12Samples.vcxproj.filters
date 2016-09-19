@@ -483,5 +483,6 @@
     <FxCompile Include="Shaders\SSAO\SSAOBlur.hlsl" />
     <FxCompile Include="Shaders\SSAO\SSAODebug.hlsl" />
     <FxCompile Include="Shaders\SSAO\SSAODefault.hlsl" />
+    <FxCompile Include="Shaders\RotationDefault.hlsl" />
   </ItemGroup>
 </Project>
