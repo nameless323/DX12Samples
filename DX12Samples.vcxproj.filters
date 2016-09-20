@@ -236,6 +236,12 @@
     <ClInclude Include="Source\Scenes\RotationScene\RotationScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Core\M3dLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scenes\SkinnedAnimation\SkinnedData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Camera.cpp">
@@ -434,6 +440,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Scenes\RotationScene\RotationScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scenes\SkinnedAnimation\SkinnedData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
