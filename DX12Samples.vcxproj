@@ -241,6 +241,7 @@
     <ClCompile Include="Core\DDSTextureLoader.cpp" />
     <ClCompile Include="Core\GameTimer.cpp" />
     <ClCompile Include="Core\GeometryGenerator.cpp" />
+    <ClCompile Include="Core\M3dLoader.cpp" />
     <ClCompile Include="Core\MathHelper.cpp" />
     <ClCompile Include="Source\Common\FrameResourceUnfogged.cpp" />
     <ClCompile Include="Source\Common\FrameResource.cpp" />
