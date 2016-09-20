@@ -242,6 +242,9 @@
     <ClInclude Include="Source\Scenes\SkinnedAnimation\SkinnedData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Scenes\SkinnedAnimation\SkinnedAnimFrameResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Camera.cpp">
@@ -446,6 +449,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Core\M3dLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scenes\SkinnedAnimation\SkinnedAnimFrameResource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
