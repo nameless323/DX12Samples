@@ -162,7 +162,7 @@ void SSAO::OnResize(UINT newWidth, UINT newHeight)
     }
 }
 
-void SSAO::ComputeSSAO(ID3D12GraphicsCommandList* cmdList, SSAOFrameResource* currFrame, int blurCount)
+void SSAO::ComputeSSAO(ID3D12GraphicsCommandList* cmdList, D3D12_GPU_VIRTUAL_ADDRESS currFrame, int blurCount)
 {
     cmdList->RSSetViewports(1, &_viewport);
     cmdList->RSSetScissorRects(1, &_scissorRect);
@@ -174,8 +174,7 @@ void SSAO::ComputeSSAO(ID3D12GraphicsCommandList* cmdList, SSAOFrameResource* cu
 
     cmdList->OMSetRenderTargets(1, &_hAmbientMap0CpuRtv, true, nullptr);
 
-    auto ssaoCBAddress = currFrame->SSAOCB->Resource()->GetGPUVirtualAddress();
-    cmdList->SetGraphicsRootConstantBufferView(0, ssaoCBAddress);
+    cmdList->SetGraphicsRootConstantBufferView(0, currFrame);
     cmdList->SetGraphicsRoot32BitConstant(1, 0, 0);
 
     cmdList->SetGraphicsRootDescriptorTable(2, _hNormalMapGpuSrv);
@@ -192,11 +191,10 @@ void SSAO::ComputeSSAO(ID3D12GraphicsCommandList* cmdList, SSAOFrameResource* cu
     BlurAmbientMap(cmdList, currFrame, blurCount);
 }
 
-void SSAO::BlurAmbientMap(ID3D12GraphicsCommandList* cmdList, SSAOFrameResource* currFrame, int blurCount)
+void SSAO::BlurAmbientMap(ID3D12GraphicsCommandList* cmdList, D3D12_GPU_VIRTUAL_ADDRESS currFrame, int blurCount)
 {
     cmdList->SetPipelineState(_blurPso);
-    auto ssaoCBAdderss = currFrame->SSAOCB->Resource()->GetGPUVirtualAddress();
-    cmdList->SetGraphicsRootConstantBufferView(0, ssaoCBAdderss);
+    cmdList->SetGraphicsRootConstantBufferView(0, currFrame);
 
     for (int i = 0; i < blurCount; i++)
     {

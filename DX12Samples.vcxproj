@@ -214,8 +214,10 @@
     <ClInclude Include="Source\Scenes\Shapes\ShapesRenderItem.h" />
     <ClInclude Include="Source\Common\FrameResourceUnfogged.h" />
     <ClInclude Include="Source\Common\RenderItem.h" />
+    <ClInclude Include="Source\Scenes\SkinnedAnimation\SkinnedAnimaiton.h" />
     <ClInclude Include="Source\Scenes\SkinnedAnimation\SkinnedAnimFrameResource.h" />
     <ClInclude Include="Source\Scenes\SkinnedAnimation\SkinnedData.h" />
+    <ClInclude Include="Source\Scenes\SkinnedAnimation\SkinnedModelInstance.h" />
     <ClInclude Include="Source\Scenes\SSAO\SSAO.h" />
     <ClInclude Include="Source\Scenes\SSAO\SSAOFrameResource.h" />
     <ClInclude Include="Source\Scenes\SSAO\SSAOScene.h" />
@@ -286,6 +288,7 @@
     <ClCompile Include="Source\Scenes\Shadowmapping\ShadowmappingFrameResource.cpp" />
     <ClCompile Include="Source\Scenes\Shapes\Shapes.cpp" />
     <ClCompile Include="Source\Scenes\Shapes\ShapesFrameResource.cpp" />
+    <ClCompile Include="Source\Scenes\SkinnedAnimation\SkinnedAnimation.cpp" />
     <ClCompile Include="Source\Scenes\SkinnedAnimation\SkinnedAnimFrameResource.cpp" />
     <ClCompile Include="Source\Scenes\SkinnedAnimation\SkinnedData.cpp" />
     <ClCompile Include="Source\Scenes\SSAO\SSAO.cpp" />

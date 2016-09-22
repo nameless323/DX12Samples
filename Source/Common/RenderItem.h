@@ -4,6 +4,7 @@
 #include "../../Core/MathHelper.h"
 #include "../../Core/D3DUtil.h"
 #include "FrameResourceUnfogged.h"
+#include "../Scenes/SkinnedAnimation/SkinnedModelInstance.h"
 
 struct RenderItem
 {
@@ -29,6 +30,9 @@ struct RenderItem
 
     DirectX::BoundingBox Bounds;
 
+    UINT SkinnedCBIndex = -1;
+    SkinnedModelInstance* SkinnedModelInst = nullptr;
+
     enum class RenderLayer : int
     {
         Opaque = 0,
@@ -42,6 +46,7 @@ struct RenderItem
         Sky,
         Highlight,
         OpaqueDynamicReflectors,
+        SkinnedOpaque,
         Debug,
         Count
     };

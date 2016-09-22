@@ -37,7 +37,7 @@ Application* app;
 
 void CreateScene(HINSTANCE hInstance)
 {
-    app = new RotationScene(hInstance);
+    app = new SSAOScene(hInstance);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)

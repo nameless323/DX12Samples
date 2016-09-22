@@ -43,9 +43,9 @@ public:
 
     void OnResize(UINT newWidth, UINT newHeight);
 
-    void ComputeSSAO(ID3D12GraphicsCommandList* cmdList, SSAOFrameResource* currFrame, int blurCount);
+    void ComputeSSAO(ID3D12GraphicsCommandList* cmdList, D3D12_GPU_VIRTUAL_ADDRESS currFrame, int blurCount);
 private:
-    void BlurAmbientMap(ID3D12GraphicsCommandList* cmdList, SSAOFrameResource* currFrame, int blurCount);
+    void BlurAmbientMap(ID3D12GraphicsCommandList* cmdList, D3D12_GPU_VIRTUAL_ADDRESS currFrame, int blurCount);
     void BlurAmbientMap(ID3D12GraphicsCommandList* cmdList, bool horizBlur);
 
     void BuildResources();

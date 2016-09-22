@@ -1,21 +1,24 @@
-#include "SSAOScene.h"
+#include "SkinnedAnimaiton.h"
 
 #include "../../../Core/GeometryGenerator.h"
+#include <minwinbase.h>
 
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace PackedVector;
-using Vertex = SSAOFrameResource::Vertex;
-using FrameResource = SSAOFrameResource;
+using Vertex = SkinnedAnimFrameResource::Vertex;
+using FrameResource = SkinnedAnimFrameResource;
 using RenderLayer = RenderItem::RenderLayer;
 
-SSAOScene::SSAOScene(HINSTANCE hInstance) : Application(hInstance)
+
+
+SkinnedAnimation::SkinnedAnimation(HINSTANCE hInstance) : Application(hInstance)
 {
     _sceneBounds.Center = XMFLOAT3(0.0f, 0.0f, 0.0f);
     _sceneBounds.Radius = sqrtf(10.0f * 10.0f + 15.0f * 15.0f);
 }
 
-bool SSAOScene::Init()
+bool SkinnedAnimation::Init()
 {
     if (!Application::Init())
         return false;
@@ -26,13 +29,13 @@ bool SSAOScene::Init()
     _shadowMap = std::make_unique<ShadowMap>(_device.Get(), 2048, 2048);
     _ssao = std::make_unique<SSAO>(_device.Get(), _commandList.Get(), _clientWidth, _clientHeight);
 
+    LoadSkinnedModel();
     LoadTextures();
     BuildRootSignature();
     BuildSSAORootSignature();
     BuildDescriptorHeaps();
     BuildShaderAndInputLayout();
     BuildShapeGeometry();
-    BuildSkullGeometry();
     BuildMaterials();
     BuildRenderItems();
     BuildFrameResources();
@@ -44,30 +47,30 @@ bool SSAOScene::Init()
     _commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_ssao->NormalMap(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_GENERIC_READ));
 
     ThrowIfFailed(_commandList->Close());
-    ID3D12CommandList* cmdsLists[] = {_commandList.Get()};
+    ID3D12CommandList* cmdsLists[] = { _commandList.Get() };
     _commandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
     FlushCommandQueue();
 
     return true;
 }
 
-SSAOScene::~SSAOScene()
+SkinnedAnimation::~SkinnedAnimation()
 {
     if (_device != nullptr)
         FlushCommandQueue();
 }
 
-LRESULT SSAOScene::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT SkinnedAnimation::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     return Application::MsgProc(hwnd, msg, wParam, lParam);
 }
 
-int SSAOScene::Run()
+int SkinnedAnimation::Run()
 {
     return Application::Run();
 }
 
-void SSAOScene::CreateRtvAndDsvDescriptorHeaps()
+void SkinnedAnimation::CreateRtvAndDsvDescriptorHeaps()
 {
     D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc;
     rtvHeapDesc.NumDescriptors = _swapChainBufferCount + 3;
@@ -84,7 +87,7 @@ void SSAOScene::CreateRtvAndDsvDescriptorHeaps()
     ThrowIfFailed(_device->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(_dsvHeap.GetAddressOf())));
 }
 
-void SSAOScene::OnResize()
+void SkinnedAnimation::OnResize()
 {
     Application::OnResize();
     _camera.SetFrustum(0.25f * MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
@@ -95,7 +98,7 @@ void SSAOScene::OnResize()
     }
 }
 
-void SSAOScene::Update(const GameTimer& timer)
+void SkinnedAnimation::Update(const GameTimer& timer)
 {
     OnKeyboardInput(timer);
 
@@ -127,33 +130,33 @@ void SSAOScene::Update(const GameTimer& timer)
     UpdateSSAOCB(timer);
 }
 
-void SSAOScene::Draw(const GameTimer& timer)
+void SkinnedAnimation::Draw(const GameTimer& timer)
 {
     auto cmdListAlloc = _currFrameResource->CmdListAlloc;
     ThrowIfFailed(cmdListAlloc->Reset());
     ThrowIfFailed(_commandList->Reset(cmdListAlloc.Get(), _PSOs["opaque"].Get()));
 
-    ID3D12DescriptorHeap* descriptorHeaps[] = {_srvHeap.Get()};
+    ID3D12DescriptorHeap* descriptorHeaps[] = { _srvHeap.Get() };
     _commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
     _commandList->SetGraphicsRootSignature(_rootSignature.Get());
 
     auto matBuffer = _currFrameResource->MaterialBuffer->Resource();
-    _commandList->SetGraphicsRootShaderResourceView(2, matBuffer->GetGPUVirtualAddress());
-    _commandList->SetGraphicsRootDescriptorTable(3, _nullSrv);
+    _commandList->SetGraphicsRootShaderResourceView(3, matBuffer->GetGPUVirtualAddress());
+    _commandList->SetGraphicsRootDescriptorTable(4, _nullSrv);
 
-    _commandList->SetGraphicsRootDescriptorTable(4, _srvHeap->GetGPUDescriptorHandleForHeapStart());
+    _commandList->SetGraphicsRootDescriptorTable(5, _srvHeap->GetGPUDescriptorHandleForHeapStart());
 
     DrawSceneToShadowMap();
 
     DrawNormalsAndDepth();
 
     _commandList->SetGraphicsRootSignature(_ssaoRootSignature.Get());
-    _ssao->ComputeSSAO(_commandList.Get(), _currFrameResource->SSAOCB->Resource()->GetGPUVirtualAddress(), 3);
+    _ssao->ComputeSSAO(_commandList.Get(), _currFrameResource->SSAOCB->Resource()->GetGPUVirtualAddress(), 2);
 
     _commandList->SetGraphicsRootSignature(_rootSignature.Get());
 
     matBuffer = _currFrameResource->MaterialBuffer->Resource();
-    _commandList->SetGraphicsRootShaderResourceView(2, matBuffer->GetGPUVirtualAddress());
+    _commandList->SetGraphicsRootShaderResourceView(3, matBuffer->GetGPUVirtualAddress());
 
     _commandList->RSSetViewports(1, &_screenViewport);
     _commandList->RSSetScissorRects(1, &_scissorRect);
@@ -163,17 +166,20 @@ void SSAOScene::Draw(const GameTimer& timer)
     _commandList->ClearRenderTargetView(CurrentBackBufferView(), Colors::LightSteelBlue, 0, nullptr);
     _commandList->OMSetRenderTargets(1, &CurrentBackBufferView(), true, &DepthStencilView());
 
-    _commandList->SetGraphicsRootDescriptorTable(4, _srvHeap->GetGPUDescriptorHandleForHeapStart());
+    _commandList->SetGraphicsRootDescriptorTable(5, _srvHeap->GetGPUDescriptorHandleForHeapStart());
 
     auto passCB = _currFrameResource->PassCB->Resource();
-    _commandList->SetGraphicsRootConstantBufferView(1, passCB->GetGPUVirtualAddress());
+    _commandList->SetGraphicsRootConstantBufferView(2, passCB->GetGPUVirtualAddress());
 
     CD3DX12_GPU_DESCRIPTOR_HANDLE skyTexDescriptor(_srvHeap->GetGPUDescriptorHandleForHeapStart());
     skyTexDescriptor.Offset(_skyTexHeapIndex, _cbvSrvUavDescriptorSize);
-    _commandList->SetGraphicsRootDescriptorTable(3, skyTexDescriptor);
+    _commandList->SetGraphicsRootDescriptorTable(4, skyTexDescriptor);
 
     _commandList->SetPipelineState(_PSOs["opaque"].Get());
     DrawRenderItems(_commandList.Get(), _renderItemLayer[(int)RenderLayer::Opaque]);
+
+    _commandList->SetPipelineState(_PSOs["skinnedOpaque"].Get());
+    DrawRenderItems(_commandList.Get(), _renderItemLayer[(int)RenderLayer::SkinnedOpaque]);
 
     _commandList->SetPipelineState(_PSOs["debug"].Get());
     DrawRenderItems(_commandList.Get(), _renderItemLayer[(int)RenderLayer::Debug]);
@@ -184,7 +190,7 @@ void SSAOScene::Draw(const GameTimer& timer)
     _commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 
     ThrowIfFailed(_commandList->Close());
-    ID3D12CommandList* cmdLists[] = {_commandList.Get()};
+    ID3D12CommandList* cmdLists[] = { _commandList.Get() };
     _commandQueue->ExecuteCommandLists(_countof(cmdLists), cmdLists);
 
     ThrowIfFailed(_swapChain->Present(0, 0));
@@ -195,19 +201,19 @@ void SSAOScene::Draw(const GameTimer& timer)
     _commandQueue->Signal(_fence.Get(), _currentFence);
 }
 
-void SSAOScene::OnMouseDown(WPARAM btnState, int x, int y)
+void SkinnedAnimation::OnMouseDown(WPARAM btnState, int x, int y)
 {
     _lastMousePos.x = x;
     _lastMousePos.y = y;
     SetCapture(_hMainWindow);
 }
 
-void SSAOScene::OnMouseUp(WPARAM btnState, int x, int y)
+void SkinnedAnimation::OnMouseUp(WPARAM btnState, int x, int y)
 {
     ReleaseCapture();
 }
 
-void SSAOScene::OnMouseMove(WPARAM btnState, int x, int y)
+void SkinnedAnimation::OnMouseMove(WPARAM btnState, int x, int y)
 {
     if ((btnState & MK_LBUTTON) != 0)
     {
@@ -221,7 +227,7 @@ void SSAOScene::OnMouseMove(WPARAM btnState, int x, int y)
     _lastMousePos.y = y;
 }
 
-void SSAOScene::OnKeyboardInput(const GameTimer& timer)
+void SkinnedAnimation::OnKeyboardInput(const GameTimer& timer)
 {
     const float dt = timer.DeltaTime();
 
@@ -240,11 +246,11 @@ void SSAOScene::OnKeyboardInput(const GameTimer& timer)
     _camera.UpdateViewMatrix();
 }
 
-void SSAOScene::AnimateMaterials(const GameTimer& timer)
+void SkinnedAnimation::AnimateMaterials(const GameTimer& timer)
 {
 }
 
-void SSAOScene::UpdateObjectCBs(const GameTimer& timer)
+void SkinnedAnimation::UpdateObjectCBs(const GameTimer& timer)
 {
     auto currObjectCB = _currFrameResource->ObjectCB.get();
     for (auto& e : _allRenderItems)
@@ -265,7 +271,18 @@ void SSAOScene::UpdateObjectCBs(const GameTimer& timer)
     }
 }
 
-void SSAOScene::UpdateMaterialBuffer(const GameTimer& timer)
+void SkinnedAnimation::UpdateSkinnedCBs(const GameTimer& timer)
+{
+    auto currSkinnedCB = _currFrameResource->SkinnedCB.get();
+
+    _skinnedModelInst->UpdateSkinnedAnimation(timer.DeltaTime());
+
+    SkinnedAnimFrameResource::SkinnedConstants skinnedConstants;
+//    std::copy(std::begin(_skinnedModelInst->FinalTransforms), std::end(_skinnedModelInst->FinalTransforms), &skinnedConstants.BoneTransforms[0]);
+    currSkinnedCB->CopyData(0, skinnedConstants);
+}
+
+void SkinnedAnimation::UpdateMaterialBuffer(const GameTimer& timer)
 {
     auto currMaterialBuffer = _currFrameResource->MaterialBuffer.get();
     for (auto& e : _materials)
@@ -288,7 +305,7 @@ void SSAOScene::UpdateMaterialBuffer(const GameTimer& timer)
     }
 }
 
-void SSAOScene::UpdateShadowTransform(const GameTimer& timer)
+void SkinnedAnimation::UpdateShadowTransform(const GameTimer& timer)
 {
     XMVECTOR lightDir = XMLoadFloat3(&_rotatedLightDirections[0]);
     XMVECTOR lightPos = -2.0f * _sceneBounds.Radius * lightDir;
@@ -313,19 +330,19 @@ void SSAOScene::UpdateShadowTransform(const GameTimer& timer)
     XMMATRIX lightProj = XMMatrixOrthographicOffCenterLH(l, r, b, t, n, f);
 
     XMMATRIX T
-    (
-        0.5f, 0.0f, 0.0f, 0.0f,
-        0.0f, -0.5f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.0f, 1.0f
-    );
+        (
+            0.5f, 0.0f, 0.0f, 0.0f,
+            0.0f, -0.5f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.5f, 0.5f, 0.0f, 1.0f
+            );
     XMMATRIX S = lightView * lightProj * T;
     XMStoreFloat4x4(&_lightView, lightView);
     XMStoreFloat4x4(&_lightProj, lightProj);
     XMStoreFloat4x4(&_shadowTransform, S);
 }
 
-void SSAOScene::UpdateMainPassCB(const GameTimer& timer)
+void SkinnedAnimation::UpdateMainPassCB(const GameTimer& timer)
 {
     XMMATRIX view = _camera.GetView();
     XMMATRIX proj = _camera.GetProj();
@@ -336,12 +353,12 @@ void SSAOScene::UpdateMainPassCB(const GameTimer& timer)
     XMMATRIX invViewProj = XMMatrixInverse(&XMMatrixDeterminant(viewProj), viewProj);
 
     XMMATRIX T
-    (
-        0.5f, 0.0f, 0.0f, 0.0f,
-        0.0f, -0.5f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.0f, 1.0f
-    );
+        (
+            0.5f, 0.0f, 0.0f, 0.0f,
+            0.0f, -0.5f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.5f, 0.5f, 0.0f, 1.0f
+            );
     XMMATRIX viewProjTex = XMMatrixMultiply(viewProj, T);
     XMMATRIX shadowTransform = XMLoadFloat4x4(&_shadowTransform);
 
@@ -360,20 +377,20 @@ void SSAOScene::UpdateMainPassCB(const GameTimer& timer)
     _mainPassCB.FarZ = 1000.0f;
     _mainPassCB.TotalTime = timer.TotalTime();
     _mainPassCB.DeltaTime = timer.DeltaTime();
-    _mainPassCB.AmbientLight = {0.25f, 0.25f, 0.35f, 1.0f};
+    _mainPassCB.AmbientLight = { 0.25f, 0.25f, 0.35f, 1.0f };
 
     _mainPassCB.Lights[0].Direction = _rotatedLightDirections[0];
-    _mainPassCB.Lights[0].Strength = {0.4f, 0.4f, 0.5f};
+    _mainPassCB.Lights[0].Strength = { 0.4f, 0.4f, 0.5f };
     _mainPassCB.Lights[1].Direction = _rotatedLightDirections[1];
-    _mainPassCB.Lights[1].Strength = {0.1f, 0.1f, 0.1f};
+    _mainPassCB.Lights[1].Strength = { 0.1f, 0.1f, 0.1f };
     _mainPassCB.Lights[2].Direction = _rotatedLightDirections[2];
-    _mainPassCB.Lights[2].Strength = {0.0f, 0.0f, 0.0f};
+    _mainPassCB.Lights[2].Strength = { 0.0f, 0.0f, 0.0f };
 
     auto currPassCB = _currFrameResource->PassCB.get();
     currPassCB->CopyData(0, _mainPassCB);
 }
 
-void SSAOScene::UpdateShadowPassCB(const GameTimer& timer)
+void SkinnedAnimation::UpdateShadowPassCB(const GameTimer& timer)
 {
     XMMATRIX view = XMLoadFloat4x4(&_lightView);
     XMMATRIX proj = XMLoadFloat4x4(&_lightProj);
@@ -402,7 +419,7 @@ void SSAOScene::UpdateShadowPassCB(const GameTimer& timer)
     currPassCB->CopyData(1, _shadowPassCB);
 }
 
-void SSAOScene::UpdateSSAOCB(const GameTimer& timer)
+void SkinnedAnimation::UpdateSSAOCB(const GameTimer& timer)
 {
     FrameResource::SSAOConstants ssaoCB;
     XMMATRIX P = _camera.GetProj();
@@ -435,7 +452,7 @@ void SSAOScene::UpdateSSAOCB(const GameTimer& timer)
     currSssaoCB->CopyData(0, ssaoCB);
 }
 
-void SSAOScene::LoadTextures()
+void SkinnedAnimation::LoadTextures()
 {
     std::vector<std::string> texNames =
     {
@@ -457,37 +474,61 @@ void SSAOScene::LoadTextures()
         L"Textures/default_nmap.dds",
         L"Textures/sunsetcube1024.dds"
     };
+
+    for (UINT i = 0; i < _skinnedMats.size(); i++)
+    {
+        std::string diffuseName = _skinnedMats[i].DiffuseMapName;
+        std::string normalName = _skinnedMats[i].NormalMapName;
+
+        std::wstring diffuseFilename = L"Textures/" + AnsiToWString(diffuseName);
+        std::wstring normalFilename = L"Textures/" + AnsiToWString(normalName);
+
+        diffuseName = diffuseName.substr(0, diffuseName.find_last_of("."));
+        normalName = normalName.substr(0, normalName.find_last_of("."));
+
+        _skinnedTextureNames.push_back(diffuseName);
+        texNames.push_back(diffuseName);
+        texFilenames.push_back(diffuseFilename);
+
+        _skinnedTextureNames.push_back(normalName);
+        texNames.push_back(normalName);
+        texFilenames.push_back(normalFilename);
+    }
     for (int i = 0; i < (int)texNames.size(); i++)
     {
-        auto texMap = std::make_unique<Texture>();
-        texMap->Name = texNames[i];
-        texMap->Filename = texFilenames[i];
-        ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(_device.Get(), _commandList.Get(), texMap->Filename.c_str(), texMap->Resource, texMap->UploadHeap));
-        _textures[texMap->Name] = std::move(texMap);
+        if (_textures.find(texNames[i]) == std::end(_textures))
+        {
+            auto texMap = std::make_unique<Texture>();
+            texMap->Name = texNames[i];
+            texMap->Filename = texFilenames[i];
+            ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(_device.Get(), _commandList.Get(), texMap->Filename.c_str(), texMap->Resource, texMap->UploadHeap));
+            _textures[texMap->Name] = std::move(texMap);
+        }
     }
 }
 
-void SSAOScene::BuildRootSignature()
+void SkinnedAnimation::BuildRootSignature()
 {
     CD3DX12_DESCRIPTOR_RANGE texTable0;
-	texTable0.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 0, 0);
+    texTable0.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 3, 0, 0);
 
-	CD3DX12_DESCRIPTOR_RANGE texTable1;
-	texTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 10, 3, 0);
+    CD3DX12_DESCRIPTOR_RANGE texTable1;
+    texTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 48, 3, 0);
 
     // Root parameter can be a table, root descriptor or root constants.
-    CD3DX12_ROOT_PARAMETER slotRootParameter[5];
+    CD3DX12_ROOT_PARAMETER slotRootParameter[6];
 
-	// Perfomance TIP: Order from most frequent to least frequent.
+    // Perfomance TIP: Order from most frequent to least frequent.
     slotRootParameter[0].InitAsConstantBufferView(0);
     slotRootParameter[1].InitAsConstantBufferView(1);
-    slotRootParameter[2].InitAsShaderResourceView(0, 1);
-	slotRootParameter[3].InitAsDescriptorTable(1, &texTable0, D3D12_SHADER_VISIBILITY_PIXEL);
-	slotRootParameter[4].InitAsDescriptorTable(1, &texTable1, D3D12_SHADER_VISIBILITY_PIXEL);
+    slotRootParameter[2].InitAsConstantBufferView(2);
+    slotRootParameter[3].InitAsShaderResourceView(0, 1);
+    slotRootParameter[4].InitAsDescriptorTable(1, &texTable0, D3D12_SHADER_VISIBILITY_PIXEL);
+    slotRootParameter[5].InitAsDescriptorTable(1, &texTable1, D3D12_SHADER_VISIBILITY_PIXEL);
 
     auto staticSamplers = GetStaticSamplers();
 
-    CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(5, slotRootParameter, (UINT)staticSamplers.size(), staticSamplers.data(), D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+    CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(6, slotRootParameter, (UINT)staticSamplers.size(), staticSamplers.data(), D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
     ComPtr<ID3DBlob> serializedRootSig = nullptr;
     ComPtr<ID3DBlob> errorBlob = nullptr;
 
@@ -499,7 +540,7 @@ void SSAOScene::BuildRootSignature()
     ThrowIfFailed(_device->CreateRootSignature(0, serializedRootSig->GetBufferPointer(), serializedRootSig->GetBufferSize(), IID_PPV_ARGS(_rootSignature.GetAddressOf())));
 }
 
-void SSAOScene::BuildSSAORootSignature()
+void SkinnedAnimation::BuildSSAORootSignature()
 {
     CD3DX12_DESCRIPTOR_RANGE texTable0;
     texTable0.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 2, 0, 0);
@@ -562,16 +603,16 @@ void SSAOScene::BuildSSAORootSignature()
     ThrowIfFailed(_device->CreateRootSignature(0, serializedRootSig->GetBufferPointer(), serializedRootSig->GetBufferSize(), IID_PPV_ARGS(_ssaoRootSignature.GetAddressOf())));
 }
 
-void SSAOScene::BuildDescriptorHeaps()
+void SkinnedAnimation::BuildDescriptorHeaps()
 {
     D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
-    srvHeapDesc.NumDescriptors = 18;
+    srvHeapDesc.NumDescriptors = 64;
     srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
     srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
     ThrowIfFailed(_device->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(_srvHeap.GetAddressOf())));
 
     CD3DX12_CPU_DESCRIPTOR_HANDLE hDescriptor(_srvHeap->GetCPUDescriptorHandleForHeapStart());
-    
+
     std::vector<ComPtr<ID3D12Resource>> tex2DList =
     {
         _textures["bricksDiffuseMap"]->Resource,
@@ -581,6 +622,14 @@ void SSAOScene::BuildDescriptorHeaps()
         _textures["defaultDiffuseMap"]->Resource,
         _textures["defaultNormalMap"]->Resource
     };
+
+    _skinnedSrvHeapStart = (UINT)tex2DList.size();
+    for (UINT i = 0; i < (UINT)_skinnedTextureNames.size(); i++)
+    {
+        auto texResource = _textures[_skinnedTextureNames[i]]->Resource;
+        assert(texResource != nullptr);
+        tex2DList.push_back(texResource);
+    }
 
     auto skyCubeMap = _textures["skyCubeMap"]->Resource;
 
@@ -633,7 +682,7 @@ void SSAOScene::BuildDescriptorHeaps()
     _ssao->BuildDescriptors(_depthStencilBuffer.Get(), GetCpuSrv(_ssaoHeapIndex), GetGpuSrv(_ssaoHeapIndex), GetRtv(_swapChainBufferCount), _cbvSrvUavDescriptorSize, _rtvDescriptorSize);
 }
 
-void SSAOScene::BuildShaderAndInputLayout()
+void SkinnedAnimation::BuildShaderAndInputLayout()
 {
     const D3D_SHADER_MACRO alphaTestDefines[] =
     {
@@ -642,9 +691,11 @@ void SSAOScene::BuildShaderAndInputLayout()
     };
 
     _shaders["standardVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAODefault.hlsl", nullptr, "vert", "vs_5_1");
+    _shaders["skinnedVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAODefault.hlsl", nullptr, "vert", "vs_5_1");
     _shaders["opaquePS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAODefault.hlsl", nullptr, "frag", "ps_5_1");
 
     _shaders["shadowVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\RenderShadows.hlsl", nullptr, "vert", "vs_5_1");
+    _shaders["skinnedShadowVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\RenderShadows.hlsl", nullptr, "vert", "vs_5_1");
     _shaders["shadowOpaquePS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\RenderShadows.hlsl", nullptr, "frag", "ps_5_1");
     _shaders["shadowAlphaTestedPS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\RenderShadows.hlsl", alphaTestDefines, "frag", "ps_5_1");
 
@@ -652,6 +703,7 @@ void SSAOScene::BuildShaderAndInputLayout()
     _shaders["debugPS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAODebug.hlsl", nullptr, "frag", "ps_5_1");
 
     _shaders["drawNormalsVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\DrawNormals.hlsl", nullptr, "vert", "vs_5_1");
+    _shaders["skinnedDrawNormalsVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\DrawNormals.hlsl", nullptr, "vert", "vs_5_1");
     _shaders["drawNormalsPS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\DrawNormals.hlsl", nullptr, "frag", "ps_5_1");
 
     _shaders["ssaoVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAO.hlsl", nullptr, "vert", "vs_5_1");
@@ -668,11 +720,13 @@ void SSAOScene::BuildShaderAndInputLayout()
         { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
         { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
         { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-        { "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+        { "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+        { "WEIGHTS", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 44, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+        { "BONEINDICES", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 56, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
     };
 }
 
-void SSAOScene::BuildShapeGeometry()
+void SkinnedAnimation::BuildShapeGeometry()
 {
     GeometryGenerator geoGen;
     GeometryGenerator::MeshData box = geoGen.CreateBox(1.0f, 1.0f, 1.0f, 3);
@@ -807,107 +861,59 @@ void SSAOScene::BuildShapeGeometry()
     _geometries[geo->Name] = move(geo);
 }
 
-void SSAOScene::BuildSkullGeometry()
+void SkinnedAnimation::LoadSkinnedModel()
 {
-    std::ifstream fin("Models\\skull.txt");
+    std::vector<M3dLoader::SkinnedVertex> vertices;
+    std::vector<std::uint16_t> indices;
 
-    if (!fin)
-    {
-        MessageBox(0, L"Models\\scull.txt not found", nullptr, 0);
-        return;
-    }
+    M3dLoader m3dLoader;
+    m3dLoader.LoadM3d(_skinnedModelFilename, vertices, indices, _skinnedSubsets, _skinnedMats, _skinnedInfo);
 
-    UINT vcount = 0;
-    UINT tcount = 0;
-    std::string ignore;
+    _skinnedModelInst = std::make_unique<SkinnedModelInstance>();
+    _skinnedModelInst->SkinnedInfo = &_skinnedInfo;
+    _skinnedModelInst->FinalTransforms.resize(_skinnedInfo.BoneCount());
+    _skinnedModelInst->ClipName = "Take1";
+    _skinnedModelInst->TimePos = 0.0f;
 
-    fin >> ignore >> vcount;
-    fin >> ignore >> tcount;
-    fin >> ignore >> ignore >> ignore >> ignore;
-
-    XMFLOAT3 vMinf3(+MathHelper::Infinity, +MathHelper::Infinity, +MathHelper::Infinity);
-    XMFLOAT3 vMaxf3(-MathHelper::Infinity, -MathHelper::Infinity, -MathHelper::Infinity);
-
-    XMVECTOR vMin = XMLoadFloat3(&vMinf3);
-    XMVECTOR vMax = XMLoadFloat3(&vMaxf3);
-
-    std::vector<Vertex> vertices(vcount);
-    for (UINT i = 0; i < vcount; i++)
-    {
-        fin >> vertices[i].Pos.x >> vertices[i].Pos.y >> vertices[i].Pos.z;
-        fin >> vertices[i].Normal.x >> vertices[i].Normal.y >> vertices[i].Normal.z;
-
-        XMVECTOR P = XMLoadFloat3(&vertices[i].Pos);
-        XMVECTOR N = XMLoadFloat3(&vertices[i].Normal);
-        XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-        if (fabsf(XMVectorGetX(XMVector3Dot(N, up))) < 1.0f - 0.001f)
-        {
-            XMVECTOR T = XMVector3Normalize(XMVector3Cross(up, N));
-            XMStoreFloat3(&vertices[i].Tangent, T);
-        }
-        else
-        {
-            up = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
-            XMVECTOR T = XMVector3Normalize(XMVector3Cross(N, up));
-            XMStoreFloat3(&vertices[i].Tangent, T);
-        }
-
-        XMFLOAT3 spherePos;
-        XMStoreFloat3(&spherePos, XMVector3Normalize(P));
-
-        float theta = atan2f(spherePos.z, spherePos.x);
-
-        if (theta < 0.0f)
-            theta += XM_2PI;
-
-        float phi = acosf(spherePos.y);
-
-        float u = theta / (2.0f * XM_PI);
-        float v = phi / XM_PI;
-
-        vertices[i].Uv = { u, v };
-
-        vMin = XMVectorMin(vMin, P);
-        vMax = XMVectorMax(vMax, P);
-    }
-    BoundingBox bounds;
-    XMStoreFloat3(&bounds.Center, 0.5f * (vMin + vMax));
-    XMStoreFloat3(&bounds.Extents, 0.5f * (vMax - vMin));
-
-    fin >> ignore;
-    fin >> ignore;
-    fin >> ignore;
-
-    std::vector<std::int32_t> indices(3 * tcount);
-    for (UINT i = 0; i < tcount; i++)
-    {
-        fin >> indices[i * 3 + 0] >> indices[i * 3 + 1] >> indices[i * 3 + 2];
-    }
-    fin.close();
-
-    const UINT vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
-    const UINT ibByteSize = (UINT)indices.size() * sizeof(int32_t);
+    const UINT vbByteSize = (UINT)vertices.size() * sizeof(M3dLoader::SkinnedVertex);
+    const UINT ibByteSize = (UINT)indices.size() * sizeof(std::uint16_t);
 
     auto geo = std::make_unique<MeshGeometry>();
-    geo->Name = "skullGeo";
+    geo->Name = _skinnedModelFilename;
+
+    ThrowIfFailed(D3DCreateBlob(vbByteSize, &geo->VertexBufferCPU));
+    CopyMemory(geo->VertexBufferCPU->GetBufferPointer(), vertices.data(), vbByteSize);
+
+    ThrowIfFailed(D3DCreateBlob(ibByteSize, &geo->IndexBufferCPU));
+    CopyMemory(geo->IndexBufferCPU->GetBufferPointer(), indices.data(), ibByteSize);
 
     geo->VertexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), vertices.data(), vbByteSize, geo->VertexBufferUploader);
+
     geo->IndexBufferGPU = D3DUtil::CreateDefaultBuffer(_device.Get(), _commandList.Get(), indices.data(), ibByteSize, geo->IndexBufferUploader);
 
-    geo->VertexByteStride = sizeof(Vertex);
+    geo->VertexByteStride = sizeof(M3dLoader::SkinnedVertex);
     geo->VertexBufferByteSize = vbByteSize;
-    geo->IndexFormat = DXGI_FORMAT_R32_UINT;
+    geo->IndexFormat = DXGI_FORMAT_R16_UINT;
     geo->IndexBufferByteSize = ibByteSize;
 
-    SubmeshGeometry submesh;
-    submesh.IndexCount = (UINT)indices.size();
-    submesh.StartIndexLocation = 0;
-    submesh.BaseVertexLocation = 0;
-    geo->DrawArgs["skull"] = submesh;
-    _geometries[geo->Name] = move(geo);
+    for (UINT i = 0; i < (UINT)_skinnedSubsets.size(); i++)
+    {
+        SubmeshGeometry submesh;
+        std::string name = "sm_" + std::to_string(i);
+
+        submesh.IndexCount = (UINT)_skinnedSubsets[i].FaceCount * 3;
+        submesh.StartIndexLocation = _skinnedSubsets[i].FaceStart * 3;
+        submesh.BaseVertexLocation = 0;
+        geo->DrawArgs[name] = submesh;
+    }
+    _geometries[geo->Name] = std::move(geo);
 }
 
-void SSAOScene::BuildPSOs()
+void SkinnedAnimation::BuildSkullGeometry()
+{
+}
+
+void SkinnedAnimation::BuildPSOs()
 {
     D3D12_GRAPHICS_PIPELINE_STATE_DESC basePsoDesc;
 
@@ -937,9 +943,21 @@ void SSAOScene::BuildPSOs()
     basePsoDesc.DSVFormat = _dsvFormat;
 
     D3D12_GRAPHICS_PIPELINE_STATE_DESC opaquePso = basePsoDesc;
-    opaquePso.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_EQUAL;
-    opaquePso.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
     ThrowIfFailed(_device->CreateGraphicsPipelineState(&opaquePso, IID_PPV_ARGS(&_PSOs["opaque"])));
+
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC skinnedOpaquePsoDesc = opaquePso;
+    skinnedOpaquePsoDesc.InputLayout = { _skinnedInputLayout.data(), (UINT)_skinnedInputLayout.size() };
+    skinnedOpaquePsoDesc.VS =
+    {
+        reinterpret_cast<BYTE*>(_shaders["skinnedVS"]->GetBufferPointer()),
+        _shaders["skinnedVS"]->GetBufferSize()
+    };
+    skinnedOpaquePsoDesc.PS =
+    {
+        reinterpret_cast<BYTE*>(_shaders["opaquePS"]->GetBufferPointer()),
+        _shaders["opaquePS"]->GetBufferSize()
+    };
+    ThrowIfFailed(_device->CreateGraphicsPipelineState(&skinnedOpaquePsoDesc, IID_PPV_ARGS(&_PSOs["skinnedOpaque"])));
 
     D3D12_GRAPHICS_PIPELINE_STATE_DESC smapPsoDesc = basePsoDesc;
     smapPsoDesc.RasterizerState.DepthBias = 100000;
@@ -959,6 +977,20 @@ void SSAOScene::BuildPSOs()
     smapPsoDesc.RTVFormats[0] = DXGI_FORMAT_UNKNOWN;
     smapPsoDesc.NumRenderTargets = 0;
     ThrowIfFailed(_device->CreateGraphicsPipelineState(&smapPsoDesc, IID_PPV_ARGS(&_PSOs["shadow_opaque"])));
+
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC skinnedSmapPsoDesc = smapPsoDesc;
+    skinnedSmapPsoDesc.InputLayout = { _skinnedInputLayout.data(), (UINT)_skinnedInputLayout.size() };
+    skinnedSmapPsoDesc.VS =
+    {
+        reinterpret_cast<BYTE*>(_shaders["skinnedShadowVS"]->GetBufferPointer()),
+        _shaders["skinnedShadowVS"]->GetBufferSize()
+    };
+    skinnedSmapPsoDesc.PS =
+    {
+        reinterpret_cast<BYTE*>(_shaders["shadowOpaquePS"]->GetBufferPointer()),
+        _shaders["shadowOpaquePS"]->GetBufferSize()
+    };
+    ThrowIfFailed(_device->CreateGraphicsPipelineState(&skinnedSmapPsoDesc, IID_PPV_ARGS(&_PSOs["skinnedShadow_opaque"])));
 
     D3D12_GRAPHICS_PIPELINE_STATE_DESC debugPsoDesc = basePsoDesc;
     debugPsoDesc.pRootSignature = _rootSignature.Get();
@@ -990,6 +1022,21 @@ void SSAOScene::BuildPSOs()
     drawNormalsPsoDesc.SampleDesc.Quality = 0;
     drawNormalsPsoDesc.DSVFormat = _dsvFormat;
     ThrowIfFailed(_device->CreateGraphicsPipelineState(&drawNormalsPsoDesc, IID_PPV_ARGS(&_PSOs["drawNormals"])));
+
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC skinnedDrawNormalsPsoDesc = drawNormalsPsoDesc;
+    skinnedDrawNormalsPsoDesc.InputLayout = { _skinnedInputLayout.data(), (UINT)_skinnedInputLayout.size() };
+    skinnedDrawNormalsPsoDesc.VS =
+    {
+        reinterpret_cast<BYTE*>(_shaders["skinnedDrawNormalsVS"]->GetBufferPointer()),
+        _shaders["skinnedDrawNormalsVS"]->GetBufferSize()
+    };
+    skinnedDrawNormalsPsoDesc.PS =
+    {
+        reinterpret_cast<BYTE*>(_shaders["drawNormalsPS"]->GetBufferPointer()),
+        _shaders["drawNormalsPS"]->GetBufferSize()
+    };
+    ThrowIfFailed(_device->CreateGraphicsPipelineState(&skinnedDrawNormalsPsoDesc, IID_PPV_ARGS(&_PSOs["skinnedDrawNormals"])));
+
 
     D3D12_GRAPHICS_PIPELINE_STATE_DESC ssaoPsoDesc = basePsoDesc;
     ssaoPsoDesc.InputLayout = { nullptr, 0 };
@@ -1044,13 +1091,13 @@ void SSAOScene::BuildPSOs()
     ThrowIfFailed(_device->CreateGraphicsPipelineState(&skyPsoDesc, IID_PPV_ARGS(&_PSOs["sky"])));
 }
 
-void SSAOScene::BuildFrameResources()
+void SkinnedAnimation::BuildFrameResources()
 {
     for (int i = 0; i < FrameResource::NumFrameResources; i++)
-        _frameResources.push_back(std::make_unique<FrameResource>(_device.Get(), 2, (UINT)_allRenderItems.size(), (UINT)_materials.size()));
+        _frameResources.push_back(std::make_unique<FrameResource>(_device.Get(), 2, (UINT)_allRenderItems.size(), 1, (UINT)_materials.size()));
 }
 
-void SSAOScene::BuildMaterials()
+void SkinnedAnimation::BuildMaterials()
 {
     auto bricks0 = std::make_unique<Material>();
     bricks0->Name = "bricks0";
@@ -1079,18 +1126,9 @@ void SSAOScene::BuildMaterials()
     mirror0->FresnelR0 = XMFLOAT3(0.98f, 0.97f, 0.95f);
     mirror0->Roughness = 0.1f;
 
-    auto skullMat = std::make_unique<Material>();
-    skullMat->Name = "skullMat";
-    skullMat->MatCBIndex = 3;
-    skullMat->DiffuseSrvHeapIndex = 4;
-    skullMat->NormalSrvHeapIndex = 5;
-    skullMat->DiffuseAlbedo = XMFLOAT4(0.3f, 0.3f, 0.3f, 1.0f);
-    skullMat->FresnelR0 = XMFLOAT3(0.6f, 0.6f, 0.6f);
-    skullMat->Roughness = 0.2f;
-
     auto sky = std::make_unique<Material>();
     sky->Name = "sky";
-    sky->MatCBIndex = 4;
+    sky->MatCBIndex = 3;
     sky->DiffuseSrvHeapIndex = 6;
     sky->NormalSrvHeapIndex = 7;
     sky->DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -1100,11 +1138,26 @@ void SSAOScene::BuildMaterials()
     _materials["bricks0"] = move(bricks0);
     _materials["tile0"] = move(tile0);
     _materials["mirror0"] = move(mirror0);
-    _materials["skullMat"] = move(skullMat);
     _materials["sky"] = move(sky);
+
+    UINT matCBIndex = 4;
+    UINT srvHeapIndex = _skinnedSrvHeapStart;
+    for (UINT i = 0; i < _skinnedMats.size(); i++)
+    {
+        auto mat = std::make_unique<Material>();
+        mat->Name = _skinnedMats[i].Name;
+        mat->MatCBIndex = matCBIndex++;
+        mat->DiffuseSrvHeapIndex = srvHeapIndex++;
+        mat->NormalSrvHeapIndex = srvHeapIndex++;
+        mat->DiffuseAlbedo = _skinnedMats[i].DiffuseAlbedo;
+        mat->FresnelR0 = _skinnedMats[i].FresnelR0;
+        mat->Roughness = _skinnedMats[i].Roughness;
+
+        _materials[mat->Name] = std::move(mat);
+    }
 }
 
-void SSAOScene::BuildRenderItems()
+void SkinnedAnimation::BuildRenderItems()
 {
     auto skyRitem = std::make_unique<RenderItem>();
     XMStoreFloat4x4(&skyRitem->Model, XMMatrixScaling(5000.0f, 5000.0f, 5000.0f));
@@ -1134,7 +1187,7 @@ void SSAOScene::BuildRenderItems()
 
     auto boxRitem = std::make_unique<RenderItem>();
     XMStoreFloat4x4(&boxRitem->Model, XMMatrixScaling(2.0f, 1.0f, 2.0f)*XMMatrixTranslation(0.0f, 0.5f, 0.0f));
-    XMStoreFloat4x4(&boxRitem->TexTransform, XMMatrixScaling(1.0f, 0.5f, 1.0f));
+    XMStoreFloat4x4(&boxRitem->TexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
     boxRitem->ObjCBIndex = 2;
     boxRitem->Mat = _materials["bricks0"].get();
     boxRitem->Geo = _geometries["shapeGeo"].get();
@@ -1144,24 +1197,11 @@ void SSAOScene::BuildRenderItems()
     boxRitem->BaseVertexLocation = boxRitem->Geo->DrawArgs["box"].BaseVertexLocation;
     _renderItemLayer[(int)RenderLayer::Opaque].push_back(boxRitem.get());
     _allRenderItems.push_back(move(boxRitem));
-
-    auto skullRitem = std::make_unique<RenderItem>();
-    XMStoreFloat4x4(&skullRitem->Model, XMMatrixScaling(0.4f, 0.4f, 0.4f)*XMMatrixTranslation(0.0f, 1.0f, 0.0f));
-    skullRitem->TexTransform = MathHelper::Identity4x4();
-    skullRitem->ObjCBIndex = 3;
-    skullRitem->Mat = _materials["skullMat"].get();
-    skullRitem->Geo = _geometries["skullGeo"].get();
-    skullRitem->PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-    skullRitem->IndexCount = skullRitem->Geo->DrawArgs["skull"].IndexCount;
-    skullRitem->StartIndexLocation = skullRitem->Geo->DrawArgs["skull"].StartIndexLocation;
-    skullRitem->BaseVertexLocation = skullRitem->Geo->DrawArgs["skull"].BaseVertexLocation;
-    _renderItemLayer[(int)RenderLayer::Opaque].push_back(skullRitem.get());
-    _allRenderItems.push_back(move(skullRitem));
-
+    
     auto gridRitem = std::make_unique<RenderItem>();
     gridRitem->Model = MathHelper::Identity4x4();
     XMStoreFloat4x4(&gridRitem->TexTransform, XMMatrixScaling(8.0f, 8.0f, 1.0f));
-    gridRitem->ObjCBIndex = 4;
+    gridRitem->ObjCBIndex = 3;
     gridRitem->Mat = _materials["tile0"].get();
     gridRitem->Geo = _geometries["shapeGeo"].get();
     gridRitem->PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
@@ -1172,7 +1212,7 @@ void SSAOScene::BuildRenderItems()
     _allRenderItems.push_back(move(gridRitem));
 
     XMMATRIX brickTexTransform = XMMatrixScaling(1.5f, 2.0f, 1.0f);
-    UINT objCBIndex = 5;
+    UINT objCBIndex = 4;
     for (int i = 0; i < 5; ++i)
     {
         auto leftCylRitem = std::make_unique<RenderItem>();
@@ -1236,108 +1276,75 @@ void SSAOScene::BuildRenderItems()
         _allRenderItems.push_back(move(leftSphereRitem));
         _allRenderItems.push_back(move(rightSphereRitem));
     }
-}
-
-void SSAOScene::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& renderItems)
-{
-    UINT objCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(FrameResource::ObjectConstants));
-
-
-    auto objectCB = _currFrameResource->ObjectCB->Resource();
-
-    for (size_t i = 0; i < renderItems.size(); i++)
+    for (UINT i = 0; i < _skinnedMats.size(); i++)
     {
-        auto ri = renderItems[i];
+        std::string submeshName = "sm_" + std::to_string(i);
 
-        cmdList->IASetVertexBuffers(0, 1, &ri->Geo->VertexBufferView());
-        cmdList->IASetIndexBuffer(&ri->Geo->IndexBufferView());
-        cmdList->IASetPrimitiveTopology(ri->PrimitiveType);
+        auto ritem = std::make_unique<RenderItem>();
 
-        D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = objectCB->GetGPUVirtualAddress() + ri->ObjCBIndex * objCBByteSize;
+        XMMATRIX modelScale = XMMatrixScaling(0.05f, 0.05f, -0.05f);
+        XMMATRIX modelRot = XMMatrixRotationY(MathHelper::Pi);
+        XMMATRIX modelOffset = XMMatrixTranslation(0.0f, 0.0f, -5.0f);
+        XMStoreFloat4x4(&ritem->Model, modelScale*modelRot*modelOffset);
 
-        cmdList->SetGraphicsRootConstantBufferView(0, objCBAddress);
+        ritem->TexTransform = MathHelper::Identity4x4();
+        ritem->ObjCBIndex = objCBIndex++;
+        ritem->Mat = _materials[_skinnedMats[i].Name].get();
+        ritem->Geo = _geometries[_skinnedModelFilename].get();
+        ritem->PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+        ritem->IndexCount = ritem->Geo->DrawArgs[submeshName].IndexCount;
+        ritem->StartIndexLocation = ritem->Geo->DrawArgs[submeshName].StartIndexLocation;
+        ritem->BaseVertexLocation = ritem->Geo->DrawArgs[submeshName].BaseVertexLocation;
 
-        cmdList->DrawIndexedInstanced(ri->IndexCount, 1, ri->StartIndexLocation, ri->BaseVertexLocation, 0);
+        ritem->SkinnedCBIndex = 0;
+        ritem->SkinnedModelInst = _skinnedModelInst.get();
+
+        _renderItemLayer[(int)RenderLayer::SkinnedOpaque].push_back(ritem.get());
+        _allRenderItems.push_back(std::move(ritem));
     }
 }
 
-void SSAOScene::DrawSceneToShadowMap()
+void SkinnedAnimation::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& renderItems)
 {
-    _commandList->RSSetViewports(1, &_shadowMap->Viewport());
-    _commandList->RSSetScissorRects(1, &_shadowMap->ScissorRect());
-
-    _commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_shadowMap->Resource(),
-        D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_DEPTH_WRITE));
-
-    UINT passCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(FrameResource::PassConstants));
-    _commandList->ClearDepthStencilView(_shadowMap->Dsv(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
-    _commandList->OMSetRenderTargets(0, nullptr, false, &_shadowMap->Dsv());
-
-    auto passCB = _currFrameResource->PassCB->Resource();
-    D3D12_GPU_VIRTUAL_ADDRESS passCBAdderss = passCB->GetGPUVirtualAddress() + passCBByteSize;
-    _commandList->SetGraphicsRootConstantBufferView(1, passCBAdderss);
-
-    _commandList->SetPipelineState(_PSOs["shadow_opaque"].Get());
-    DrawRenderItems(_commandList.Get(), _renderItemLayer[(int)RenderLayer::Opaque]);
-    _commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_shadowMap->Resource(),
-        D3D12_RESOURCE_STATE_DEPTH_WRITE,
-        D3D12_RESOURCE_STATE_GENERIC_READ));
 }
 
-void SSAOScene::DrawNormalsAndDepth()
+void SkinnedAnimation::DrawSceneToShadowMap()
 {
-    _commandList->RSSetViewports(1, &_screenViewport);
-    _commandList->RSSetScissorRects(1, &_scissorRect);
-
-    auto normalMap = _ssao->NormalMap();
-    auto normalMapRtv = _ssao->NormalMapRtv();
-
-    _commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(normalMap, D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_RENDER_TARGET));
-
-    float clearValue[] = { 0.0f, 0.0f, 1.0f, 0.0 };
-    _commandList->ClearRenderTargetView(normalMapRtv, clearValue, 0, nullptr);
-    _commandList->ClearDepthStencilView(DepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
-
-    _commandList->OMSetRenderTargets(1, &normalMapRtv, true, &DepthStencilView());
-
-    auto passCB = _currFrameResource->PassCB->Resource();
-    _commandList->SetGraphicsRootConstantBufferView(1, passCB->GetGPUVirtualAddress());
-
-    _commandList->SetPipelineState(_PSOs["drawNormals"].Get());
-
-    DrawRenderItems(_commandList.Get(), _renderItemLayer[(int)RenderLayer::Opaque]);
-    _commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(normalMap, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_GENERIC_READ));
 }
 
-CD3DX12_CPU_DESCRIPTOR_HANDLE SSAOScene::GetCpuSrv(int index) const
+void SkinnedAnimation::DrawNormalsAndDepth()
+{
+}
+
+CD3DX12_CPU_DESCRIPTOR_HANDLE SkinnedAnimation::GetCpuSrv(int index) const
 {
     auto srv = CD3DX12_CPU_DESCRIPTOR_HANDLE(_srvHeap->GetCPUDescriptorHandleForHeapStart());
     srv.Offset(index, _cbvSrvUavDescriptorSize);
     return srv;
 }
 
-CD3DX12_GPU_DESCRIPTOR_HANDLE SSAOScene::GetGpuSrv(int index) const
+CD3DX12_GPU_DESCRIPTOR_HANDLE SkinnedAnimation::GetGpuSrv(int index) const
 {
     auto srv = CD3DX12_GPU_DESCRIPTOR_HANDLE(_srvHeap->GetGPUDescriptorHandleForHeapStart());
     srv.Offset(index, _cbvSrvUavDescriptorSize);
     return srv;
 }
 
-CD3DX12_CPU_DESCRIPTOR_HANDLE SSAOScene::GetDsv(int index) const
+CD3DX12_CPU_DESCRIPTOR_HANDLE SkinnedAnimation::GetDsv(int index) const
 {
     auto dsv = CD3DX12_CPU_DESCRIPTOR_HANDLE(_dsvHeap->GetCPUDescriptorHandleForHeapStart());
     dsv.Offset(index, _dsvDescriptorSize);
     return dsv;
 }
 
-CD3DX12_CPU_DESCRIPTOR_HANDLE SSAOScene::GetRtv(int index) const
+CD3DX12_CPU_DESCRIPTOR_HANDLE SkinnedAnimation::GetRtv(int index) const
 {
     auto rtv = CD3DX12_CPU_DESCRIPTOR_HANDLE(_rtvHeap->GetCPUDescriptorHandleForHeapStart());
     rtv.Offset(index, _rtvDescriptorSize);
     return rtv;
 }
 
-std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> SSAOScene::GetStaticSamplers()
+std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> SkinnedAnimation::GetStaticSamplers()
 {
     const CD3DX12_STATIC_SAMPLER_DESC pointWrap(
         0, // shaderRegister
@@ -1396,7 +1403,7 @@ std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> SSAOScene::GetStaticSamplers()
         D3D12_COMPARISON_FUNC_LESS_EQUAL,
         D3D12_STATIC_BORDER_COLOR_OPAQUE_BLACK);
 
-    return {
+    return{
         pointWrap, pointClamp,
         linearWrap, linearClamp,
         anisotropicWrap, anisotropicClamp,

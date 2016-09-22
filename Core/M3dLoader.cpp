@@ -31,7 +31,7 @@ bool M3dLoader::LoadM3d(const std::string& filename, std::vector<Vertex>& vertic
     return false;
 }
 
-bool M3dLoader::LoadM3d(const std::string& filename, std::vector<Vertex>& vertices, std::vector<USHORT>& indices, std::vector<Subset>& subsets, std::vector<M3dMaterial>& mats, SkinnedData& skinInfo)
+bool M3dLoader::LoadM3d(const std::string& filename, std::vector<SkinnedVertex>& vertices, std::vector<USHORT>& indices, std::vector<Subset>& subsets, std::vector<M3dMaterial>& mats, SkinnedData& skinInfo)
 {
     std::ifstream fin(filename);
     UINT numMaterials = 0;
@@ -57,7 +57,7 @@ bool M3dLoader::LoadM3d(const std::string& filename, std::vector<Vertex>& vertic
 
         ReadMaterials(fin, numMaterials, mats);
         ReadSubsetTable(fin, numMaterials, subsets);
-        ReadVertices(fin, numVertices, vertices);
+        ReadSkinnedVertices(fin, numVertices, vertices);
         ReadTriangles(fin, numTriangles, indices);
         ReadBoneOffsets(fin, numBones, boneOffsets);
         ReadBoneHierarchy(fin, numBones, boneIndexToParentIndex);
