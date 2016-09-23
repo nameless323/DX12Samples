@@ -102,7 +102,7 @@ void SkinnedAnimation::Update(const GameTimer& timer)
 {
     OnKeyboardInput(timer);
 
-    _currentFrameResourceIndex = (_currentFrameResourceIndex + 1) % SSAOFrameResource::NumFrameResources;
+    _currentFrameResourceIndex = (_currentFrameResourceIndex + 1) % FrameResource::NumFrameResources;
     _currFrameResource = _frameResources[_currentFrameResourceIndex].get();
 
     if (_currFrameResource->Fence != 0 && _fence->GetCompletedValue() < _currFrameResource->Fence)
@@ -123,6 +123,7 @@ void SkinnedAnimation::Update(const GameTimer& timer)
     }
     AnimateMaterials(timer);
     UpdateObjectCBs(timer);
+    UpdateSkinnedCBs(timer);
     UpdateMaterialBuffer(timer);
     UpdateShadowTransform(timer);
     UpdateMainPassCB(timer);
@@ -164,6 +165,7 @@ void SkinnedAnimation::Draw(const GameTimer& timer)
     _commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(CurrentBackBuffer(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 
     _commandList->ClearRenderTargetView(CurrentBackBufferView(), Colors::LightSteelBlue, 0, nullptr);
+    _commandList->ClearDepthStencilView(DepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
     _commandList->OMSetRenderTargets(1, &CurrentBackBufferView(), true, &DepthStencilView());
 
     _commandList->SetGraphicsRootDescriptorTable(5, _srvHeap->GetGPUDescriptorHandleForHeapStart());

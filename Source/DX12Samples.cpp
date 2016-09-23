@@ -32,12 +32,13 @@
 #include "Scenes/Shadowmapping/Shadowmapping.h"
 #include "Scenes/SSAO/SSAOScene.h"
 #include "Scenes/RotationScene/RotationScene.h"
+#include "Scenes/SkinnedAnimation/SkinnedAnimaiton.h"
 
 Application* app;
 
 void CreateScene(HINSTANCE hInstance)
 {
-    app = new SSAOScene(hInstance);
+    app = new SkinnedAnimation(hInstance);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
