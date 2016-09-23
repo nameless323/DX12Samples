@@ -51,11 +51,11 @@ vOut vert(vIn i)
     for (int j = 0; j < 4; j++)
     {
         posL += weights[j] * mul(float4(i.pos, 1.0f), BoneTransforms[i.BoneIndices[j]]).xyz;
-        normalL += weights[j] * mul(i.normalL, (float3x3) BoneTransforms[i.BoneIndices[j]]);
-        tangentL += weights[j] * mul(i.tangent.xyz, (float3x3) BoneTransforms[i.BoneIndices[J]]);
+        normalL += weights[j] * mul(i.normal, (float3x3) BoneTransforms[i.BoneIndices[j]]);
+        tangentL += weights[j] * mul(i.tangent.xyz, (float3x3) BoneTransforms[i.BoneIndices[j]]);
     }
     i.pos = posL;
-    i.normalL = normalL;
+    i.normal = normalL;
     i.tangent.xyz = tangentL;
 #endif
     float4 posW = mul(float4(i.pos, 1.0f), Model);
