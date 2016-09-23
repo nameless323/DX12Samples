@@ -511,5 +511,11 @@
     <FxCompile Include="Shaders\SSAO\SSAODebug.hlsl" />
     <FxCompile Include="Shaders\SSAO\SSAODefault.hlsl" />
     <FxCompile Include="Shaders\RotationDefault.hlsl" />
+    <FxCompile Include="Shaders\SkinnedRender\CommonInclude.hlsl" />
+    <FxCompile Include="Shaders\SkinnedRender\DrawNormals.hlsl" />
+    <FxCompile Include="Shaders\SkinnedRender\Debug.hlsl" />
+    <FxCompile Include="Shaders\SkinnedRender\Default.hlsl" />
+    <FxCompile Include="Shaders\SkinnedRender\Sky.hlsl" />
+    <FxCompile Include="Shaders\SkinnedRender\RenderShadows.hlsl" />
   </ItemGroup>
 </Project>

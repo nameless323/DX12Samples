@@ -278,6 +278,8 @@ void SkinnedAnimation::UpdateSkinnedCBs(const GameTimer& timer)
     _skinnedModelInst->UpdateSkinnedAnimation(timer.DeltaTime());
 
     SkinnedAnimFrameResource::SkinnedConstants skinnedConstants;
+    for (int i = 0; i < _skinnedModelInst->FinalTransforms.size(); i++)
+        skinnedConstants.BoneTransforms[i] = _skinnedModelInst->FinalTransforms[i];
 //    std::copy(std::begin(_skinnedModelInst->FinalTransforms), std::end(_skinnedModelInst->FinalTransforms), &skinnedConstants.BoneTransforms[0]);
     currSkinnedCB->CopyData(0, skinnedConstants);
 }
@@ -690,21 +692,28 @@ void SkinnedAnimation::BuildShaderAndInputLayout()
         NULL, NULL
     };
 
-    _shaders["standardVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAODefault.hlsl", nullptr, "vert", "vs_5_1");
-    _shaders["skinnedVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAODefault.hlsl", nullptr, "vert", "vs_5_1");
-    _shaders["opaquePS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAODefault.hlsl", nullptr, "frag", "ps_5_1");
+    const D3D_SHADER_MACRO skinnedDefines[] =
+    {
+        "SKINNED", "1",
+        NULL, NULL
+    };
 
-    _shaders["shadowVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\RenderShadows.hlsl", nullptr, "vert", "vs_5_1");
-    _shaders["skinnedShadowVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\RenderShadows.hlsl", nullptr, "vert", "vs_5_1");
-    _shaders["shadowOpaquePS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\RenderShadows.hlsl", nullptr, "frag", "ps_5_1");
-    _shaders["shadowAlphaTestedPS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\RenderShadows.hlsl", alphaTestDefines, "frag", "ps_5_1");
 
-    _shaders["debugVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAODebug.hlsl", nullptr, "vert", "vs_5_1");
-    _shaders["debugPS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAODebug.hlsl", nullptr, "frag", "ps_5_1");
+    _shaders["standardVS"] = D3DUtil::CompileShader(L"Shaders\\SkinnedRender\\Default.hlsl", nullptr, "vert", "vs_5_1");
+    _shaders["skinnedVS"] = D3DUtil::CompileShader(L"Shaders\\SkinnedRender\\Default.hlsl", skinnedDefines, "vert", "vs_5_1");
+    _shaders["opaquePS"] = D3DUtil::CompileShader(L"Shaders\\SkinnedRender\\Default.hlsl", nullptr, "frag", "ps_5_1");
 
-    _shaders["drawNormalsVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\DrawNormals.hlsl", nullptr, "vert", "vs_5_1");
-    _shaders["skinnedDrawNormalsVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\DrawNormals.hlsl", nullptr, "vert", "vs_5_1");
-    _shaders["drawNormalsPS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\DrawNormals.hlsl", nullptr, "frag", "ps_5_1");
+    _shaders["shadowVS"] = D3DUtil::CompileShader(L"Shaders\\SkinnedRender\\RenderShadows.hlsl", nullptr, "vert", "vs_5_1");
+    _shaders["skinnedShadowVS"] = D3DUtil::CompileShader(L"Shaders\\SkinnedRender\\RenderShadows.hlsl", skinnedDefines, "vert", "vs_5_1");
+    _shaders["shadowOpaquePS"] = D3DUtil::CompileShader(L"Shaders\\SkinnedRender\\RenderShadows.hlsl", nullptr, "frag", "ps_5_1");
+    _shaders["shadowAlphaTestedPS"] = D3DUtil::CompileShader(L"Shaders\\SkinnedRender\\RenderShadows.hlsl", alphaTestDefines, "frag", "ps_5_1");
+
+    _shaders["debugVS"] = D3DUtil::CompileShader(L"Shaders\\SkinnedRender\\Debug.hlsl", nullptr, "vert", "vs_5_1");
+    _shaders["debugPS"] = D3DUtil::CompileShader(L"Shaders\\SkinnedRender\\Debug.hlsl", nullptr, "frag", "ps_5_1");
+
+    _shaders["drawNormalsVS"] = D3DUtil::CompileShader(L"Shaders\\SkinnedRender\\DrawNormals.hlsl", nullptr, "vert", "vs_5_1");
+    _shaders["skinnedDrawNormalsVS"] = D3DUtil::CompileShader(L"Shaders\\SkinnedRender\\DrawNormals.hlsl", skinnedDefines, "vert", "vs_5_1");
+    _shaders["drawNormalsPS"] = D3DUtil::CompileShader(L"Shaders\\SkinnedRender\\DrawNormals.hlsl", nullptr, "frag", "ps_5_1");
 
     _shaders["ssaoVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAO.hlsl", nullptr, "vert", "vs_5_1");
     _shaders["ssaoPS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAO.hlsl", nullptr, "frag", "ps_5_1");
@@ -712,8 +721,8 @@ void SkinnedAnimation::BuildShaderAndInputLayout()
     _shaders["ssaoBlurVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAOBlur.hlsl", nullptr, "vert", "vs_5_1");
     _shaders["ssaoBlurPS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\SSAOBlur.hlsl", nullptr, "frag", "ps_5_1");
 
-    _shaders["skyVS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\Sky.hlsl", nullptr, "vert", "vs_5_1");
-    _shaders["skyPS"] = D3DUtil::CompileShader(L"Shaders\\SSAO\\Sky.hlsl", nullptr, "frag", "ps_5_1");
+    _shaders["skyVS"] = D3DUtil::CompileShader(L"Shaders\\SkinnedRender\\Sky.hlsl", nullptr, "vert", "vs_5_1");
+    _shaders["skyPS"] = D3DUtil::CompileShader(L"Shaders\\SkinnedRender\\Sky.hlsl", nullptr, "frag", "ps_5_1");
 
     _inputLayout =
     {
@@ -1306,14 +1315,92 @@ void SkinnedAnimation::BuildRenderItems()
 
 void SkinnedAnimation::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& renderItems)
 {
+    UINT objCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(FrameResource::ObjectConstants));
+    UINT skinnedCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(SkinnedAnimFrameResource::SkinnedConstants));
+    
+    auto objectCB = _currFrameResource->ObjectCB->Resource();
+    auto skinnedCB = _currFrameResource->SkinnedCB->Resource();
+
+    for (size_t i = 0; i < renderItems.size(); i++)
+    {
+        auto ri = renderItems[i];
+
+        cmdList->IASetVertexBuffers(0, 1, &ri->Geo->VertexBufferView());
+        cmdList->IASetIndexBuffer(&ri->Geo->IndexBufferView());
+        cmdList->IASetPrimitiveTopology(ri->PrimitiveType);
+
+        D3D12_GPU_VIRTUAL_ADDRESS objCBAddress = objectCB->GetGPUVirtualAddress() + ri->ObjCBIndex * objCBByteSize;
+
+        cmdList->SetGraphicsRootConstantBufferView(0, objCBAddress);
+
+        if (ri->SkinnedModelInst != nullptr)
+        {
+            D3D12_GPU_VIRTUAL_ADDRESS skinnedCBAddress = skinnedCB->GetGPUVirtualAddress();
+            cmdList->SetGraphicsRootConstantBufferView(1, skinnedCBAddress);
+        }
+        else
+        {
+            cmdList->SetGraphicsRootConstantBufferView(1, 0);
+        }
+
+        cmdList->DrawIndexedInstanced(ri->IndexCount, 1, ri->StartIndexLocation, ri->BaseVertexLocation, 0);
+    }
 }
 
 void SkinnedAnimation::DrawSceneToShadowMap()
 {
+    _commandList->RSSetViewports(1, &_shadowMap->Viewport());
+    _commandList->RSSetScissorRects(1, &_shadowMap->ScissorRect());
+
+    _commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_shadowMap->Resource(),
+        D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_DEPTH_WRITE));
+
+    UINT passCBByteSize = D3DUtil::CalcConstantBufferByteSize(sizeof(FrameResource::PassConstants));
+    _commandList->ClearDepthStencilView(_shadowMap->Dsv(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+    _commandList->OMSetRenderTargets(0, nullptr, false, &_shadowMap->Dsv());
+
+    auto passCB = _currFrameResource->PassCB->Resource();
+    D3D12_GPU_VIRTUAL_ADDRESS passCBAdderss = passCB->GetGPUVirtualAddress() + passCBByteSize;
+    _commandList->SetGraphicsRootConstantBufferView(2, passCBAdderss);
+
+    _commandList->SetPipelineState(_PSOs["shadow_opaque"].Get());
+    DrawRenderItems(_commandList.Get(), _renderItemLayer[(int)RenderLayer::Opaque]);
+
+    _commandList->SetPipelineState(_PSOs["skinnedShadow_opaque"].Get());
+    DrawRenderItems(_commandList.Get(), _renderItemLayer[(int)RenderLayer::SkinnedOpaque]);
+
+    _commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_shadowMap->Resource(),
+        D3D12_RESOURCE_STATE_DEPTH_WRITE,
+        D3D12_RESOURCE_STATE_GENERIC_READ));
 }
 
 void SkinnedAnimation::DrawNormalsAndDepth()
 {
+    _commandList->RSSetViewports(1, &_screenViewport);
+    _commandList->RSSetScissorRects(1, &_scissorRect);
+
+    auto normalMap = _ssao->NormalMap();
+    auto normalMapRtv = _ssao->NormalMapRtv();
+
+    _commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(normalMap, D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_RENDER_TARGET));
+
+    float clearValue[] = { 0.0f, 0.0f, 1.0f, 0.0 };
+    _commandList->ClearRenderTargetView(normalMapRtv, clearValue, 0, nullptr);
+    _commandList->ClearDepthStencilView(DepthStencilView(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+
+    _commandList->OMSetRenderTargets(1, &normalMapRtv, true, &DepthStencilView());
+
+    auto passCB = _currFrameResource->PassCB->Resource();
+    _commandList->SetGraphicsRootConstantBufferView(2, passCB->GetGPUVirtualAddress());
+
+    _commandList->SetPipelineState(_PSOs["drawNormals"].Get());
+    DrawRenderItems(_commandList.Get(), _renderItemLayer[(int)RenderLayer::Opaque]);
+
+    _commandList->SetPipelineState(_PSOs["skinnedDrawNormals"].Get());
+    DrawRenderItems(_commandList.Get(), _renderItemLayer[(int)RenderLayer::SkinnedOpaque]);
+
+
+    _commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(normalMap, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_GENERIC_READ));
 }
 
 CD3DX12_CPU_DESCRIPTOR_HANDLE SkinnedAnimation::GetCpuSrv(int index) const
