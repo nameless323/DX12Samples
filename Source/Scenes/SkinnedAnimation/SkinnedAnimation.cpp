@@ -729,9 +729,16 @@ void SkinnedAnimation::BuildShaderAndInputLayout()
         { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
         { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
         { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+        { "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }   
+    }; 
+    _skinnedInputLayout =
+    {
+        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+        { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+        { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
         { "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
         { "WEIGHTS", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 44, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-        { "BONEINDICES", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 56, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+        { "BONEINDICES", 0, DXGI_FORMAT_R8G8B8A8_UINT, 0, 56, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
     };
 }
 
@@ -924,34 +931,33 @@ void SkinnedAnimation::BuildSkullGeometry()
 
 void SkinnedAnimation::BuildPSOs()
 {
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC basePsoDesc;
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC opaquePso;
 
-    ZeroMemory(&basePsoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
-    basePsoDesc.InputLayout = { _inputLayout.data(), (UINT)_inputLayout.size() };
-    basePsoDesc.pRootSignature = _rootSignature.Get();
-    basePsoDesc.VS =
+    ZeroMemory(&opaquePso, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
+    opaquePso.InputLayout = { _inputLayout.data(), (UINT)_inputLayout.size() };
+    opaquePso.pRootSignature = _rootSignature.Get();
+    opaquePso.VS =
     {
         reinterpret_cast<BYTE*>(_shaders["standardVS"]->GetBufferPointer()),
         _shaders["standardVS"]->GetBufferSize()
     };
-    basePsoDesc.PS =
+    opaquePso.PS =
     {
         reinterpret_cast<BYTE*>(_shaders["opaquePS"]->GetBufferPointer()),
         _shaders["opaquePS"]->GetBufferSize()
     };
-    basePsoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-    basePsoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
-    basePsoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-    basePsoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
-    basePsoDesc.SampleMask = UINT_MAX;
-    basePsoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-    basePsoDesc.NumRenderTargets = 1;
-    basePsoDesc.RTVFormats[0] = _backBufferFormat;
-    basePsoDesc.SampleDesc.Count = _4xMsaa ? 4 : 1;
-    basePsoDesc.SampleDesc.Quality = _4xMsaa ? (_4xMsaaQuality - 1) : 0;
-    basePsoDesc.DSVFormat = _dsvFormat;
+    opaquePso.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+    opaquePso.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
+    opaquePso.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+    opaquePso.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+    opaquePso.SampleMask = UINT_MAX;
+    opaquePso.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+    opaquePso.NumRenderTargets = 1;
+    opaquePso.RTVFormats[0] = _backBufferFormat;
+    opaquePso.SampleDesc.Count = _4xMsaa ? 4 : 1;
+    opaquePso.SampleDesc.Quality = _4xMsaa ? (_4xMsaaQuality - 1) : 0;
+    opaquePso.DSVFormat = _dsvFormat;
 
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC opaquePso = basePsoDesc;
     ThrowIfFailed(_device->CreateGraphicsPipelineState(&opaquePso, IID_PPV_ARGS(&_PSOs["opaque"])));
 
     D3D12_GRAPHICS_PIPELINE_STATE_DESC skinnedOpaquePsoDesc = opaquePso;
@@ -968,7 +974,7 @@ void SkinnedAnimation::BuildPSOs()
     };
     ThrowIfFailed(_device->CreateGraphicsPipelineState(&skinnedOpaquePsoDesc, IID_PPV_ARGS(&_PSOs["skinnedOpaque"])));
 
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC smapPsoDesc = basePsoDesc;
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC smapPsoDesc = opaquePso;
     smapPsoDesc.RasterizerState.DepthBias = 100000;
     smapPsoDesc.RasterizerState.DepthBiasClamp = 0.0f;
     smapPsoDesc.RasterizerState.SlopeScaledDepthBias = 1.0f;
@@ -1001,7 +1007,7 @@ void SkinnedAnimation::BuildPSOs()
     };
     ThrowIfFailed(_device->CreateGraphicsPipelineState(&skinnedSmapPsoDesc, IID_PPV_ARGS(&_PSOs["skinnedShadow_opaque"])));
 
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC debugPsoDesc = basePsoDesc;
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC debugPsoDesc = opaquePso;
     debugPsoDesc.pRootSignature = _rootSignature.Get();
     debugPsoDesc.VS =
     {
@@ -1015,7 +1021,7 @@ void SkinnedAnimation::BuildPSOs()
     };
     ThrowIfFailed(_device->CreateGraphicsPipelineState(&debugPsoDesc, IID_PPV_ARGS(&_PSOs["debug"])));
 
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC drawNormalsPsoDesc = basePsoDesc;
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC drawNormalsPsoDesc = opaquePso;
     drawNormalsPsoDesc.VS =
     {
         reinterpret_cast<BYTE*>(_shaders["drawNormalsVS"]->GetBufferPointer()),
@@ -1047,7 +1053,7 @@ void SkinnedAnimation::BuildPSOs()
     ThrowIfFailed(_device->CreateGraphicsPipelineState(&skinnedDrawNormalsPsoDesc, IID_PPV_ARGS(&_PSOs["skinnedDrawNormals"])));
 
 
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC ssaoPsoDesc = basePsoDesc;
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC ssaoPsoDesc = opaquePso;
     ssaoPsoDesc.InputLayout = { nullptr, 0 };
     ssaoPsoDesc.pRootSignature = _ssaoRootSignature.Get();
     ssaoPsoDesc.VS =
@@ -1082,7 +1088,7 @@ void SkinnedAnimation::BuildPSOs()
     ThrowIfFailed(_device->CreateGraphicsPipelineState(&ssaoBlurPsoDesc, IID_PPV_ARGS(&_PSOs["ssaoBlur"])));
 
 
-    D3D12_GRAPHICS_PIPELINE_STATE_DESC skyPsoDesc = basePsoDesc;
+    D3D12_GRAPHICS_PIPELINE_STATE_DESC skyPsoDesc = opaquePso;
     skyPsoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
 
     skyPsoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
