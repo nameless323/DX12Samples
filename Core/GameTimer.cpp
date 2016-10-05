@@ -1,4 +1,5 @@
 #include <windows.h>
+
 #include "GameTimer.h"
 
 GameTimer::GameTimer() : _secondsPerCount(0.0), _dt(-1.0f), _baseTime(0), _pausedTime(0), _stopTime(0), _prevTime(0), _currTime(0), _stopped(false)
@@ -55,7 +56,6 @@ void GameTimer::Stop()
         _stopped = true;
     }
 }
-
 
 void GameTimer::Tick()
 {
