@@ -1,3 +1,8 @@
+//
+// Describes timer used throughout the game.
+//
+
+
 #pragma once
 
 class GameTimer
@@ -5,18 +10,29 @@ class GameTimer
 public:
     GameTimer();
 
-    /// <summary> Total time in seconds </summary>
+    /**
+     * \brief Total time in seconds.
+     */
     float TotalTime() const;
-    /// <summary> Delta time in seconds </summary>
+    /**
+     * \brief Delta time in seconds.
+     */
     float DeltaTime() const;
-
-    /// <summary> Call before message loop. </summary>
+    /**
+     * \brief Call before message loop.
+     */
     void Reset();
-    /// <summary> Call when unpaused. </summary>
+    /**
+     * \brief Call when unpaused.
+     */
     void Start();
-    /// <summary> Call when paused. </summary>
+    /**
+     * \brief Call when paused.
+     */
     void Stop();
-    /// <summary> Call every frame to update timer. </summary>
+    /**
+     * \brief Call every frame to update timer.
+     */
     void Tick();
 private:
     double _secondsPerCount;
