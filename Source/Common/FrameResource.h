@@ -1,4 +1,9 @@
+//
+// Describes data which has to be set at each frame to GPU.
+//
+
 #pragma once
+
 #include "../../Core/D3DUtil.h"
 #include "../../Core/UploadBuffer.h"
 
@@ -17,11 +22,13 @@ struct FrameResource
         DirectX::XMFLOAT3 Normal;
         DirectX::XMFLOAT2 TexC;
     };
+    
     struct ObjectConstants
     {
         DirectX::XMFLOAT4X4 Model = MathHelper::Identity4x4();
         DirectX::XMFLOAT4X4 TexTransform = MathHelper::Identity4x4();
     };
+    
     struct PassConstants
     {
         DirectX::XMFLOAT4X4 View = MathHelper::Identity4x4();
@@ -58,13 +65,9 @@ struct FrameResource
     ~FrameResource();
 
     Microsoft::WRL::ComPtr<ID3D12CommandAllocator> CmdListAlloc;
-
     std::unique_ptr<UploadBuffer<PassConstants>> PassCB = nullptr;
     std::unique_ptr<UploadBuffer<MaterialConstants>> MaterialCB = nullptr;
     std::unique_ptr<UploadBuffer<ObjectConstants>> ObjectCB = nullptr;
-
     std::unique_ptr<UploadBuffer<Vertex>> WavesVB = nullptr;
-
     UINT64 Fence = 0;
-
 };
