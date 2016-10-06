@@ -1,6 +1,12 @@
+//
+// Describes data which nesessary to render single item in world.
+//
+
 #pragma once
+
 #include <DirectXCollision.h>
 #include <DirectXMath.h>
+
 #include "../../Core/MathHelper.h"
 #include "../../Core/D3DUtil.h"
 #include "FrameResourceUnfogged.h"
@@ -12,15 +18,13 @@ struct RenderItem
 
     DirectX::XMFLOAT4X4 Model = MathHelper::Identity4x4();
     DirectX::XMFLOAT4X4 TexTransform = MathHelper::Identity4x4();
-
     int NumFramesDirty = FrameResourceUnfogged::NumFrameResources;
-
     UINT ObjCBIndex = -1;
     Material* Mat = nullptr;
     MeshGeometry* Geo = nullptr;
     DirectX::XMFLOAT2 DisplacementMapTexelSize = { 1.0f, 1.0f };
     float GridSpatialStep = 1.0f;
-
+    
     D3D12_PRIMITIVE_TOPOLOGY PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
     UINT IndexCount = 0;
