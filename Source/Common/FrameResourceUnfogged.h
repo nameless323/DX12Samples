@@ -1,4 +1,9 @@
+//
+// Describes data which has to be set at each frame to GPU without fog data.
+//
+
 #pragma once
+
 #include "../../Core/D3DUtil.h"
 #include "../../Core/UploadBuffer.h"
 
@@ -12,11 +17,13 @@ struct FrameResourceUnfogged
         DirectX::XMFLOAT3 Normal;
         DirectX::XMFLOAT2 TexC;
     };
+    
     struct ObjectConstants
     {
         DirectX::XMFLOAT4X4 Model = MathHelper::Identity4x4();
         DirectX::XMFLOAT4X4 TexTransform = MathHelper::Identity4x4();
     };
+    
     struct PassConstants
     {
         DirectX::XMFLOAT4X4 View = MathHelper::Identity4x4();
@@ -48,63 +55,61 @@ struct FrameResourceUnfogged
     ~FrameResourceUnfogged();
 
     Microsoft::WRL::ComPtr<ID3D12CommandAllocator> CmdListAlloc;
-
     std::unique_ptr<UploadBuffer<PassConstants>> PassCB = nullptr;
     std::unique_ptr<UploadBuffer<MaterialConstants>> MaterialCB = nullptr;
     std::unique_ptr<UploadBuffer<ObjectConstants>> ObjectCB = nullptr;
-
     std::unique_ptr<UploadBuffer<Vertex>> WavesVB = nullptr;
-
     UINT64 Fence = 0;
-
-
+    /**
+     * \brief Returns bunch of prepared static samplers to set in root signature.
+     */
     static std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> GetStaticSamplers()
     {
         const CD3DX12_STATIC_SAMPLER_DESC pointWrap(
-            0, // shaderRegister
-            D3D12_FILTER_MIN_MAG_MIP_POINT, // filter
-            D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressU
-            D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressV
-            D3D12_TEXTURE_ADDRESS_MODE_WRAP); // addressW
+            0, // ShaderRegister.
+            D3D12_FILTER_MIN_MAG_MIP_POINT, // Filter.
+            D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // AddressU.
+            D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // AddressV.
+            D3D12_TEXTURE_ADDRESS_MODE_WRAP); // AddressW.
 
         const CD3DX12_STATIC_SAMPLER_DESC pointClamp(
-            1, // shaderRegister
-            D3D12_FILTER_MIN_MAG_MIP_POINT, // filter
-            D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressU
-            D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressV
-            D3D12_TEXTURE_ADDRESS_MODE_CLAMP); // addressW
+            1,
+            D3D12_FILTER_MIN_MAG_MIP_POINT,
+            D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+            D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+            D3D12_TEXTURE_ADDRESS_MODE_CLAMP);
 
         const CD3DX12_STATIC_SAMPLER_DESC linearWrap(
-            2, // shaderRegister
-            D3D12_FILTER_MIN_MAG_MIP_LINEAR, // filter
-            D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressU
-            D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressV
-            D3D12_TEXTURE_ADDRESS_MODE_WRAP); // addressW
+            2,
+            D3D12_FILTER_MIN_MAG_MIP_LINEAR,
+            D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+            D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+            D3D12_TEXTURE_ADDRESS_MODE_WRAP);
 
         const CD3DX12_STATIC_SAMPLER_DESC linearClamp(
-            3, // shaderRegister
-            D3D12_FILTER_MIN_MAG_MIP_LINEAR, // filter
-            D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressU
-            D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressV
-            D3D12_TEXTURE_ADDRESS_MODE_CLAMP); // addressW
+            3,
+            D3D12_FILTER_MIN_MAG_MIP_LINEAR,
+            D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+            D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+            D3D12_TEXTURE_ADDRESS_MODE_CLAMP);
 
         const CD3DX12_STATIC_SAMPLER_DESC anisotropicWrap(
-            4, // shaderRegister
-            D3D12_FILTER_ANISOTROPIC, // filter
-            D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressU
-            D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressV
-            D3D12_TEXTURE_ADDRESS_MODE_WRAP,  // addressW
-            0.0f,                             // mipLODBias
-            8);                               // maxAnisotropy
+            4,
+            D3D12_FILTER_ANISOTROPIC,
+            D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+            D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+            D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+            0.0f,
+            8);
 
         const CD3DX12_STATIC_SAMPLER_DESC anisotropicClamp(
-            5, // shaderRegister
-            D3D12_FILTER_ANISOTROPIC, // filter
-            D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressU
-            D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressV
-            D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressW
-            0.0f,                              // mipLODBias
-            8);                                // maxAnisotropy
+            5,
+            D3D12_FILTER_ANISOTROPIC,
+            D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+            D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+            D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+            0.0f,
+            8);
 
         return
         {
