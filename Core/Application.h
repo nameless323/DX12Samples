@@ -1,3 +1,7 @@
+//
+// Main application class. Creates and handles all Dx infrastructure.
+//
+
 #pragma once
 
 #if defined(DEBUG) || defined(_DEBUG)
@@ -19,40 +23,94 @@ public:
     HINSTANCE AppInstance() const;
     HWND MainWindow() const;
     float AspectRatio() const;
-
+    /**
+     * \brief Get if system supports 4x anti-aliasing.
+     */
     bool Get4xMsaaState() const;
+    /**
+     * \brief Set antialiasing on/off. Internally recreates swap chain.
+     */
     void Set4xMsaaState(bool value);
-
+    /**
+     * \brief Run application. This method handles windows message loop.
+     */
     virtual int Run();
-
+    /**
+     * \brief Create system window and DX infrasturcture.
+     */
     virtual bool Init();
+    /**
+     * \brief Windows message callback. See WINAPI.
+     */
     virtual LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 protected:
+    /**
+     * \brief Create Render target and Depth stencil heaps. Override this if you need to add additional in this heaps.
+     */
     virtual void CreateRtvAndDsvDescriptorHeaps();
+    /**
+     * \brief Recreates window size dependent resources.
+     */
     virtual void OnResize();
+    /**
+     * \brief Calls when game needs to update logic (set buffers, update animations etc).
+     */
     virtual void Update(const GameTimer& timer) abstract;
+    /**
+     * \brief Calls when system needs to redrow scene.
+     */
     virtual void Draw(const GameTimer& timer) abstract;
-
     virtual void OnMouseDown(WPARAM btnState, int x, int y) {}
     virtual void OnMouseUp(WPARAM btnState, int x, int y) {}
     virtual void OnMouseMove(WPARAM btnState, int x, int y) {}
-
+    /**
+     * \brief Create system window.
+     */
     bool InitMainWindow();
+    /**
+     * \brief Initialize DirectX infrastructure.
+     */
     bool InitDirectX();
+    /**
+     * \brief Create command allocator, command queue and command list.
+     */
     void CreateCommandObjects();
+    /**
+     * \brief Create swap chain.
+     */
     void CreateSwapChain();
-
+    /**
+     * \brief Stop CPU executing while GPU doesn't finish exequte commands in queue.
+     */
     void FlushCommandQueue();
-
+    /**
+     * \brief Get current back buffer resource.
+     */
     ID3D12Resource* CurrentBackBuffer() const;
+    /**
+     * \brief Get current back buffer resource view.
+     */
     D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackBufferView() const;
+    /**
+     * \brief Get current depth stencil view.
+     */
     D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilView() const;
-
+    /**
+     * \brief Get FPS.
+     */
     void CalculateFrameStats() const;
-
+    /**
+     * \brief Log all adapters (video cards) avaliable in system.
+     */
     void LogAdapters();
+    /**
+     * \brief Log all avaliable monitors.
+     */
     void LogAdapterOutputs(IDXGIAdapter* adapter);
+    /**
+     * \brief Log all avaliable display modes (resolutions and refresh rate)
+     */
     void LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format);
 
     static Application* _app;
