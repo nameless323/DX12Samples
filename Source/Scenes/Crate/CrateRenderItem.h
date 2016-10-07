@@ -1,8 +1,13 @@
+//
+// Data wich nesessary to render single item on scene.
+//
+
 #pragma once
+
 #include <DirectXMath.h>
 #include "../../../Core/MathHelper.h"
-#include "CrateFrameResource.h"
 #include "../../../Core/D3DUtil.h"
+#include "CrateFrameResource.h"
 
 struct CrateRenderItem
 {
