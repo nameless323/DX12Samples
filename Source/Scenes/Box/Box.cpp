@@ -12,7 +12,6 @@ Box::~Box()
 {
 }
 
-
 bool Box::Init()
 {
     if (!Application::Init())
@@ -33,7 +32,6 @@ bool Box::Init()
     FlushCommandQueue();
     return true;
 }
-
 
 LRESULT Box::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
