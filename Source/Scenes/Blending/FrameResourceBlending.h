@@ -1,4 +1,9 @@
+//
+// Describes data which has to be set at each frame to GPU.
+//
+
 #pragma once
+
 #include "../../Core/D3DUtil.h"
 #include "../../Core/UploadBuffer.h"
 
@@ -66,8 +71,10 @@ struct FrameResourceBlending
     std::unique_ptr<UploadBuffer<Vertex>> WavesVB = nullptr;
 
     UINT64 Fence = 0;
-
-
+    
+    /**
+     * \brief Returns bunch of prepared static samplers to set in root signature.
+     */
     static std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> GetStaticSamplers()
     {
         const CD3DX12_STATIC_SAMPLER_DESC pointWrap(
