@@ -1,3 +1,7 @@
+//
+// Applies gaussian blur to image.
+//
+
 #pragma once
 
 #include "../../Core/D3DUtil.h"
@@ -8,16 +12,33 @@ class GaussBlurFilter
 {
 public:
     GaussBlurFilter(ID3D12Device* device, UINT width, UINT height, DXGI_FORMAT format);
-
     GaussBlurFilter(const GaussBlurFilter& rhs) = delete;
     GaussBlurFilter& operator=(const GaussBlurFilter& rhs) = delete;
     ~GaussBlurFilter() = default;
-
+    /**
+     * \brief Get blurred resource.
+     */
     ID3D12Resource* Output();
-
+    /**
+     * \brief Build descriptors for blur.
+     * \param hCpuDescriptor Cpu descriptor in prebuilt heap.
+     * \param hGpuDescriptor Gpu descriptor in prebuilt heap.
+     * \param descriptorSize Size of CBV SRV UAV decrtiptor to offset in heap.
+     */
     void BuildDescriptors(CD3DX12_CPU_DESCRIPTOR_HANDLE hCpuDescriptor, CD3DX12_GPU_DESCRIPTOR_HANDLE hGpuDescriptor, UINT descriptorSize);
+    /**
+    * \brief Calls when window are resized to rebuild size dependent resources.
+    */
     void OnResize(UINT newWidth, UINT newHeight);
-
+    /**
+     * \brief Execute blur for input resorce.
+     * \param cmdList Command list for execution.
+     * \param rootSig Compute root signature for blur.
+     * \param horizBlurPSO PSO for horizontal blur.
+     * \param vertBlurPSO PSO for vertical blur.
+     * \param input Input resource to perform blur.
+     * \param blurCount Count of blur iterations.
+     */
     void Execute(ID3D12GraphicsCommandList* cmdList,
         ID3D12RootSignature* rootSig,
         ID3D12PipelineState* horizBlurPSO,
@@ -26,6 +47,9 @@ public:
         int blurCount);
 
 private:
+    /**
+     * \brief Calculate Gauss weight for sigma.
+     */
     std::vector<float> CalcGaussWeights(float sigma);
     void BuildDescriptors();
     void BuildResources();
