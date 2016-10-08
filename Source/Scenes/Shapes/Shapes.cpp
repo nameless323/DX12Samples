@@ -1,6 +1,9 @@
 #include "Shapes.h"
+
 #include "../../../Core/GeometryGenerator.h"
 
+namespace DX12Samples
+{
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace DirectX::PackedVector;
@@ -583,7 +586,6 @@ void Shapes::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vect
     }
 }
 
-
 GeometryGenerator::MeshData Shapes::ParseFile(std::string filename) const
 {
     GeometryGenerator::MeshData data;
@@ -639,4 +641,5 @@ GeometryGenerator::MeshData Shapes::ParseFile(std::string filename) const
     }
     file.close();
     return data;
+}
 }

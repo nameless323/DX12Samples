@@ -1,7 +1,10 @@
 #include "MathHelper.h"
+
 #include <float.h>
 #include <cmath>
 
+namespace DX12Samples
+{
 using namespace DirectX;
 
 const float MathHelper::Infinity = FLT_MAX;
@@ -49,4 +52,4 @@ XMVECTOR MathHelper::RandHemisphereUnitVec3(XMVECTOR n)
         return XMVector3Normalize(v);
     }
 }
-
+}

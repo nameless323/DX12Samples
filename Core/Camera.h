@@ -1,11 +1,13 @@
 //
-// Simple first person camera class. Just enough to review the world.
+// Simple first person camera. Just enough to review the world.
 //
 
 #pragma once
 
 #include "D3DUtil.h"
 
+namespace DX12Samples
+{
 class Camera
 {
 public:
@@ -156,3 +158,4 @@ private:
     DirectX::XMFLOAT4X4 _view = MathHelper::Identity4x4();
     DirectX::XMFLOAT4X4 _proj = MathHelper::Identity4x4();
 };
+}

@@ -1,12 +1,14 @@
 #pragma once
+
 #include "../../../Core/Application.h"
 #include "../../../Core/D3DUtil.h"
-
 #include "../../Common/RenderItem.h"
 #include "CubemappingFrameResource.h"
 #include "../../../Core/Camera.h"
 #include "CubeRenderTarget.h"
 
+namespace DX12Samples
+{
 class DynamicCubemap : public Application
 {
 public:
@@ -17,6 +19,7 @@ public:
     ~DynamicCubemap() override;
     LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
     int Run() override;
+
 protected:
     void OnResize() override;
     void Update(const GameTimer& timer) override;
@@ -49,6 +52,7 @@ protected:
     void DrawSceneToCubemap();
 
     void BuildCubeFaceCamera(float x, float y, float z);
+
 private:
     std::vector<std::unique_ptr<CubemappingFrameResource>> _frameResources;
     CubemappingFrameResource* _currFrameResource = nullptr;
@@ -85,3 +89,4 @@ private:
 
     const UINT CubeMapSize = 512;
 };
+}

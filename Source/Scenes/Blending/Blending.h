@@ -6,11 +6,12 @@
 
 #include "../../../Core/Application.h"
 #include "../../../Core/D3DUtil.h"
-
 #include "../../Common/RenderItem.h"
 #include "FrameResourceBlending.h"
 #include "../Waves/Waves.h"
 
+namespace DX12Samples
+{
 class Blending : public Application
 {
 public:
@@ -24,6 +25,7 @@ public:
     bool Init() override;
     LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
     int Run() override;
+
 protected:
     /**
      * \brief Calls when window are resized to rebuild size dependent resources.
@@ -172,3 +174,4 @@ private:
 
     POINT _lastMousePos;
 };
+}

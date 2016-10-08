@@ -1,7 +1,10 @@
 #include "D3DUtil.h"
+
 #include <comdef.h>
 #include <fstream>
 
+namespace DX12Samples
+{
 using Microsoft::WRL::ComPtr;
 
 DxException::DxException(HRESULT hr, const std::wstring& functionName, const std::wstring& filename, int lineNumber) :
@@ -142,4 +145,5 @@ std::wstring DxException::ToString() const
     _com_error err(ErrorCode);
     std::wstring msg = err.ErrorMessage();
     return FunctionName + L" failed in " + FileName + L"; Line" + std::to_wstring(LineNumber) + L"; error" + msg;
+}
 }

@@ -1,11 +1,16 @@
 #pragma once
+
 #include <DirectXMath.h>
 #include <DirectXPackedVector.h>
+
 #include "../../../Core/MathHelper.h"
 #include "../../../Core/D3DUtil.h"
 
+namespace DX12Samples
+{
 struct WavesRenderItem
 {
+public:
     static const int NumFrameResources = 3;
     WavesRenderItem() = default;
 
@@ -27,3 +32,4 @@ enum class RenderLayer : int
     Opaque = 0,
     Count
 };
+}

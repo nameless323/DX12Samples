@@ -6,15 +6,17 @@
 
 #include "../../Core/D3DUtil.h"
 
+namespace DX12Samples
+{
 class RenderTarget
 {
 public:
     /**
      * \brief Create render target resource.
-     * \param Device which will be used for creation.
-     * \param Width texture width.
-     * \param Height texture height.
-     * \format Render target texture format.
+     * \param device which will be used for creation.
+     * \param width texture width.
+     * \param height texture height.
+     * \param format Render target texture format.
      */
     RenderTarget(ID3D12Device* device, UINT width, UINT height, DXGI_FORMAT format);
     RenderTarget(const RenderTarget& rhs) = delete;
@@ -34,9 +36,9 @@ public:
     CD3DX12_CPU_DESCRIPTOR_HANDLE Rtv();
     /**
      * \brief Build descriptors for render target.
-     * \hCpuSrv Cpu descriptor for render target in SRV heap.
-     * \hGpuSrv Gpu descriptor for render target in SRV heap.
-     * \hCpuRtvCpu descriptor for render target in SRV RTV.
+     * \param hCpuSrv Cpu descriptor for render target in SRV heap.
+     * \param hGpuSrv Gpu descriptor for render target in SRV heap.
+     * \param hCpuRtv descriptor for render target in SRV RTV.
      */
     void BuildDescriptors(CD3DX12_CPU_DESCRIPTOR_HANDLE hCpuSrv, CD3DX12_GPU_DESCRIPTOR_HANDLE hGpuSrv, CD3DX12_CPU_DESCRIPTOR_HANDLE hCpuRtv);
     /**
@@ -58,3 +60,4 @@ private:
 
     Microsoft::WRL::ComPtr<ID3D12Resource> _offscreenTex = nullptr;
 };
+}

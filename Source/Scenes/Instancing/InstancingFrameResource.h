@@ -3,6 +3,8 @@
 #include "../../Core/D3DUtil.h"
 #include "../../Core/UploadBuffer.h"
 
+namespace DX12Samples
+{
 class InstancingFrameResource
 {
 public:
@@ -131,3 +133,4 @@ public:
         };
     }
 };
+}

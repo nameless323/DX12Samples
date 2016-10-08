@@ -1,5 +1,7 @@
 #include "CSVectorAdd.h"
 
+namespace DX12Samples
+{
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace PackedVector;
@@ -152,4 +154,5 @@ void CSVectorAdd::BuildPSOs()
     };
     computePsoDesc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
     _device->CreateComputePipelineState(&computePsoDesc, IID_PPV_ARGS(&_PSOs["vecAdd"]));
+}
 }

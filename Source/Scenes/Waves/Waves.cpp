@@ -1,5 +1,9 @@
 #include "Waves.h"
+
 #include <ppl.h>
+
+namespace DX12Samples
+{
 using namespace DirectX;
 
 Waves::Waves(int m, int n, float dx, float dt, float speed, float damping) : _numRows(m), _numColumns(n), _vertexCount(m * n), _triangleCount((m - 1) * (n - 1) * 2), _timeStep(dt), _spatialStep(dx)
@@ -125,7 +129,4 @@ void Waves::Disturb(int i, int j, float magnitude)
     _currSolution[(i + 1) * _numColumns + j].y += halfMag;
     _currSolution[(i - 1) * _numColumns + j].y += halfMag;
 }
-
-
-
-
+}

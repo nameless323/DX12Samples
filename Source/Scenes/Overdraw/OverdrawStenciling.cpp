@@ -2,6 +2,8 @@
 #include "../../Common/RenderItem.h"
 #include "../../../Core/GeometryGenerator.h"
 
+namespace DX12Samples
+{
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace PackedVector;
@@ -823,4 +825,5 @@ XMFLOAT3 OverdrawStenciling::GetHillsNormal(float x, float z) const
     XMVECTOR unitNormal = XMVector3Normalize(XMLoadFloat3(&n));
     XMStoreFloat3(&n, unitNormal);
     return n;
+}
 }

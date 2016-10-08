@@ -1,6 +1,9 @@
 #include "GeomCylinder.h"
+
 #include "../../../Core/GeometryGenerator.h"
 
+namespace DX12Samples
+{
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace Colors;
@@ -364,4 +367,5 @@ void GeomCylinder::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std
         cmdList->SetGraphicsRootConstantBufferView(0, _currFrameResource->ObjectCB->Resource()->GetGPUVirtualAddress() + renderItem->ObjCBIndex*objCbByteSize);
         cmdList->DrawInstanced(renderItem->IndexCount, 1, 0, 0);
     }
+}
 }

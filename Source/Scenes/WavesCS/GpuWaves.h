@@ -1,7 +1,10 @@
 #pragma once
+
 #include "../../Core/D3DUtil.h"
 #include "../../Core/GameTimer.h"
 
+namespace DX12Samples
+{
 class GpuWaves
 {
 public:
@@ -55,3 +58,4 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource> _prevUploadBuffer = nullptr;
     Microsoft::WRL::ComPtr<ID3D12Resource> _currUploadBuffer = nullptr;
 };
+}

@@ -2,10 +2,11 @@
 
 #include "../../../Core/Application.h"
 #include "../../../Core/D3DUtil.h"
-
 #include "../../Common/RenderItem.h"
 #include "../Blending/FrameResourceBlending.h"
 
+namespace DX12Samples
+{
 class BezierPatch : public Application
 {
 public:
@@ -17,6 +18,7 @@ public:
     bool Init() override;
     LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
     int Run() override;
+
 protected:
     void OnResize() override;
     void Update(const GameTimer& timer) override;
@@ -77,3 +79,4 @@ private:
 
     POINT _lastMousePos;
 };
+}

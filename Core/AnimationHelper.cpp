@@ -1,5 +1,7 @@
 #include "AnimationHelper.h"
 
+namespace DX12Samples
+{
 using namespace DirectX;
 
 Keyframe::Keyframe() : TimePos(0.0f), Translation(0.0f, 0.0f, 0.0f), Scale(1.0f, 1.0f, 1.0f), RotationQuat(0.0f, 0.0f, 0.0f, 1.0f)
@@ -69,4 +71,5 @@ void BoneAnimation::Interpolate(float t, XMFLOAT4X4& M) const
             }
         }
     }
+}
 }

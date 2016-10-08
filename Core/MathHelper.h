@@ -7,6 +7,8 @@
 #include <Windows.h>
 #include <DirectXMath.h>
 
+namespace DX12Samples
+{
 class MathHelper
 {
 public:
@@ -123,3 +125,4 @@ public:
     static const float Infinity;
     static const float Pi;
 };
+}

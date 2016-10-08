@@ -1,9 +1,13 @@
 #pragma once
-#include "../../Core/D3DUtil.h"
+
 #include <DirectXMath.h>
 #include <DirectXPackedVector.h>
-#include "InstancingFrameResource.h"
 
+#include "InstancingFrameResource.h"
+#include "../../Core/D3DUtil.h"
+
+namespace DX12Samples
+{
 struct InstancingRenderItem
 {
     InstancingRenderItem() = default;
@@ -28,3 +32,4 @@ struct InstancingRenderItem
     UINT StartIndexLocation = 0;
     UINT BaseVertexLocation = 0;
 };
+}

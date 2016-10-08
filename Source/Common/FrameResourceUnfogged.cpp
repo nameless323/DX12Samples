@@ -1,5 +1,7 @@
 #include "FrameResourceUnfogged.h"
 
+namespace DX12Samples
+{
 FrameResourceUnfogged::FrameResourceUnfogged(ID3D12Device* device, UINT passCount, UINT objectCount, UINT materialCount)
 {
     ThrowIfFailed(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(CmdListAlloc.GetAddressOf())));
@@ -12,4 +14,4 @@ FrameResourceUnfogged::FrameResourceUnfogged(ID3D12Device* device, UINT passCoun
 FrameResourceUnfogged::~FrameResourceUnfogged()
 {
 }
-
+}

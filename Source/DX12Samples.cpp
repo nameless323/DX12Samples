@@ -34,11 +34,11 @@
 #include "Scenes/RotationScene/RotationScene.h"
 #include "Scenes/SkinnedAnimation/SkinnedAnimaiton.h"
 
-Application* app;
+DX12Samples::Application* app;
 
 void CreateScene(HINSTANCE hInstance)
 {
-    app = new SkinnedAnimation(hInstance);
+    app = new DX12Samples::SkinnedAnimation(hInstance);
 }
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
@@ -53,7 +53,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
             return 0;
         return app->Run();
     }
-    catch(DxException& e)
+    catch(DX12Samples::DxException& e)
     {
         MessageBox(nullptr, e.ToString().c_str(), L"HR Failed", MB_OK);
         delete app;

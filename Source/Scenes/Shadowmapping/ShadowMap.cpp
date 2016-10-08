@@ -1,5 +1,7 @@
 #include "ShadowMap.h"
 
+namespace DX12Samples
+{
 ShadowMap::ShadowMap(ID3D12Device* device, UINT width, UINT height)
 {
     _device = device;
@@ -117,4 +119,5 @@ void ShadowMap::BuildResorce()
         &optClear,
         IID_PPV_ARGS(_shadowMap.GetAddressOf())
         ));
+}
 }

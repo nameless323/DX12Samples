@@ -1,6 +1,9 @@
-#include "Application.h"
 #include <WindowsX.h>
 
+#include "Application.h"
+
+namespace DX12Samples
+{
 using Microsoft::WRL::ComPtr;
 using namespace std;
 using namespace DirectX;
@@ -550,4 +553,5 @@ void Application::LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format)
 
         OutputDebugString(text.c_str());
     }
+}
 }

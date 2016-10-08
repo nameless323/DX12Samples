@@ -10,6 +10,8 @@
 #include "CrateRenderItem.h"
 #include "CrateFrameResource.h"
 
+namespace DX12Samples
+{
 class Crate : public Application
 {
 public:
@@ -23,6 +25,7 @@ public:
     ~Crate() override;
     LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
     int Run() override;
+
 protected:
     /**
      * \brief Calls when window are resized to rebuild size dependent resources.
@@ -145,3 +148,4 @@ private:
     float _rotationAngle = 0.0f;
     POINT _lastMousePos;
 };
+}

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "../../../Core/Application.h"
 #include "../../../Core/D3DUtil.h"
 
@@ -6,6 +7,8 @@
 #include "DynamicIndexingFrameResource.h"
 #include "../../../Core/Camera.h"
 
+namespace DX12Samples
+{
 class DynamicIndexing : public Application
 {
 public:
@@ -16,6 +19,7 @@ public:
     ~DynamicIndexing() override;
     LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
     int Run() override;
+
 protected:
     void OnResize() override;
     void Update(const GameTimer& timer) override;
@@ -68,4 +72,4 @@ private:
 
     POINT _lastMousePos;
 };
-
+}

@@ -1,5 +1,7 @@
 #include "M3dLoader.h"
 
+namespace DX12Samples
+{
 using namespace DirectX;
 
 bool M3dLoader::LoadM3d(const std::string& filename, std::vector<Vertex>& vertices, std::vector<USHORT>& indices, std::vector<Subset>& subsets, std::vector<M3dMaterial>& mats)
@@ -240,4 +242,5 @@ void M3dLoader::ReadBoneKeyframes(std::ifstream& fin, UINT numBones, BoneAnimati
     }
 
     fin >> ignore;
+}
 }

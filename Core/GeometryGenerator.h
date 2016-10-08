@@ -1,13 +1,14 @@
 //
-// Helper class for different procedural generated meshes.
+// Helper class for different procedural generated meshes by Frank Luna (C) 2011 All Rights Reserved. And some of my comments.
 //
 
 #pragma once
 
-#include <cstdint>
 #include <DirectXMath.h>
 #include <vector>
 
+namespace DX12Samples
+{
 class GeometryGenerator
 {
 public:
@@ -95,3 +96,4 @@ private:
     void BuildCylinderTopCap(float bottomRadius, float topRadius, float height, uint32 sliceCount, uint32 stackCount, MeshData& meshData);
     void BuildCylinderBottomCap(float bottomRadius, float topRadius, float height, uint32 sliceCount, uint32 stackCount, MeshData& meshData);
 };
+}

@@ -2,13 +2,14 @@
 
 #include "../../../Core/Application.h"
 #include "../../../Core/D3DUtil.h"
-
 #include "../../Common/RenderItem.h"
 #include "GpuWavesFrameResource.h"
 #include "GpuWaves.h"
 #include "../../Common/RenderTarget.h"
 #include "SobelFilter.h"
 
+namespace DX12Samples
+{
 class WavesCS : public Application
 {
 public:
@@ -20,6 +21,7 @@ public:
     bool Init() override;
     LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
     int Run() override;
+
 protected:
     void CreateRtvAndDsvDescriptorHeaps() override;
     void OnResize() override;
@@ -56,6 +58,7 @@ protected:
 
     float GetHillsHeight(float x, float z) const;
     DirectX::XMFLOAT3 GetHillsNormal(float x, float z) const;
+
 private:
     std::vector<std::unique_ptr<GpuWavesFrameResource>> _frameResources;
     GpuWavesFrameResource* _currFrameResource = nullptr;
@@ -98,3 +101,4 @@ private:
 
     POINT _lastMousePos;
 };
+}

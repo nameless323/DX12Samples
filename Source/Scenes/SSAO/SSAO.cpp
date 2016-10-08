@@ -1,8 +1,10 @@
 #include "SSAO.h"
+
 #include <DirectXPackedVector.h>
 #include <minwinbase.h>
-#include <minwinbase.h>
 
+namespace DX12Samples
+{
 using namespace DirectX;
 using namespace PackedVector;
 using namespace Microsoft::WRL;
@@ -377,4 +379,5 @@ void SSAO::BuildOffsetVectors()
 
         XMStoreFloat4(&_offsets[i], v);
     }
+}
 }

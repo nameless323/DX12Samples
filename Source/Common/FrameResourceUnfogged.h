@@ -7,6 +7,8 @@
 #include "../../Core/D3DUtil.h"
 #include "../../Core/UploadBuffer.h"
 
+namespace DX12Samples
+{
 struct FrameResourceUnfogged
 {
     static const int NumFrameResources = 3;
@@ -119,3 +121,4 @@ struct FrameResourceUnfogged
         };
     }
 };
+}

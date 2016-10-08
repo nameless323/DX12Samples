@@ -7,6 +7,8 @@
 #include "../../Core/D3DUtil.h"
 #include "../../Core/UploadBuffer.h"
 
+namespace DX12Samples
+{
 struct FrameResource
 {
     static const int NumFrameResources = 3;
@@ -71,3 +73,4 @@ struct FrameResource
     std::unique_ptr<UploadBuffer<Vertex>> WavesVB = nullptr;
     UINT64 Fence = 0;
 };
+}

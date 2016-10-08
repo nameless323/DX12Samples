@@ -1,16 +1,16 @@
 #include "SkinnedAnimaiton.h"
 
-#include "../../../Core/GeometryGenerator.h"
 #include <minwinbase.h>
+#include "../../../Core/GeometryGenerator.h"
 
+namespace DX12Samples
+{
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace PackedVector;
 using Vertex = SkinnedAnimFrameResource::Vertex;
 using FrameResource = SkinnedAnimFrameResource;
 using RenderLayer = RenderItem::RenderLayer;
-
-
 
 SkinnedAnimation::SkinnedAnimation(HINSTANCE hInstance) : Application(hInstance)
 {
@@ -1504,4 +1504,5 @@ std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> SkinnedAnimation::GetStaticSamp
         anisotropicWrap, anisotropicClamp,
         shadow
     };
+}
 }

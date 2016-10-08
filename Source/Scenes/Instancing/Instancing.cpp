@@ -1,5 +1,7 @@
 #include "Instancing.h"
 
+namespace DX12Samples
+{
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace PackedVector;
@@ -687,4 +689,5 @@ void Instancing::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::
 
         cmdList->DrawIndexedInstanced(ri->IndexCount, ri->InstanceCount, ri->StartIndexLocation, ri->BaseVertexLocation, 0);
     }
+}
 }

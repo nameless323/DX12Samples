@@ -2,6 +2,8 @@
 
 #include "../../Core/D3DUtil.h"
 
+namespace DX12Samples
+{
 class SobelFilter
 {
 public:
@@ -39,3 +41,4 @@ private:
 
     Microsoft::WRL::ComPtr<ID3D12Resource> _output = nullptr;
 };
+}

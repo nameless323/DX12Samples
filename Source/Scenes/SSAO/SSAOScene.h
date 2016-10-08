@@ -1,4 +1,5 @@
 #pragma once
+
 #include "../../../Core/Application.h"
 #include "../../../Core/D3DUtil.h"
 
@@ -8,6 +9,8 @@
 #include "../Shadowmapping/ShadowMap.h"
 #include "SSAO.h"
 
+namespace DX12Samples
+{
 class SSAOScene : public Application
 {
 public:
@@ -18,6 +21,7 @@ public:
     ~SSAOScene() override;
     LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
     int Run() override;
+
 protected:
     void CreateRtvAndDsvDescriptorHeaps() override;
     void OnResize() override;
@@ -58,6 +62,7 @@ protected:
     CD3DX12_CPU_DESCRIPTOR_HANDLE GetRtv(int index) const;
 
     std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> GetStaticSamplers();
+
 private:
     std::vector<std::unique_ptr<SSAOFrameResource>> _frameResources;
     SSAOFrameResource* _currFrameResource = nullptr;
@@ -117,4 +122,4 @@ private:
 
     POINT _lastMousePos;
 };
-
+}

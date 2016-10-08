@@ -3,6 +3,8 @@
 #include "../../Core/D3DUtil.h"
 #include "../../Core/UploadBuffer.h"
 
+namespace DX12Samples
+{
 struct NormalMappingFrameResource
 {
 public:
@@ -26,24 +28,24 @@ public:
         DirectX::XMFLOAT4X4 InvProj = MathHelper::Identity4x4();
         DirectX::XMFLOAT4X4 VP = MathHelper::Identity4x4();
         DirectX::XMFLOAT4X4 InvVP = MathHelper::Identity4x4();
-        DirectX::XMFLOAT3 EyePosW = { 0.0f, 0.0f, 0.0f };
+        DirectX::XMFLOAT3 EyePosW = {0.0f, 0.0f, 0.0f};
         float cbPerObjectPad1 = 0.0f;
-        DirectX::XMFLOAT2 RenderTargetSize = { 0.0f, 0.0f };
-        DirectX::XMFLOAT2 InvRenderTargetSize = { 0.0, 0.0f };
+        DirectX::XMFLOAT2 RenderTargetSize = {0.0f, 0.0f};
+        DirectX::XMFLOAT2 InvRenderTargetSize = {0.0, 0.0f};
         float NearZ = 0.0f;
         float FarZ = 0.0f;
         float TotalTime = 0.0f;
         float DeltaTime = 0.0f;
 
-        DirectX::XMFLOAT4 AmbientLight = { 0.0f, 0.0f, 0.0f, 1.0f };
+        DirectX::XMFLOAT4 AmbientLight = {0.0f, 0.0f, 0.0f, 1.0f};
 
         Light Lights[MaxLights];
     };
 
     struct MaterialData
     {
-        DirectX::XMFLOAT4 DiffuseAlbedo = { 1.0f, 1.0f, 1.0f, 1.0f };
-        DirectX::XMFLOAT3 FresnelR0 = { 0.01f, 0.01f, 0.01f };
+        DirectX::XMFLOAT4 DiffuseAlbedo = {1.0f, 1.0f, 1.0f, 1.0f};
+        DirectX::XMFLOAT3 FresnelR0 = {0.01f, 0.01f, 0.01f};
         float Roughness = 64.0f;
 
         DirectX::XMFLOAT4X4 MatTransform = MathHelper::Identity4x4();
@@ -64,7 +66,7 @@ public:
 
     NormalMappingFrameResource(ID3D12Device* device, UINT passCount, UINT objectCount, UINT materialCount);
     NormalMappingFrameResource(const NormalMappingFrameResource& rhs) = delete;
-    NormalMappingFrameResource& operator= (const NormalMappingFrameResource& rhs) = delete;
+    NormalMappingFrameResource& operator=(const NormalMappingFrameResource& rhs) = delete;
     ~NormalMappingFrameResource();
 
     Microsoft::WRL::ComPtr<ID3D12CommandAllocator> CmdListAlloc;
@@ -76,3 +78,4 @@ public:
 
     UINT64 Fence = 0;
 };
+}

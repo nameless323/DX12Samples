@@ -9,6 +9,8 @@
 #include "../../../Core/UploadBuffer.h"
 #include "../../../Core/Application.h"
 
+namespace DX12Samples
+{
 /**
  * \brief Box vertex data.
  */
@@ -110,3 +112,4 @@ private:
 
     POINT _lastMousePos;
 };
+}

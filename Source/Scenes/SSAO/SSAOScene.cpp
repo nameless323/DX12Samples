@@ -2,9 +2,12 @@
 
 #include "../../../Core/GeometryGenerator.h"
 
+namespace DX12Samples
+{
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace PackedVector;
+
 using Vertex = SSAOFrameResource::Vertex;
 using FrameResource = SSAOFrameResource;
 using RenderLayer = RenderItem::RenderLayer;
@@ -1402,4 +1405,5 @@ std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> SSAOScene::GetStaticSamplers()
         anisotropicWrap, anisotropicClamp,
         shadow
     };
+}
 }

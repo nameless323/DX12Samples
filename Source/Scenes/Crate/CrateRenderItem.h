@@ -9,6 +9,8 @@
 #include "../../../Core/D3DUtil.h"
 #include "CrateFrameResource.h"
 
+namespace DX12Samples
+{
 struct CrateRenderItem
 {
     CrateRenderItem() = default;
@@ -28,3 +30,4 @@ struct CrateRenderItem
     UINT StartIndexLocation = 0;
     int BaseVertexLocation = 0;
 };
+}

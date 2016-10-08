@@ -2,6 +2,8 @@
 
 #include "../../Core/D3DUtil.h"
 
+namespace DX12Samples
+{
 class GaussBlurFilter
 {
 public:
@@ -50,3 +52,4 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource> _blurMap0 = nullptr;
     Microsoft::WRL::ComPtr<ID3D12Resource> _blurMap1 = nullptr;
 };
+}

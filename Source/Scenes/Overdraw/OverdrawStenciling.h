@@ -2,11 +2,12 @@
 
 #include "../../../Core/Application.h"
 #include "../../../Core/D3DUtil.h"
-
 #include "../../Common/RenderItem.h"
 #include "../Blending/FrameResourceBlending.h"
 #include "../Waves/Waves.h"
 
+namespace DX12Samples
+{
 class OverdrawStenciling : public Application
 {
 public:
@@ -18,6 +19,7 @@ public:
     bool Init() override;
     LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
     int Run() override;
+
 protected:
     void OnResize() override;
     void Update(const GameTimer& timer) override;
@@ -50,6 +52,7 @@ protected:
 
     float GetHillsHeight(float x, float z) const;
     DirectX::XMFLOAT3 GetHillsNormal(float x, float z) const;
+
 private:
     std::vector<std::unique_ptr<FrameResourceBlending>> _frameResources;
     FrameResourceBlending* _currFrameResource = nullptr;
@@ -75,7 +78,7 @@ private:
 
     bool _isWireframe = false;
 
-    DirectX::XMFLOAT3 _eyePos = { 0.0f, 0.0f, 0.0f };
+    DirectX::XMFLOAT3 _eyePos = {0.0f, 0.0f, 0.0f};
     DirectX::XMFLOAT4X4 _view = MathHelper::Identity4x4();
     DirectX::XMFLOAT4X4 _proj = MathHelper::Identity4x4();
 
@@ -89,3 +92,4 @@ private:
 
     POINT _lastMousePos;
 };
+}

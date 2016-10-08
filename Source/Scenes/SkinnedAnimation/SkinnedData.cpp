@@ -1,5 +1,7 @@
 #include "SkinnedData.h"
 
+namespace DX12Samples
+{
 using namespace DirectX;
 
 float AnimationClip::GetClipStartTime() const
@@ -75,4 +77,5 @@ void SkinnedData::GetFinalTransforms(const std::string& clipName, float timePos,
         XMMATRIX finalTransform = XMMatrixMultiply(offset, toRoot);
         XMStoreFloat4x4(&finalTransforms[i], XMMatrixTranspose(finalTransform));
     }
+}
 }

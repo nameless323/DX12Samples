@@ -2,9 +2,21 @@
 
 #include "../../Core/D3DUtil.h"
 
+namespace DX12Samples
+{
 class CubeRenderTarget
 {
 public:
+    enum class CubemapFace : int
+    {
+        PositiveX = 0,
+        NegativeX = 1,
+        PositiveY = 2,
+        NegativeY = 3,
+        PositiveZ = 4,
+        NegativeZ = 5
+    };
+
     CubeRenderTarget(ID3D12Device* device, UINT width, UINT height, DXGI_FORMAT format);
 
     CubeRenderTarget(const CubeRenderTarget& rhs) = delete;
@@ -20,11 +32,11 @@ public:
 
     void BuildDescriptors(CD3DX12_CPU_DESCRIPTOR_HANDLE hCpuSrv, CD3DX12_GPU_DESCRIPTOR_HANDLE hGpuSrv, CD3DX12_CPU_DESCRIPTOR_HANDLE hCpuRtv[6]);
     void OnResize(UINT newWidth, UINT newHeight);
+
 private:
     void BuildDescriptors();
     void BuildResource();
 
-private:
     ID3D12Device* _device = nullptr;
     D3D12_VIEWPORT _viewport;
     D3D12_RECT _scissorRect;
@@ -37,14 +49,5 @@ private:
     CD3DX12_CPU_DESCRIPTOR_HANDLE _hCpuRtv[6];
 
     Microsoft::WRL::ComPtr<ID3D12Resource> _cubemap = nullptr;
-public:
-    enum class CubemapFace : int
-    {
-        PositiveX = 0,
-        NegativeX = 1,
-        PositiveY = 2,
-        NegativeY = 3,
-        PositiveZ = 4,
-        NegativeZ = 5
-    };
 };
+}

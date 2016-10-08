@@ -1,7 +1,10 @@
 #include "GpuWaves.h"
+
 #include <cassert>
 #include <vector>
 
+namespace DX12Samples
+{
 GpuWaves::GpuWaves(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int m, int n, float dx, float dt, float speed, float damping)
 {
     _device = device;
@@ -241,4 +244,5 @@ void GpuWaves::Disturb(ID3D12GraphicsCommandList* cmdList, ID3D12RootSignature* 
     cmdList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(_currSol.Get(), D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_UNORDERED_ACCESS));
 
     cmdList->Dispatch(1, 1, 1);
+}
 }

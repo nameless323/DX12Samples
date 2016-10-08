@@ -1,7 +1,10 @@
 #include "Picking.h"
+
 #include "../DynamicIndexing/DynamicIndexingFrameResource.h"
 #include "../../../Core/GeometryGenerator.h"
 
+namespace DX12Samples
+{
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace PackedVector;
@@ -618,4 +621,5 @@ void Picking::Pick(int sx, int sy)
             }
         }
     }
+}
 }

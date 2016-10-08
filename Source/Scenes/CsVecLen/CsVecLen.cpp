@@ -1,5 +1,7 @@
 #include "CsVecLen.h"
 
+namespace DX12Samples
+{
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace PackedVector;
@@ -159,4 +161,5 @@ void CsVecLen::BuildPSOs()
     pso.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
     pso.pRootSignature = _rootSignature.Get();
     ThrowIfFailed(_device->CreateComputePipelineState(&pso, IID_PPV_ARGS(&_PSOs["vecLen"])));
+}
 }

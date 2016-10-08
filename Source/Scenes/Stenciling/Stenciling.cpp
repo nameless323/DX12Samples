@@ -2,6 +2,8 @@
 
 #include "../../../Core/GeometryGenerator.h"
 
+namespace DX12Samples
+{
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace PackedVector;
@@ -892,4 +894,5 @@ void Stenciling::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::
 
         cmdList->DrawIndexedInstanced(ri->IndexCount, 1, ri->StartIndexLocation, ri->BaseVertexLocation, 0);
     }
+}
 }

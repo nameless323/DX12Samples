@@ -5,7 +5,8 @@
 #include "../../Core/UploadBuffer.h"
 #include "../Shapes/ShapesFrameResource.h"
 
-
+namespace DX12Samples
+{
 struct WavesFrameResource
 {
 public:
@@ -14,6 +15,7 @@ public:
         DirectX::XMFLOAT3 Pos;
         DirectX::XMFLOAT4 Color;
     };
+
     struct ObjectConstants
     {
         DirectX::XMFLOAT4X4 Model = MathHelper::Identity4x4();
@@ -31,5 +33,5 @@ public:
     std::unique_ptr<UploadBuffer<Vertex>> WavesVB = nullptr;
 
     UINT64 Fence = 0;
-
 };
+}

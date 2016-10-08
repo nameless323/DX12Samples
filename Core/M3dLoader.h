@@ -1,7 +1,14 @@
+//
+// Class for loading meshes from file.
+//
+
 #pragma once
+
 #include "D3DUtil.h"
 #include "../Source/Scenes/SkinnedAnimation/SkinnedData.h"
 
+namespace DX12Samples
+{
 struct BoneAnimation;
 class SkinnedData;
 
@@ -61,3 +68,4 @@ private:
     void ReadAnimationClips(std::ifstream& fin, UINT numBones, UINT numAnimationClips, std::unordered_map<std::string, AnimationClip>& animations);
     void ReadBoneKeyframes(std::ifstream& fin, UINT numBones, BoneAnimation& boneAnimation);
 };
+}

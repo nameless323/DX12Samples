@@ -1,12 +1,12 @@
 #pragma once
 
-#pragma once
 #include "../../../Core/Application.h"
 #include "../../../Core/D3DUtil.h"
-
 #include "../Crate/CrateRenderItem.h"
 #include "../Crate/CrateFrameResource.h"
 
+namespace DX12Samples
+{
 class GeomCylinder : public Application
 {
 public:
@@ -18,6 +18,7 @@ public:
     ~GeomCylinder() override;
     LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
     int Run() override;
+
 protected:
     void OnResize() override;
     void Update(const GameTimer& timer) override;
@@ -72,3 +73,4 @@ private:
 
     POINT _lastMousePos;
 };
+}

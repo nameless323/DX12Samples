@@ -3,6 +3,8 @@
 #include "../../Core/D3DUtil.h"
 #include "../../../Core/AnimationHelper.h"
 
+namespace DX12Samples
+{
 struct AnimationClip
 {
     float GetClipStartTime() const;
@@ -28,3 +30,4 @@ private:
     std::vector<DirectX::XMFLOAT4X4> _boneOffsets;
     std::unordered_map<std::string, AnimationClip> _animations;
 };
+}

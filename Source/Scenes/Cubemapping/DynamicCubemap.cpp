@@ -1,9 +1,13 @@
 #include "DynamicCubemap.h"
+
 #include "../../../Core/GeometryGenerator.h"
 
+namespace DX12Samples
+{
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace PackedVector;
+
 using Vertex = CubemappingFrameResource::Vertex;
 using FrameResource = CubemappingFrameResource;
 using RenderLayer = RenderItem::RenderLayer;
@@ -1027,4 +1031,5 @@ void DynamicCubemap::BuildCubeFaceCamera(float x, float y, float z)
         _cubeMapCamera[i].SetFrustum(0.5f * XM_PI, 1.0f, 0.1f, 1000.0f);
         _cubeMapCamera[i].UpdateViewMatrix();
     }
+}
 }

@@ -1,5 +1,7 @@
 #include "SkinnedAnimFrameResource.h"
 
+namespace DX12Samples
+{
 SkinnedAnimFrameResource::SkinnedAnimFrameResource(ID3D12Device* device, UINT passCount, UINT objectCount, UINT skinnedObjectCount, UINT materialCount)
 {
     ThrowIfFailed(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(CmdListAlloc.GetAddressOf())));
@@ -13,4 +15,5 @@ SkinnedAnimFrameResource::SkinnedAnimFrameResource(ID3D12Device* device, UINT pa
 
 SkinnedAnimFrameResource::~SkinnedAnimFrameResource()
 {
+}
 }

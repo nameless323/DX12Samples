@@ -1,9 +1,11 @@
 #pragma once
-#include "../../../Core/Application.h"
 
+#include "../../../Core/Application.h"
 #include "LitColumnsRenderItem.h"
 #include "LitColumnsFrameResource.h"
 
+namespace DX12Samples
+{
 class LitColumns : public Application
 {
 public:
@@ -14,6 +16,7 @@ public:
     ~LitColumns() override;
     LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
     int Run() override;
+
 protected:
     void OnResize() override;
     void Update(const GameTimer& timer) override;
@@ -38,7 +41,8 @@ protected:
     void BuildFrameResources();
     void BuildMaterials();
     void BuildRenderItems();
-    void DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<LitColumnsRenderItem*>& renderItems);    
+    void DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<LitColumnsRenderItem*>& renderItems); 
+
 private:
     std::vector<std::unique_ptr<LitColumnsFrameResource>> _frameResources;
     LitColumnsFrameResource* _currFrameResource = nullptr;
@@ -70,4 +74,4 @@ private:
 
     POINT _lastMousePos;
 };
-
+}

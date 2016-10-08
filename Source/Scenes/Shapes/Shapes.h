@@ -1,9 +1,12 @@
 #pragma once
-#include "../../../Core/Application.h"
+
 #include "ShapesRenderItem.h"
+#include "../../../Core/Application.h"
 #include "ShapesFrameResource.h"
 #include "../../../Core/GeometryGenerator.h"
 
+namespace DX12Samples
+{
 class Shapes : public Application
 {
 public:
@@ -12,6 +15,7 @@ public:
     ~Shapes() override;
     LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
     int Run() override;
+
 protected:
     void OnResize() override;
     void Update(const GameTimer& timer) override;
@@ -36,6 +40,7 @@ protected:
     void BuildRenderItems();
     void DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<ShapesRenderItem*>& renderItems);
     GeometryGenerator::MeshData ParseFile(std::string filename) const;
+
 private:
     std::vector<std::unique_ptr<ShapesFrameResource>> _frameResources;
     ShapesFrameResource* _currFrameResource = nullptr;
@@ -67,4 +72,4 @@ private:
 
     POINT _lastMousePos;
 };
-
+}

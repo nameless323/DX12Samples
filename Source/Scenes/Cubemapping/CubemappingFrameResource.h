@@ -3,6 +3,8 @@
 #include "../../Core/D3DUtil.h"
 #include "../../Core/UploadBuffer.h"
 
+namespace DX12Samples
+{
 struct CubemappingFrameResource
 {
 public:
@@ -70,8 +72,8 @@ public:
 
     std::unique_ptr<UploadBuffer<PassConstants>> PassCB = nullptr;
     std::unique_ptr<UploadBuffer<ObjectConstants>> ObjectCB = nullptr;
-
     std::unique_ptr<UploadBuffer<MaterialData>> MaterialBuffer = nullptr;
 
     UINT64 Fence = 0;
 };
+}

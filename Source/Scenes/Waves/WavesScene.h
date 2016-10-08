@@ -1,9 +1,12 @@
 #pragma once
+
 #include "../../../Core/Application.h"
 #include "WavesFrameResource.h"
 #include "WavesRenderItem.h"
 #include "Waves.h"
 
+namespace DX12Samples
+{
 class WavesScene : public Application
 {
 public:
@@ -15,6 +18,7 @@ public:
     bool Init() override;
     LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
     int Run() override;
+
 protected:
     void OnResize() override;
     void Update(const GameTimer& timer) override;
@@ -41,6 +45,7 @@ protected:
 
     float GetHillsHeight(float x, float z) const;
     DirectX::XMFLOAT3 GetHillsNormal(float x, float z) const;
+
 private:
     std::vector<std::unique_ptr<WavesFrameResource>> _frameResources;
     WavesFrameResource* _currFrameResource = nullptr;
@@ -78,4 +83,4 @@ private:
 
     POINT _lastMousePos;
 };
-
+}

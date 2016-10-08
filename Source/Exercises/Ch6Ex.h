@@ -1,11 +1,12 @@
 #pragma once
-#pragma once
+
 #include <windows.h>
+
 #include "../../Core/Application.h"
 #include "../../Core/UploadBuffer.h"
 
-
-
+namespace DX12Samples
+{
 class Ch6Ex : public Application
 {
 public:
@@ -77,3 +78,4 @@ private:
 
     POINT _lastMousePos;
 };
+}

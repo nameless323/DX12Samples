@@ -3,6 +3,8 @@
 #include "../../Core/D3DUtil.h"
 #include "../../Core/UploadBuffer.h"
 
+namespace DX12Samples
+{
 struct RotationSceneFrameResource
 {
 public:
@@ -75,3 +77,4 @@ public:
 
     UINT64 Fence = 0;
 };
+}

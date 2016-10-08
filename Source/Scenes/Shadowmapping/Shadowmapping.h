@@ -1,12 +1,14 @@
 #pragma once
+
+#include "ShadowMap.h"
 #include "../../../Core/Application.h"
 #include "../../../Core/D3DUtil.h"
-
 #include "../../Common/RenderItem.h"
 #include "ShadowmappingFrameResource.h"
 #include "../../../Core/Camera.h"
-#include "ShadowMap.h"
 
+namespace DX12Samples
+{
 class Shadowmapping : public Application
 {
 public:
@@ -17,6 +19,7 @@ public:
     ~Shadowmapping() override;
     LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
     int Run() override;
+
 protected:
     void CreateRtvAndDsvDescriptorHeaps() override;
     void OnResize() override;
@@ -49,6 +52,7 @@ protected:
     void DrawSceneToShadowMap();
 
     std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> GetStaticSamplers();
+
 private:
     std::vector<std::unique_ptr<ShadowmappingFrameResource>> _frameResources;
     ShadowmappingFrameResource* _currFrameResource = nullptr;
@@ -102,4 +106,4 @@ private:
 
     POINT _lastMousePos;
 };
-
+}

@@ -1,5 +1,7 @@
 #include "Camera.h"
 
+namespace DX12Samples
+{
 using namespace DirectX;
 
 Camera::Camera()
@@ -186,7 +188,6 @@ void Camera::Walk(float d)
     _isViewDirty = true;
 }
 
-/// <summary> Rotates around local right. </summary>
 void Camera::Pitch(float angle)
 {
     XMMATRIX R = XMMatrixRotationAxis(XMLoadFloat3(&_right), angle);
@@ -197,7 +198,6 @@ void Camera::Pitch(float angle)
     _isViewDirty = true;
 }
 
-/// <summary> Rotates around world up. </summary>
 void Camera::RotateY(float angle)
 {
     XMMATRIX R = XMMatrixRotationY(angle);
@@ -251,4 +251,5 @@ void Camera::UpdateViewMatrix()
 
         _isViewDirty = false;
     }
+}
 }

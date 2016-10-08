@@ -1,5 +1,7 @@
 #include "RenderTarget.h"
 
+namespace DX12Samples
+{
 RenderTarget::RenderTarget(ID3D12Device* device, UINT width, UINT height, DXGI_FORMAT format)
 {
     _device = device;
@@ -85,4 +87,5 @@ void RenderTarget::BuildResource()
             nullptr,
             IID_PPV_ARGS(&_offscreenTex)
         ));
+}
 }

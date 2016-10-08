@@ -1,11 +1,10 @@
 #pragma once
 
-#pragma once
-
 #include "../../../Core/Application.h"
 #include "../../../Core/D3DUtil.h"
 
-
+namespace DX12Samples
+{
 class CsVecLen : public Application
 {
 public:
@@ -17,6 +16,7 @@ public:
     bool Init() override;
     LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
     int Run() override;
+
 protected:
     void OnResize() override;
     void Update(const GameTimer& timer) override;
@@ -27,6 +27,7 @@ protected:
     void BuildRootSignature();
     void BuildShaderAndInputLayout();
     void BuildPSOs();
+
 private:
     Microsoft::WRL::ComPtr<ID3D12RootSignature> _rootSignature = nullptr;
     std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3DBlob>> _shaders;
@@ -42,3 +43,4 @@ private:
     Microsoft::WRL::ComPtr<ID3D12Resource> _outputBuffer = nullptr;
     Microsoft::WRL::ComPtr<ID3D12Resource> _readBackBuffer = nullptr;
 };
+}

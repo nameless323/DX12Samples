@@ -3,6 +3,8 @@
 #include <vector>
 #include <DirectXMath.h>
 
+namespace DX12Samples
+{
 class Waves
 {
 public:
@@ -54,3 +56,4 @@ private:
     std::vector<DirectX::XMFLOAT3> _normals;
     std::vector<DirectX::XMFLOAT3> _tangentX;
 };
+}

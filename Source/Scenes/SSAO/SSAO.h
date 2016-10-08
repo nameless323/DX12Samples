@@ -2,6 +2,8 @@
 
 #include "SSAOFrameResource.h"
 
+namespace DX12Samples
+{
 class SSAO
 {
 public:
@@ -38,21 +40,17 @@ public:
         );
 
     void RebuildDescriptors(ID3D12Resource* depthStencilBuffer);
-
     void SetPSOs(ID3D12PipelineState* ssaoPso, ID3D12PipelineState* ssaoBlurPso);
-
     void OnResize(UINT newWidth, UINT newHeight);
-
     void ComputeSSAO(ID3D12GraphicsCommandList* cmdList, D3D12_GPU_VIRTUAL_ADDRESS currFrame, int blurCount);
+
 private:
     void BlurAmbientMap(ID3D12GraphicsCommandList* cmdList, D3D12_GPU_VIRTUAL_ADDRESS currFrame, int blurCount);
     void BlurAmbientMap(ID3D12GraphicsCommandList* cmdList, bool horizBlur);
-
     void BuildResources();
     void BuildRandomVectorTexture(ID3D12GraphicsCommandList* cmdList);
-
     void BuildOffsetVectors();
-private:
+
     ID3D12Device* _device;
     Microsoft::WRL::ComPtr<ID3D12RootSignature> _ssaoRootSig;
 
@@ -90,3 +88,4 @@ private:
     D3D12_VIEWPORT _viewport;
     D3D12_RECT _scissorRect;
 };
+}

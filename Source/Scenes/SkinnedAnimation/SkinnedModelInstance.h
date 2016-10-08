@@ -1,6 +1,9 @@
 #pragma once
+
 #include "SkinnedData.h"
 
+namespace DX12Samples
+{
 struct SkinnedModelInstance
 {
     SkinnedData* SkinnedInfo = nullptr;
@@ -18,3 +21,4 @@ struct SkinnedModelInstance
         SkinnedInfo->GetFinalTransforms(ClipName, TimePos, FinalTransforms);
     }
 };
+}

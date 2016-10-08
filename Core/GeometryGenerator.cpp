@@ -3,8 +3,11 @@
 //***************************************************************************************
 
 #include "GeometryGenerator.h"
+
 #include <algorithm>
 
+namespace DX12Samples
+{
 using namespace DirectX;
 
 GeometryGenerator::MeshData GeometryGenerator::CreateBox(float width, float height, float depth, uint32 numSubdivisions)
@@ -591,8 +594,7 @@ GeometryGenerator::MeshData GeometryGenerator::CreateGrid(float width, float dep
     //
 
     meshData.Indices32.resize(faceCount * 3); // 3 indices per face
-
-                                              // Iterate over each quad and compute indices.
+    // Iterate over each quad and compute indices.
     uint32 k = 0;
     for (uint32 i = 0; i < m - 1; ++i)
     {
@@ -654,4 +656,5 @@ GeometryGenerator::MeshData GeometryGenerator::CreateQuad(float x, float y, floa
     meshData.Indices32[5] = 3;
 
     return meshData;
+}
 }

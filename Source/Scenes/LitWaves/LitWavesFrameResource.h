@@ -5,7 +5,8 @@
 #include "../../Core/UploadBuffer.h"
 #include "../Shapes/ShapesFrameResource.h"
 
-
+namespace DX12Samples
+{
 struct LitWavesFrameResource
 {
 public:
@@ -52,5 +53,5 @@ public:
     std::unique_ptr<UploadBuffer<Vertex>> WavesVB = nullptr;
 
     UINT64 Fence = 0;
-
 };
+}

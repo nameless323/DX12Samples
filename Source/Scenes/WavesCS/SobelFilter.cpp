@@ -1,5 +1,7 @@
 #include "SobelFilter.h"
 
+namespace DX12Samples
+{
 SobelFilter::SobelFilter(ID3D12Device* device, UINT width, UINT height, DXGI_FORMAT format)
 {
     _device = device;
@@ -100,4 +102,5 @@ void SobelFilter::BuildResource()
         D3D12_RESOURCE_STATE_GENERIC_READ,
         nullptr,
         IID_PPV_ARGS(&_output)));
+}
 }

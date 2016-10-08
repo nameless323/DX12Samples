@@ -1,10 +1,20 @@
 #pragma once
 
 #include <DirectXMath.h>
+
 #include "../../../Core/MathHelper.h"
 
+namespace DX12Samples
+{
 struct LitColumnsRenderItem
 {
+public:
+    enum class RenderLayer : int
+    {
+        Opaque = 0,
+        Count
+    };
+
     static const int NumFrameResources = 3;
 
     DirectX::XMFLOAT4X4 Model = MathHelper::Identity4x4();
@@ -20,12 +30,6 @@ struct LitColumnsRenderItem
 
     UINT IndexCount = 0;
     UINT StartIndexLocation = 0;
-    int BaseVertexLocation = 0;    
-
-    enum class RenderLayer : int
-    {
-        Opaque = 0,
-        Count
-    };
-
+    int BaseVertexLocation = 0;
 };
+}

@@ -1,11 +1,13 @@
 #pragma once
+
 #include "../../../Core/Application.h"
 #include "../../../Core/D3DUtil.h"
-
 #include "../../Common/RenderItem.h"
 #include "CubemappingFrameResource.h"
 #include "../../../Core/Camera.h"
 
+namespace DX12Samples
+{
 class Cubemapping : public Application
 {
 public:
@@ -16,6 +18,7 @@ public:
     ~Cubemapping() override;
     LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
     int Run() override;
+
 protected:
     void OnResize() override;
     void Update(const GameTimer& timer) override;
@@ -59,7 +62,6 @@ private:
 
     std::vector<D3D12_INPUT_ELEMENT_DESC> _inputLayout;
 
-
     std::vector<std::unique_ptr<RenderItem>> _allRenderItems;
     std::vector<RenderItem*> _renderItemLayer[(int)RenderItem::RenderLayer::Count];
 
@@ -71,4 +73,4 @@ private:
 
     POINT _lastMousePos;
 };
-
+}

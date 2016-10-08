@@ -2,6 +2,8 @@
 
 #include "../../Core/D3DUtil.h"
 
+namespace DX12Samples
+{
 class ShadowMap
 {
 public:
@@ -28,7 +30,6 @@ private:
     void BuildDescriptors();
     void BuildResorce();
 
-private:
     ID3D12Device* _device = nullptr;
     D3D12_VIEWPORT _viewport;
     D3D12_RECT _scissorRect;
@@ -43,3 +44,4 @@ private:
 
     Microsoft::WRL::ComPtr<ID3D12Resource> _shadowMap = nullptr;
 };
+}

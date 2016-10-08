@@ -1,9 +1,13 @@
 #include "BasicTesselation.h"
+
 #include "../../../Core/GeometryGenerator.h"
 
+namespace DX12Samples
+{
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace PackedVector;
+
 using Vertex = FrameResourceBlending::Vertex;
 using PassConstants = FrameResourceBlending::PassConstants;
 using ObjectConstants = FrameResourceBlending::ObjectConstants;
@@ -469,4 +473,5 @@ void BasicTesselation::DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const
 
         cmdList->DrawIndexedInstanced(ri->IndexCount, 1, ri->StartIndexLocation, ri->BaseVertexLocation, 0);
     }
+}
 }

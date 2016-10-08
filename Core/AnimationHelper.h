@@ -6,6 +6,8 @@
 
 #include "D3DUtil.h"
 
+namespace DX12Samples
+{
 // Describes single keyframe.
 struct Keyframe
 {
@@ -37,3 +39,4 @@ struct BoneAnimation
 
     std::vector<Keyframe> Keyframes;
 };
+}

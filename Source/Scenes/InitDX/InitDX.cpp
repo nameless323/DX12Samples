@@ -1,7 +1,11 @@
-#include "../../Core/Application.h"
 #include "InitDX.h"
+
 #include <DirectXColors.h>
 
+#include "../../Core/Application.h"
+
+namespace DX12Samples
+{
 using namespace DirectX;
 
 InitDX::InitDX(HINSTANCE hInstance) : Application(hInstance)
@@ -79,4 +83,5 @@ void InitDX::OnMouseUp(WPARAM btnState, int x, int y)
 void InitDX::OnMouseMove(WPARAM btnState, int x, int y)
 {
     Application::OnMouseMove(btnState, x, y);
+}
 }

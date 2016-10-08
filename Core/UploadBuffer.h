@@ -6,6 +6,8 @@
 
 #include "D3DUtil.h"
 
+namespace DX12Samples
+{
 template<typename T>
 class UploadBuffer
 {
@@ -57,3 +59,4 @@ private:
     UINT _elementByteSize = 0;
     bool _isConstantBuffer = false;
 };
+}

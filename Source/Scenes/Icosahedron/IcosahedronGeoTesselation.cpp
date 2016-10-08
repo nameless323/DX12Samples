@@ -1,6 +1,9 @@
 #include "IcosahedronGeoTesselation.h"
+
 #include "../../../Core/GeometryGenerator.h"
 
+namespace DX12Samples
+{
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace PackedVector;
@@ -563,4 +566,5 @@ void IcosahedronGeoTesselation::DrawRenderItems(ID3D12GraphicsCommandList* cmdLi
 
         cmdList->DrawIndexedInstanced(renderItem->IndexCount, 1, renderItem->StartIndexLocation, renderItem->BaseVertexLocation, 0);
     }
+}
 }

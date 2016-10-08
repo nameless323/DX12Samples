@@ -3,7 +3,8 @@
 #include "../../Core/D3DUtil.h"
 #include "../../Core/MathHelper.h"
 
-
+namespace DX12Samples
+{
 struct ShapesRenderItem
 {
     static const int NumFrameResources = 3;
@@ -18,3 +19,4 @@ struct ShapesRenderItem
     UINT StartIndexLocation = 0;
     int BaseVertexLocation = 0;
 };
+}

@@ -4,8 +4,8 @@
 #include "../../Core/MathHelper.h"
 #include "../../Core/UploadBuffer.h"
 
-
-
+namespace DX12Samples
+{
 struct PassConstants
 {
     DirectX::XMFLOAT4X4 View = MathHelper::Identity4x4();
@@ -23,8 +23,6 @@ struct PassConstants
     float TotalTime = 0.0f;
     float DeltaTime = 0.0f;
 };
-
-
 
 struct ShapesFrameResource
 {
@@ -48,6 +46,6 @@ public:
     std::unique_ptr<UploadBuffer<PassConstants>> PassCB = nullptr;
     std::unique_ptr<UploadBuffer<ObjectConstants>> ObjectCB = nullptr;
 
-    UINT64 Fence = 0;
-   
+    UINT64 Fence = 0;   
 };
+}

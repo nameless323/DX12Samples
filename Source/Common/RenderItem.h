@@ -12,6 +12,8 @@
 #include "FrameResourceUnfogged.h"
 #include "../Scenes/SkinnedAnimation/SkinnedModelInstance.h"
 
+namespace DX12Samples
+{
 struct RenderItem
 {
     RenderItem() = default;
@@ -55,3 +57,4 @@ struct RenderItem
         Count
     };
 };
+}

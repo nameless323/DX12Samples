@@ -2,9 +2,10 @@
 // Describes timer used throughout the game.
 //
 
-
 #pragma once
 
+namespace DX12Samples
+{
 class GameTimer
 {
 public:
@@ -46,3 +47,4 @@ private:
 
     bool _stopped;
 };
+}

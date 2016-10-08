@@ -1,7 +1,11 @@
 #pragma once
+
 #include <windows.h>
+
 #include "../../../Core/Application.h"
 
+namespace DX12Samples
+{
 class InitDX : public Application
 {
 public:
@@ -10,6 +14,7 @@ public:
     ~InitDX() override;
     LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
     int Run() override;
+
 protected:
     void CreateRtvAndDsvDescriptorHeaps() override;
     void OnResize() override;
@@ -19,3 +24,4 @@ protected:
     void OnMouseUp(WPARAM btnState, int x, int y) override;
     void OnMouseMove(WPARAM btnState, int x, int y) override;
 };
+}

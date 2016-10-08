@@ -1,5 +1,7 @@
 #include "ShapesFrameResource.h"
 
+namespace DX12Samples
+{
 ShapesFrameResource::ShapesFrameResource(ID3D12Device* device, UINT passCount, UINT objectCount)
 {
     ThrowIfFailed(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(CmdListAlloc.GetAddressOf())));
@@ -10,4 +12,4 @@ ShapesFrameResource::ShapesFrameResource(ID3D12Device* device, UINT passCount, U
 ShapesFrameResource::~ShapesFrameResource()
 { 
 }
-
+}

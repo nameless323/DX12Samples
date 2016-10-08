@@ -1,5 +1,7 @@
 #include "GaussBlurFilter.h"
 
+namespace DX12Samples
+{
 GaussBlurFilter::GaussBlurFilter(ID3D12Device* device, UINT width, UINT height, DXGI_FORMAT format)
 {
     _device = device;
@@ -159,4 +161,5 @@ void GaussBlurFilter::BuildResources()
         nullptr,
         IID_PPV_ARGS(&_blurMap1)
         ));
+}
 }

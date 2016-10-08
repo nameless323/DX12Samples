@@ -1,5 +1,7 @@
 #include "Ch6Ex.h"
 
+namespace DX12Samples
+{
 using namespace DirectX;
 using namespace PackedVector;
 using Microsoft::WRL::ComPtr;
@@ -11,7 +13,6 @@ Ch6Ex::Ch6Ex(HINSTANCE hInstance) : Application(hInstance)
 Ch6Ex::~Ch6Ex()
 {
 }
-
 
 bool Ch6Ex::Init()
 {
@@ -33,7 +34,6 @@ bool Ch6Ex::Init()
     FlushCommandQueue();
     return true;
 }
-
 
 LRESULT Ch6Ex::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -379,7 +379,6 @@ void Ch6Ex::BuildGeometry()
     _geometry->DrawArgs["pyramide"] = pyramideGeometry;
 }
 
-
 void Ch6Ex::BuildPSO()
 {
     D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc;
@@ -409,4 +408,5 @@ void Ch6Ex::BuildPSO()
     psoDesc.DSVFormat = _dsvFormat;
     ThrowIfFailed(_device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&_PSO)));
 
+}
 }

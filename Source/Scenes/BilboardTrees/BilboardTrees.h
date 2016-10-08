@@ -11,6 +11,8 @@
 #include "../Blending/FrameResourceBlending.h"
 #include "../Waves/Waves.h"
 
+namespace DX12Samples
+{
 class BilboardTrees : public Application
 {
 public:
@@ -177,3 +179,4 @@ private:
 
     POINT _lastMousePos;
 };
+}

@@ -12,6 +12,8 @@
 #include "D3DUtil.h"
 #include "GameTimer.h"
 
+namespace DX12Samples
+{
 class Application
 {
 public:
@@ -160,3 +162,4 @@ protected:
     int _clientWidth = 800;
     int _clientHeight = 600;
 };
+}

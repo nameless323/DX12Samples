@@ -1,7 +1,10 @@
 #pragma once
+
 #include "../../Core/D3DUtil.h"
 #include "../../Core/UploadBuffer.h"
 
+namespace DX12Samples
+{
 struct GpuWavesFrameResource
 {
     static const int NumFrameResources = 3;
@@ -17,6 +20,7 @@ struct GpuWavesFrameResource
         DirectX::XMFLOAT3 Normal;
         DirectX::XMFLOAT2 TexC;
     };
+
     struct ObjectConstants
     {
         DirectX::XMFLOAT4X4 Model = MathHelper::Identity4x4();
@@ -25,6 +29,7 @@ struct GpuWavesFrameResource
         float GridSpatialStep = 1.0f;
         float Pad;
     };
+
     struct PassConstants
     {
         DirectX::XMFLOAT4X4 View = MathHelper::Identity4x4();
@@ -64,7 +69,6 @@ struct GpuWavesFrameResource
     std::unique_ptr<UploadBuffer<ObjectConstants>> ObjectCB = nullptr;
 
     UINT64 Fence = 0;
-
 
     static std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> GetStaticSamplers()
     {
@@ -122,3 +126,4 @@ struct GpuWavesFrameResource
         };
     }
 };
+}

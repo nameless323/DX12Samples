@@ -1,7 +1,10 @@
 #pragma once
+
 #include "../../Core/D3DUtil.h"
 #include "../../Core/UploadBuffer.h"
 
+namespace DX12Samples
+{
 struct StencilingFrameResource
 {
     static const int NumFrameResources = 3;
@@ -17,11 +20,13 @@ struct StencilingFrameResource
         DirectX::XMFLOAT3 Normal;
         DirectX::XMFLOAT2 TexC;
     };
+
     struct ObjectConstants
     {
         DirectX::XMFLOAT4X4 Model = MathHelper::Identity4x4();
         DirectX::XMFLOAT4X4 TexTransform = MathHelper::Identity4x4();
     };
+
     struct PassConstants
     {
         DirectX::XMFLOAT4X4 View = MathHelper::Identity4x4();
@@ -66,7 +71,6 @@ struct StencilingFrameResource
     std::unique_ptr<UploadBuffer<Vertex>> WavesVB = nullptr;
 
     UINT64 Fence = 0;
-
 
     static std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> GetStaticSamplers()
     {
@@ -124,3 +128,4 @@ struct StencilingFrameResource
         };
     }
 };
+}

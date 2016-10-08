@@ -2,11 +2,12 @@
 
 #include "../../../Core/Application.h"
 #include "../../../Core/D3DUtil.h"
-
 #include "../../Common/RenderItem.h"
 #include "../Blending/FrameResourceBlending.h"
 #include "../Waves/Waves.h"
 
+namespace DX12Samples
+{
 class OverdrawBlending : public Application
 {
 public:
@@ -18,6 +19,7 @@ public:
     bool Init() override;
     LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
     int Run() override;
+
 protected:
     void OnResize() override;
     void Update(const GameTimer& timer) override;
@@ -50,6 +52,7 @@ protected:
 
     float GetHillsHeight(float x, float z) const;
     DirectX::XMFLOAT3 GetHillsNormal(float x, float z) const;
+
 private:
     std::vector<std::unique_ptr<FrameResourceBlending>> _frameResources;
     FrameResourceBlending* _currFrameResource = nullptr;
@@ -89,3 +92,4 @@ private:
 
     POINT _lastMousePos;
 };
+}

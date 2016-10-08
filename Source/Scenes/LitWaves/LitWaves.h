@@ -1,9 +1,12 @@
 #pragma once
+
 #include "../../../Core/Application.h"
 #include "LitWavesFrameResource.h"
 #include "../Waves/Waves.h"
 #include "../LitColumns/LitColumnsRenderItem.h"
 
+namespace DX12Samples
+{
 class LitWaves : public Application
 {
 public:
@@ -15,6 +18,7 @@ public:
     bool Init() override;
     LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
     int Run() override;
+
 protected:
     void OnResize() override;
     void Update(const GameTimer& timer) override;
@@ -43,6 +47,7 @@ protected:
 
     float GetHillsHeight(float x, float z) const;
     DirectX::XMFLOAT3 GetHillsNormal(float x, float z) const;
+
 private:
     std::vector<std::unique_ptr<LitWavesFrameResource>> _frameResources;
     LitWavesFrameResource* _currFrameResource = nullptr;
@@ -81,4 +86,4 @@ private:
 
     POINT _lastMousePos;
 };
-
+}

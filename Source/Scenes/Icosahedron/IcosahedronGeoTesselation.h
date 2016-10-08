@@ -2,9 +2,10 @@
 
 #include "../../../Core/Application.h"
 #include "../../../Core/D3DUtil.h"
-
 #include "../Crate/CrateRenderItem.h"
 
+namespace DX12Samples
+{
 class IcosahedronGeoTesselation : public Application
 {
 public:
@@ -15,6 +16,7 @@ public:
     ~IcosahedronGeoTesselation() override;
     LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
     int Run() override;
+
 protected:
     void OnResize() override;
     void Update(const GameTimer& timer) override;
@@ -81,4 +83,4 @@ private:
 
     POINT _lastMousePos;
 };
-
+}

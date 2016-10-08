@@ -23,26 +23,44 @@
 #include "DDSTextureLoader.h"
 #include "MathHelper.h"
 
+namespace DX12Samples
+{
 const int gNumFrameResources = 3;
 
+/**
+ * \brief Set name for DirectX object in debug layer.
+ * \param obj Object to name.
+ * \param name New object name.
+ */
 inline void D3DSetDebugName(IDXGIObject* obj, const char* name)
 {
     if (obj != nullptr)
         obj->SetPrivateData(WKPDID_D3DDebugObjectName, lstrlenA(name), name);
 }
-
+/**
+ * \brief Set name for DirectX device in debug layer.
+ * \param obj Device to name.
+ * \param name New object name.
+ */
 inline void D3DSetDebugName(ID3D12Device* obj, const char* name)
 {
     if (obj != nullptr)
         obj->SetPrivateData(WKPDID_D3DDebugObjectName, lstrlenA(name), name);
 }
-
+/**
+ * \brief Set name for DirectX device child in debug layer.
+ * \param obj Object to name.
+ * \param name New object name.
+ */
 inline void D3DSetDebugName(ID3D12DeviceChild* obj, const char* name)
 {
     if (obj != nullptr)
         obj->SetPrivateData(WKPDID_D3DDebugObjectName, lstrlenA(name), name);
 }
 
+/**
+ * \brief Convert string to wstring.
+ */
 inline std::wstring AnsiToWString(const std::string& str)
 {
     WCHAR buffer[512];
@@ -53,21 +71,48 @@ inline std::wstring AnsiToWString(const std::string& str)
 class D3DUtil
 {
 public:
+    /**
+     * \brief Check if key was down this frame.
+     * \param keyCode Code of the key.
+     * \return True if key was down this frame.
+     */
     static bool IsKeyDown(int keyCode);
-    static std::string ToString(HRESULT hr);
+    /**
+     * \brief Get size of constant buffer from byteSize (const buffers must be 255 byte aligned).
+     */
     static UINT CalcConstantBufferByteSize(UINT byteSize)
     {
         return (byteSize + 255) & ~255;
     }
 
+    /**
+     * \brief Load bynary data from file to ID3DBlob.
+     */
     static Microsoft::WRL::ComPtr<ID3DBlob> LoadBinary(const std::wstring& filename);
 
+    /**
+     * \brief Creates default buffer using upload buffer.
+     * \param device Deivce to create buffer.
+     * \param cmdList Command list to write commands.
+     * \param initData Which data should be in buffer.
+     * \param byteSize Buffer size.
+     * \param uploadBuffer Intermidiate upload buffer.
+     * \return 
+     */
     static Microsoft::WRL::ComPtr<ID3D12Resource> CreateDefaultBuffer
         (
             ID3D12Device* device, ID3D12GraphicsCommandList* cmdList,
             const void* initData, UINT64 byteSize,
             Microsoft::WRL::ComPtr<ID3D12Resource>& uploadBuffer
         );
+    /**
+     * \brief Compile shader from file.
+     * \param fileName Name of the file.
+     * \param defines Shader defines.
+     * \param entryPoint Entry point of shader i.e. vert, frag, main etc.
+     * \param target Shader target i.e VS_5_1, PS_5_1 etc.
+     * \return 
+     */
     static Microsoft::WRL::ComPtr<ID3DBlob> CompileShader
         (
             const std::wstring& fileName,
@@ -76,6 +121,9 @@ public:
             const std::string& target
         );
 
+    /**
+     * \brief Get array of static samplers to use with root signature creation.
+     */
     static std::array<const CD3DX12_STATIC_SAMPLER_DESC, 6> GetStaticSamplers();
 };
 
@@ -102,6 +150,7 @@ struct SubmeshGeometry
     DirectX::BoundingBox Bounds;
 };
 
+// Describes single blob of mesh geometry and all possible submeshes for this geometry.
 struct MeshGeometry
 {
     std::string Name;
@@ -123,7 +172,6 @@ struct MeshGeometry
 
     UINT VertexByteStrideSlot2 = 0;
     UINT VertexBufferByteSizeSlot2 = 0;
-
 
     DXGI_FORMAT IndexFormat = DXGI_FORMAT_R16_UINT;
     UINT IndexBufferByteSize = 0;
@@ -221,3 +269,4 @@ struct Texture
 #ifndef ReleaseCom
 #define ReleaseCom(x) { if (x) { x->Release(); x = 0; }}
 #endif
+}

@@ -1,10 +1,14 @@
 #include "GaussBlur.h"
+
 #include "../../Common/RenderItem.h"
 #include "../../../Core/GeometryGenerator.h"
 
+namespace DX12Samples
+{
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace PackedVector;
+
 using Vertex = FrameResource::Vertex;
 using PassConstants = FrameResource::PassConstants;
 using ObjectConstants = FrameResource::ObjectConstants;
@@ -822,4 +826,5 @@ XMFLOAT3 GaussBlur::GetHillsNormal(float x, float z) const
     XMStoreFloat3(&n, unitNormal);
 
     return n;
+}
 }

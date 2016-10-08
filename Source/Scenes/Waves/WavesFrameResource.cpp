@@ -1,5 +1,7 @@
 #include "WavesFrameResource.h"
 
+namespace DX12Samples
+{
 WavesFrameResource::WavesFrameResource(ID3D12Device* device, UINT passCount, UINT objectCount, UINT waveVertCount)
 {
     ThrowIfFailed(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(CmdListAlloc.GetAddressOf())));
@@ -11,4 +13,5 @@ WavesFrameResource::WavesFrameResource(ID3D12Device* device, UINT passCount, UIN
 
 WavesFrameResource::~WavesFrameResource()
 {
+}
 }

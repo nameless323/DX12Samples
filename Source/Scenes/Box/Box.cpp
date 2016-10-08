@@ -1,5 +1,7 @@
 #include "Box.h"
 
+namespace DX12Samples
+{
 using namespace DirectX;
 using namespace PackedVector;
 using Microsoft::WRL::ComPtr;
@@ -288,4 +290,5 @@ void Box::BuildPSO()
     psoDesc.SampleDesc.Quality = _4xMsaa ? (_4xMsaaQuality - 1) : 0;
     psoDesc.DSVFormat = _dsvFormat;
     ThrowIfFailed(_device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&_PSO)));
+}
 }

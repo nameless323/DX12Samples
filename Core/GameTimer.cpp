@@ -1,7 +1,9 @@
-#include <windows.h>
-
 #include "GameTimer.h"
 
+#include <windows.h>
+
+namespace DX12Samples
+{
 GameTimer::GameTimer() : _secondsPerCount(0.0), _dt(-1.0f), _baseTime(0), _pausedTime(0), _stopTime(0), _prevTime(0), _currTime(0), _stopped(false)
 {
     __int64 countsPerSec;
@@ -73,4 +75,5 @@ void GameTimer::Tick()
 
     if (_dt < 0.0)
         _dt = 0.0;
+}
 }
