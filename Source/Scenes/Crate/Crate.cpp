@@ -1,4 +1,5 @@
 #include "Crate.h"
+
 #include "../../../Core/GeometryGenerator.h"
 
 namespace DX12Samples

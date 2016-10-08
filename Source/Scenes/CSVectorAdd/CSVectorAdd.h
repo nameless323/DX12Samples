@@ -49,7 +49,7 @@ protected:
      */
     void BuildRootSignature();
     /**
-     * \brief Load shaders from hlsl files and construct input layouts.
+     * \brief Build scene main root signature.
      */
     void BuildShaderAndInputLayout();
     /**
@@ -68,10 +68,10 @@ private:
 
     Microsoft::WRL::ComPtr<ID3D12Resource> _inputBufferA = nullptr;
     Microsoft::WRL::ComPtr<ID3D12Resource> _inputUploadBufferA = nullptr;
-    
+
     Microsoft::WRL::ComPtr<ID3D12Resource> _inputBufferB = nullptr;
     Microsoft::WRL::ComPtr<ID3D12Resource> _inputUploadBufferB = nullptr;
-    
+
     Microsoft::WRL::ComPtr<ID3D12Resource> _outputBuffer = nullptr;
     Microsoft::WRL::ComPtr<ID3D12Resource> _readBackBuffer = nullptr;
 
