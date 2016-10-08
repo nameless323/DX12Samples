@@ -1,3 +1,7 @@
+//
+// Render item description for instancing.
+//
+
 #pragma once
 
 #include <DirectXMath.h>

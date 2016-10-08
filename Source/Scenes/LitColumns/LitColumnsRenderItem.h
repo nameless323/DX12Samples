@@ -1,3 +1,7 @@
+//
+// Description of single render item.
+//
+
 #pragma once
 
 #include <DirectXMath.h>
