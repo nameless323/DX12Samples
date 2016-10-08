@@ -1,3 +1,7 @@
+//
+// Scene with shadows.
+//
+
 #pragma once
 
 #include "ShadowMap.h"
@@ -15,42 +19,122 @@ public:
     Shadowmapping(HINSTANCE hInstance);
     Shadowmapping(const Shadowmapping& rhs) = delete;
     Shadowmapping& operator=(const Shadowmapping& rhs) = delete;
+    /**
+    * \brief Scene initiallization including texture loading, loading all pipline etc.
+    */
     bool Init() override;
     ~Shadowmapping() override;
     LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
     int Run() override;
 
 protected:
+    /**
+     * \brief Create render target and depth stencil heaps with additional descriptors for shadow casting light.
+     */
     void CreateRtvAndDsvDescriptorHeaps() override;
+    /**
+     * \brief Calls when window are resized to rebuild size dependent resources.
+     */
     void OnResize() override;
+    /**
+     * \brief Update game logic.
+     */
     void Update(const GameTimer& timer) override;
+    /**
+     * \brief Draw scene.
+     */
     void Draw(const GameTimer& timer) override;
-
+    /**
+     * \brief Calls when mouse button down.
+     */
     void OnMouseDown(WPARAM btnState, int x, int y) override;
+    /**
+     * \brief Calls when mouse button up.
+     */
     void OnMouseUp(WPARAM btnState, int x, int y) override;
+    /**
+     * \brief Calls when mouse moves.
+     */
     void OnMouseMove(WPARAM btnState, int x, int y) override;
-
+    /**
+     * \brief Handle keyboard input.
+     */
     void OnKeyboardInput(const GameTimer& timer);
+    /**
+     * \brief Animate materials e.g water.
+     */
     void AnimateMaterials(const GameTimer& timer);
+    /**
+     * \brief Update objects constant buffers for current frame.
+     */
     void UpdateObjectCBs(const GameTimer& timer);
+    /**
+     * \brief Update materials constant buffers for current frame.
+     */
     void UpdateMaterialBuffer(const GameTimer& timer);
+    /**
+     * \brief Update transform of shadow casting light.
+     */
     void UpdateShadowTransform(const GameTimer& timer);
+    /**
+     * \brief Update pass buffer.
+     */
     void UpdateMainPassCB(const GameTimer& timer);
+    /**
+     * \brief Update shadow pass constant buffer.
+     */
     void UpdateShadowPassCB(const GameTimer& timer);
-
+    /**
+     * \brief Load scene texutres from dds.
+     */
     void LoadTextures();
+    /**
+     * \brief Build scene main root signature.
+     */
     void BuildRootSignature();
+    /**
+     * \brief Build nesessary deccriptor heaps for scene.
+     */
     void BuildDescriptorHeaps();
+    /**
+     * \brief Load shaders from hlsl files and construct input layouts.
+     */
     void BuildShaderAndInputLayout();
+    /**
+     * \brief Build level geometry.
+     */
     void BuildShapeGeometry();
+    /**
+     * \brief Build skull geometry.
+     */
     void BuildSkullGeometry();
+    /**
+     * \brief Build pipline state objects.
+     */
     void BuildPSOs();
+    /**
+     * \brief Build nessesary amount for frame resources.
+     */
     void BuildFrameResources();
+    /**
+     * \brief Build materials for scene.
+     */
     void BuildMaterials();
+    /**
+     * \brief Build scene objects.
+     */
     void BuildRenderItems();
+    /**
+     * \brief Draw scene objects.
+     */
     void DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<RenderItem*>& renderItems);
+    /**
+     * \brief Draw scene to shadow map for shadow casting.
+     */
     void DrawSceneToShadowMap();
-
+    /**
+     * \brief Get static samplers array for use in Root Signature creation.
+     */
     std::array<const CD3DX12_STATIC_SAMPLER_DESC, 7> GetStaticSamplers();
 
 private:
@@ -68,8 +152,7 @@ private:
     std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> _PSOs;
 
     std::vector<D3D12_INPUT_ELEMENT_DESC> _inputLayout;
-
-
+    
     std::vector<std::unique_ptr<RenderItem>> _allRenderItems;
     std::vector<RenderItem*> _renderItemLayer[(int)RenderItem::RenderLayer::Count];
 

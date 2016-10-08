@@ -1,3 +1,7 @@
+//
+// Data for render single item.
+//
+
 #pragma once
 
 #include "../../Core/D3DUtil.h"

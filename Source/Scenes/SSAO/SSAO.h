@@ -1,3 +1,7 @@
+//
+// Creates SSAO map for resorce.
+//
+
 #pragma once
 
 #include "SSAOFrameResource.h"
@@ -12,24 +16,51 @@ public:
     SSAO& operator=(const SSAO& rhs) = delete;
     ~SSAO() = default;
 
-    static const DXGI_FORMAT AmbientMapFormat = DXGI_FORMAT_R16_UNORM;
-    static const DXGI_FORMAT NormalMapFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
-
-    static const int MaxBlurRadius = 5;
-
+    /**
+     * \brief Get ssao map texture width.
+     */
     UINT SSAOMapWidth() const;
+    /**
+     * \brief Get ssao map texture height.
+     */
     UINT SSAOMapHeight() const;
-
+    /**
+     * \brief Get 14 offset vectors.
+     */
     void GetOffsetVectors(DirectX::XMFLOAT4 offsets[14]);
+    /**
+     * \brief Calculates gauss weights for sigma.
+     */
     std::vector<float> CalcGaussWeights(float sigma);
-
+    /**
+     * \brief Get normal map resoruce.
+     */
     ID3D12Resource* NormalMap();
+    /**
+     * \brief Get SSAO map resource.
+     */
     ID3D12Resource* AmbientMap();
-
+    /**
+     * \brief Get normal map render target view.
+     */
     CD3DX12_CPU_DESCRIPTOR_HANDLE NormalMapRtv() const;
+    /**
+     * \brief Get normal map shader resource view.
+     */
     CD3DX12_GPU_DESCRIPTOR_HANDLE NormalMapSrv() const;
+    /**
+     * \brief Get SSAO map shader resource view.
+     */
     CD3DX12_GPU_DESCRIPTOR_HANDLE AmbientMapSrv() const;
-
+    /**
+     * \brief Build ssao decriptors.
+     * \param depthStencilBuffer Depth scene resource.
+     * \param hCpuSrv CPU shader resource view in prebuild srv heap.
+     * \param hGpuSrv GPU shader resource view in prebuild srv heap.
+     * \param hCpuRtv CPU render target view in prebuild rtv heap.
+     * \param cbvSrvUavDescriptorSize SBV SRV UAV descriptor size to offset in heap.
+     * \param rtvDescriptorSize RTV descriptor size to offset in rtv heap.
+     */
     void BuildDescriptors(
         ID3D12Resource* depthStencilBuffer,
         CD3DX12_CPU_DESCRIPTOR_HANDLE hCpuSrv,
@@ -38,11 +69,28 @@ public:
         UINT cbvSrvUavDescriptorSize,
         UINT rtvDescriptorSize
         );
-
+    /**
+     * \brief Rebuild descriptors.
+     */
     void RebuildDescriptors(ID3D12Resource* depthStencilBuffer);
+    /**
+     * \brief Set piplene state objects.
+     * \param ssaoPso PSO for ssao.
+     * \param ssaoBlurPso PSO for making blur for SSAO map.
+     */
     void SetPSOs(ID3D12PipelineState* ssaoPso, ID3D12PipelineState* ssaoBlurPso);
+    /**
+    * \brief Calls when window are resized to rebuild size dependent resources.
+    */
     void OnResize(UINT newWidth, UINT newHeight);
+    /**
+     * \brief Compute SSAO map. 
+     */
     void ComputeSSAO(ID3D12GraphicsCommandList* cmdList, D3D12_GPU_VIRTUAL_ADDRESS currFrame, int blurCount);
+
+    static const DXGI_FORMAT AmbientMapFormat = DXGI_FORMAT_R16_UNORM;
+    static const DXGI_FORMAT NormalMapFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
+    static const int MaxBlurRadius = 5;
 
 private:
     void BlurAmbientMap(ID3D12GraphicsCommandList* cmdList, D3D12_GPU_VIRTUAL_ADDRESS currFrame, int blurCount);

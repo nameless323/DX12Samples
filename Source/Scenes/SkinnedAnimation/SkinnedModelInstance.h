@@ -1,3 +1,7 @@
+//
+// Instance data for skinned mesh
+//
+
 #pragma once
 
 #include "SkinnedData.h"

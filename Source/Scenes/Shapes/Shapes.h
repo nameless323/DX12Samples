@@ -1,3 +1,7 @@
+//
+// Scene with simple shapes.
+//
+
 #pragma once
 
 #include "ShapesRenderItem.h"
@@ -11,34 +15,96 @@ class Shapes : public Application
 {
 public:
     Shapes(HINSTANCE hInstance);
+    /**
+     * \brief Scene initiallization including texture loading, loading all pipline etc.
+     */
     bool Init() override;
     ~Shapes() override;
     LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
     int Run() override;
 
 protected:
+    /**
+     * \brief Calls when window are resized to rebuild size dependent resources.
+     */
     void OnResize() override;
+    /**
+     * \brief Update game logic.
+     */
     void Update(const GameTimer& timer) override;
+    /**
+     * \brief Draw scene.
+     */
     void Draw(const GameTimer& timer) override;
-
+    /**
+     * \brief Calls when mouse button down.
+     */
     void OnMouseDown(WPARAM btnState, int x, int y) override;
+    /**
+     * \brief Calls when mouse button up.
+     */
     void OnMouseUp(WPARAM btnState, int x, int y) override;
+    /**
+     * \brief Calls when mouse moves.
+     */
     void OnMouseMove(WPARAM btnState, int x, int y) override;
-
+    /**
+     * \brief Handle keyboard input.
+     */
     void OnKeyboardInput(const GameTimer& timer);
+    /**
+     * \brief Move camera.
+     */
     void UpdateCamera(const GameTimer& timer);
+    /**
+     * \brief Update objects constant buffers for current frame.
+     */
     void UpdateObjectCBs(const GameTimer& timer);
+    /**
+     * \brief Update pass buffer.
+     */
     void UpdateMainPassCB(const GameTimer& timer);
-
+    /**
+     * \brief Build nesessary deccriptor heaps for scene.
+     */
     void BuildDescriptorHeaps();
+    /**
+     * \brief Build constant buffer view whis is nessesary for this scene.
+     */
     void BuildConstantBufferViews();
+    /**
+     * \brief Build scene main root signature.
+     */
     void BuildRootSignature();
+    /**
+     * \brief Load shaders from hlsl files and construct input layouts.
+     */
     void BuildShaderAndInputLayout();
+    /**
+     * \brief Build geometry for scene.
+     */
     void BuildShapeGeometry();
+    /**
+     * \brief Build pipline state objects.
+     */
     void BuildPSOs();
+    /**
+     * \brief Build nessesary amount for frame resources.
+     */
     void BuildFrameResources();
+    /**
+     * \brief Build scene objects.
+     */
     void BuildRenderItems();
+    /**
+     * \brief Draw scene objects.
+     */
     void DrawRenderItems(ID3D12GraphicsCommandList* cmdList, const std::vector<ShapesRenderItem*>& renderItems);
+    /**
+     * \brief Parsefile to mesh data.
+     * \param filename File name to parse.
+     * \return 
+     */
     GeometryGenerator::MeshData ParseFile(std::string filename) const;
 
 private:

@@ -1,3 +1,7 @@
+//
+// Describes data which has to be set at each frame to GPU.
+//
+
 #pragma once
 
 #include "../../Core/D3DUtil.h"

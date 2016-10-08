@@ -1,3 +1,7 @@
+//
+// Simple vertex animation scene.
+//
+
 #pragma once
 
 #include <windows.h>
@@ -31,26 +35,64 @@ public:
         DirectX::XMFLOAT4X4 MVP = MathHelper::Identity4x4();
     };
 
-
     Ch6Ex(HINSTANCE hInstance);
+    /**
+     * \brief Scene initiallization including texture loading, loading all pipline etc.
+     */
     bool Init() override;
     ~Ch6Ex() override;
     LRESULT MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) override;
     int Run() override;
 protected:
+    /**
+     * \brief Calls when window are resized to rebuild size dependent resources.
+     */
     void OnResize() override;
+    /**
+     * \brief Update game logic.
+     */
     void Update(const GameTimer& timer) override;
+    /**
+     * \brief Draw scene.
+     */
     void Draw(const GameTimer& timer) override;
-
+    /**
+     * \brief Calls when mouse button down.
+     */
     void OnMouseDown(WPARAM btnState, int x, int y) override;
+    /**
+     * \brief Calls when mouse button up.
+     */
     void OnMouseUp(WPARAM btnState, int x, int y) override;
+    /**
+     * \brief Calls when mouse moves.
+     */
     void OnMouseMove(WPARAM btnState, int x, int y) override;
+
 private:
+    /**
+     * \brief Build nessesary descriptor heaps.
+     */
     void BuildDescriptorHeaps();
+    /**
+     * \brief Build scene constant buffers.
+     */
     void BuildConstantBuffers();
+    /**
+     * \brief Build scene main root signature.
+     */
     void BuildRootSignature();
+    /**
+     * \brief Load shaders from hlsl files and construct input layouts.
+     */
     void BuildShadersAndInputLayout();
+    /**
+     * \brief Build scene geometry.
+     */
     void BuildGeometry();
+    /**
+     * \brief Build pipline state objects.
+     */
     void BuildPSO();
 
     Microsoft::WRL::ComPtr<ID3D12RootSignature> _rootSignature = nullptr;

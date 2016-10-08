@@ -1,3 +1,7 @@
+//
+// Data for skinned animations.
+//
+
 #pragma once
 
 #include "../../Core/D3DUtil.h"
