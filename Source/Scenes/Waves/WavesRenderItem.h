@@ -1,3 +1,6 @@
+//
+// Scene single item for rendering.
+//
 #pragma once
 
 #include <DirectXMath.h>
